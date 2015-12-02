@@ -6,34 +6,25 @@
 
 <body ng-app="lunchedIn" ng-controller="UserDisplay" ng-cloak>
 	  
-	  <md-sidenav flex layout="column" class="md-sidenav" md-is-locked-open=$mdMedia('min-width: 300px')>
-	      <md-button class="md-accent">Button 1</md-button> <br>
-	      <md-button class="md-accent">Button 2</md-button>
-	  </md-sidenav>
+    <md-toolbar class="md-theme-indigo" layout="row" flex>
+       			<h1 class="md-toolbar-tools">LunchedIn</h1>
+  	</md-toolbar>
 
-
-        <div ng-repeat="user in users | orderBy: '-level' ">
-			<div flex="50" layout="column">
-			     <md-card>
-			        <md-card-title>
-			          <md-card-title-text>
-			            <span class="md-headline">{{user.name}}</span>
-			            <span class="md-subhead">{{user.title}}</span>
-			          </md-card-title-text>
-			          <md-card-title-media>
-			            <div class="md-media-sm card-media"></div>
-			          </md-card-title-media>
-			        </md-card-title>
-			        <md-card-actions layout="row" layout-align="end center">
-			          <md-button>Action 1</md-button>
-			          <md-button>Action 2</md-button>
-			        </md-card-actions>
-			        <md-card-footer>
-						   {{user.phone}}
-					</md-card-footer>
-			      </md-card>
-			 </div>	
-		</div>
+	<h1>User List</h1>
+	  <div class='md-padding' layout="row" layout-wrap>
+	        <md-card style="width: 300px;" ng-repeat="user in users | orderBy: '-level' ">
+	          <img src="http://placehold.it/150x150" class="md-card-image" alt="user avatar">
+	          <md-card-content>
+	            <h2>{{user.name}}</h2>
+	            <p>{{user.designation}}</p>
+	             <md-card-footer> {{user.phone}} </md-card-footer>
+	          </md-card-content>
+	          <div class="md-actions" layout="row" layout-align="end center">
+	            <md-button>Save</md-button>
+	            <md-button>Later</md-button>
+	          </div>
+	        </md-card>
+	   </div>
 
 		<div>
 		    	<form ng-submit="addUser()">

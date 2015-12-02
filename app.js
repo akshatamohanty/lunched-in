@@ -1,15 +1,15 @@
-var app = angular.module('lunchedIn', []);
+var app = angular.module('lunchedIn', ['ngMaterial']);
 
 app.controller('UserDisplay', [
 	'$scope',
 	function( $scope ){
 
 		$scope.users = [
-			{	name:'Akshata',
+			{	name:'user1',
 				title: 'Senior Designer',
 				level: 3,
 				phone: 90154732 },
-			{	name:'Rajiv',
+			{	name:'user2',
 				title: 'Business Associate',
 				level: 1,
 				phone: 7588739188 }
