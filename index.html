@@ -12,15 +12,15 @@
 
 	<h1>User List</h1>
 	  <div class='md-padding' layout="row" layout-wrap>
-	        <md-card style="width: 300px;" ng-repeat="user in users | orderBy: '-level' ">
+	        <md-card style="width: 200px;" ng-repeat="user in users | orderBy: '-level' ">
 	          <img src="http://placehold.it/150x150" class="md-card-image" alt="user avatar">
 	          <md-card-content>
 	            <h2>{{user.name}}</h2>
-	            <p>{{user.designation}}</p>
+	            <p>{{user.title}}</p>
 	             <md-card-footer> {{user.phone}} </md-card-footer>
 	          </md-card-content>
 	          <div class="md-actions" layout="row" layout-align="end center">
-	            <md-button>Save</md-button>
+	            <md-button>Ok</md-button>
 	            <md-button>Later</md-button>
 	          </div>
 	        </md-card>
