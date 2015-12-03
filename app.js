@@ -8,7 +8,7 @@ app.controller('UserDisplay', [
 			{	name:'user1',
 				title: 'Senior Designer',
 				level: 3,
-				phone: 90154732 },
+				phone: 123414 },
 			{	name:'user2',
 				title: 'Business Associate',
 				level: 1,
