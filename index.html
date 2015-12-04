@@ -2,6 +2,7 @@
 
 <head>
   <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.11.2/angular-material.min.css">
+  <link rel="stylesheet" href="assets/css/pref.css">
 </head>
 
 <body ng-app="lunchedIn" ng-controller="UserDisplay" ng-cloak>
@@ -10,36 +11,80 @@
        			<h1 class="md-toolbar-tools">LunchedIn.</h1>
   	</md-toolbar>
 
-  	<md-tabs>
-  		<md-tab label="LunchMates"></md-tab>
-  		<md-tab label="Preferences"></md-tab>
+  	<md-tabs md-selected=3 md-swipe-content=true md-dynamic-height=true>
+  		<md-tab label="LunchMates">
+  			<md-content class="md-padding">
+			  <div class='md-padding' layout="row" layout-wrap flex>
+			        <md-card style="width: 200px;" ng-repeat="user in users | orderBy: '-level' ">
+			          <img src="http://placehold.it/150x150" class="md-card-image" alt="user avatar">
+			          <md-card-content>
+			            <h4>{{user.name}}</h4>
+			            <p>{{user.title}}</p>
+			             <md-card-footer> {{user.phone}} </md-card-footer>
+			          </md-card-content>
+			          <div class="md-actions" layout="row" layout-align="end center">
+			            <md-button>Ok</md-button>
+			            <md-button>Later</md-button>
+			          </div>
+			        </md-card>
+			   </div>
+
+				<div>
+				    	<form ng-submit="addUser()">
+						  <input type="text" ng-model="name"> Name </input> <br>
+						  <input type="text" ng-model="title"> Title </input> <br>
+						  <input type="text" ng-model="level"> Level </input> <br>
+						  <input type="text" ng-model="phone"> Phone </input> <br>
+						  <md-button class="md-raised">Add User!</md-button>
+						</form>
+				</div>
+			</md-content>
+  		</md-tab>
+
+  		<md-tab label="Preferences">
+
+  		<div ng-controller="preferenceFormCtrl as ctrl">
+		  <form novalidate>
+		    <md-chips ng-model="selectedCuisines" md-autocomplete-snap
+		              md-transform-chip="transformChip($chip)"
+		              md-require-match=true>
+		      <md-autocomplete md-selected-item="selectedItem"
+		          md-search-text="searchText" md-items="item in querySearch(searchText)" md-item-text="item.name"
+		          placeholder="Search for a cuisine">
+		        <span md-highlight-text="searchText">{{item.name}} </span>
+		      </md-autocomplete>
+		      <md-chip-template>
+		        <span>
+		          <strong>{{$chip.name}}</strong>
+		          <em>({{$chip.resCount}})</em>
+		        </span>
+		      </md-chip-template>
+		    </md-chips>
+		    <br />
+		    <h2 class="md-title">Cuisine Options</h2>
+				<md-list>
+				      <md-list-item class="md-2-line cuisine" ng-repeat="cuisine in cuisines" layout="column"
+				          layout-wrap>
+				        <div class="md-item-text md-whiteframe-z1" flex>
+				          {{cuisine.name}} || {{cuisine.resCount}} restaurants
+				        </div>
+				      </md-list-item>
+				    </md-list>
+		  </md-content>
+		</div>
+
+		  </form>
+		</div>
+		    <br><br>
+		    <button ng-click="save()">SAVE</button>
+
+  		</md-tab>
+
+
   		<md-tab label="Matches"></md-tab>
   	</md-tabs>
 
-	  <div class='md-padding' layout="row" layout-wrap>
-	        <md-card style="width: 200px;" ng-repeat="user in users | orderBy: '-level' ">
-	          <img src="http://placehold.it/150x150" class="md-card-image" alt="user avatar">
-	          <md-card-content>
-	            <h2>{{user.name}}</h2>
-	            <p>{{user.title}}</p>
-	             <md-card-footer> {{user.phone}} </md-card-footer>
-	          </md-card-content>
-	          <div class="md-actions" layout="row" layout-align="end center">
-	            <md-button>Ok</md-button>
-	            <md-button>Later</md-button>
-	          </div>
-	        </md-card>
-	   </div>
 
-		<div>
-		    	<form ng-submit="addUser()">
-				  <input type="text" ng-model="name"> Name </input> <br>
-				  <input type="text" ng-model="title"> Title </input> <br>
-				  <input type="text" ng-model="level"> Level </input> <br>
-				  <input type="text" ng-model="phone"> Phone </input> <br>
-				  <md-button class="md-raised">Add User!</md-button>
-				</form>
-		</div>
 
     <!-- Angular Material Dependencies -->
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
