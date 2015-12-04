@@ -10,7 +10,12 @@
        			<h1 class="md-toolbar-tools">LunchedIn.</h1>
   	</md-toolbar>
 
-	<h1>User List</h1>
+  	<md-tabs>
+  		<md-tab label="LunchMates"></md-tab>
+  		<md-tab label="Preferences"></md-tab>
+  		<md-tab label="Matches"></md-tab>
+  	</md-tabs>
+
 	  <div class='md-padding' layout="row" layout-wrap>
 	        <md-card style="width: 200px;" ng-repeat="user in users | orderBy: '-level' ">
 	          <img src="http://placehold.it/150x150" class="md-card-image" alt="user avatar">
