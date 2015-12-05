@@ -1,0 +1,25 @@
+<!--Mates-->
+<div class='md-padding' layout="row" layout-wrap flex>
+<md-card style="width: 200px;" ng-repeat="user in users | orderBy: '-level' ">
+  <img src="http://placehold.it/150x150" class="md-card-image" alt="user avatar">
+  <md-card-content>
+    <h4>{{user.name}}</h4>
+    <p>{{user.title}}</p>
+     <md-card-footer> {{user.phone}} </md-card-footer>
+  </md-card-content>
+  <div class="md-actions" layout="row" layout-align="end center">
+    <md-button>Ok</md-button>
+    <md-button>Later</md-button>
+  </div>
+</md-card>
+</div>
+
+<div>
+	<form ng-submit="addUser()">
+	  <input type="text" ng-model="name"> Name </input> <br>
+	  <input type="text" ng-model="title"> Title </input> <br>
+	  <input type="text" ng-model="level"> Level </input> <br>
+	  <input type="text" ng-model="phone"> Phone </input> <br>
+	  <md-button class="md-raised">Add User!</md-button>
+	</form>
+</div>

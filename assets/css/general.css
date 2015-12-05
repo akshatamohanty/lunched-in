@@ -1,7 +1,16 @@
+div.background {
+    background: url("../images/background/officelunch.jpg");
+    opacity: 0.4;
+}
+
+.section{
+	height:100%;
+}
 .contentArea{
 	clear:both;
     left:15%;
     position:absolute;
     width:70%;
+    height:900px;
     box-shadow: 0 0 3px #ccc;
 }

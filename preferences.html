@@ -1,0 +1,27 @@
+<div ng-controller="preferenceFormCtrl as ctrl">
+    <md-chips ng-model="selectedCuisines" md-autocomplete-snap
+              md-transform-chip="transformChip($chip)"
+              md-require-match=true>
+      <md-autocomplete md-selected-item="selectedItem"
+          md-search-text="searchText" md-items="item in querySearch(searchText)" md-item-text="item.name"
+          placeholder="Search for a cuisine">
+        <span md-highlight-text="searchText">{{item.name}} </span>
+      </md-autocomplete>
+      <md-chip-template>
+        <span>
+          <strong>{{$chip.name}}</strong>
+          <em>({{$chip.resCount}})</em>
+        </span>
+      </md-chip-template>
+    </md-chips>
+    <br />
+    <h2 class="md-title">Cuisine Options</h2>
+	<md-list>
+	      <md-list-item class="md-2-line cuisine" ng-repeat="cuisine in cuisines" layout="column"
+	          layout-wrap>
+	        <div class="md-item-text md-whiteframe-z1" flex>
+	          {{cuisine.name}} || {{cuisine.resCount}} restaurants
+	        </div>
+	      </md-list-item>
+	</md-list>
+</div>
