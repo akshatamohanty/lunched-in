@@ -1,0 +1,25 @@
+<!--Mates-->
+<div class='md-padding' layout="row" layout-wrap flex>
+<md-button ng-repeat="user in users | orderBy: '-level' " ng-class="{true: 'btn-primary', false: 'btn-danger'}[!user.enabled]" ng-click="user.enabled = !user.enabled"> <!--{{!user.enabled && 'Archive' || 'Unarchive'}}> -->
+  <md-card flex="100" style:"width:200px;">
+    <md-card-title>
+      <md-card-title-text>
+        <span class="md-headline">{{user.name}}</span><br>
+        <span class="md-subhead">{{user.title}}</span>
+      </md-card-title-text>
+    </md-card-title>
+    {{user.enabled}}
+  </md-card>
+</md-button>
+</div>
+
+<!-- testing code 
+<div>
+	<form ng-submit="addUser()">
+	  <input type="text" ng-model="name"> Name </input> <br>
+	  <input type="text" ng-model="title"> Title </input> <br>
+	  <input type="text" ng-model="level"> Level </input> <br>
+	  <input type="text" ng-model="phone"> Phone </input> <br>
+	  <md-button class="md-raised">Add User!</md-button>
+	</form>
+</div> -->

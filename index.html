@@ -5,35 +5,26 @@
 
   <link rel="stylesheet" href="assets/css/pref.css">
   <link rel="stylesheet" href="assets/css/general.css">
-  <link rel="stylesheet" href="assets/css/jquery.fullPage.css">
 
 </head>
 
 
-<body ng-app="lunchedIn" ng-controller="UserDisplay" ng-cloak>
+<body ng-app="lunchedIn" ng-cloak>
 	  
     <md-toolbar class="md-theme-indigo" layout="row" flex>
        	<h1 class="md-toolbar-tools">LunchedIn.</h1>
+        <a href="#mates"> Mates </a>
+        <a href="#preferences"> Pref </a>
+        <a href="#matches"> Matches </a>
   	</md-toolbar>
 
-  	<div id = 'fullpage' class='background'>
-  		<div class='section'> This is the content area.
-		</div>
-		
-		<div class='section'> This is the content area 2.
-		</div>
-		
-		<div class='section'> This is the content area3.
-		</div>
-		 
-		 <div class='section'> This is the content area4.
-		</div>
-	</div>
+    <div ng-view>
 
-
+    </div>
 
     <!-- Angular Material Dependencies -->
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-route.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-animate.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-aria.min.js"></script>
 
@@ -43,7 +34,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 
  	<script src="app.js"></script>
- 	<script src="assets/js/jquery.fullPage.min.js">
 </body>
 
 </html>

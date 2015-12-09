@@ -1,20 +1,48 @@
 var app = angular
-      .module('lunchedIn', ['ngMaterial'])
+      .module('lunchedIn', ['ngMaterial', 'ngRoute'])
+
+app.config(['$routeProvider', function($routeProvider) {
+   $routeProvider.
+   
+   when('/mates', {
+      templateUrl: 'templates/mates.html', controller: 'UserDisplay'
+   }).
+   
+   when('/preferences', {
+      templateUrl: 'templates/preferences.html', controller: 'preferenceFormCtrl'
+   }).
+
+   when('/matches', {
+      templateUrl: 'templates/matches.html', controller: 'preferenceFormCtrl'
+   }).
+   
+   otherwise({
+      redirectTo: '/addStudent'
+   });
+	
+}]);
+
 
 app.controller('UserDisplay', [
 	'$scope',
 	function( $scope ){
-
+		$scope.message = "This page will be used to display users";
 		$scope.users = [
 			{	name:'user1',
 				title: 'Senior Designer',
 				level: 3,
-				phone: 123414 },
+				phone: 123414,
+				enabled: false },
 			{	name:'user2',
 				title: 'Business Associate',
 				level: 1,
-				phone: 7588739188 }
+				phone: 7588739188,
+				enabled: false }
 		];
+
+		$scope.toggle = function(){
+			//$scope.enabled = !$scope.enabled;
+		}
 
 		$scope.addUser = function(){
 			if(!$scope.name || $scope.name === '') { return; }
@@ -40,7 +68,7 @@ app.controller('UserDisplay', [
 app.controller('preferenceFormCtrl', [
 			'$scope',
 			function( $scope ){
-				
+				$scope.message = "This page will be used to display add preferences";
 				// cuisine preference
 
 			    $scope.selectedItem = null;
@@ -109,3 +137,5 @@ app.controller('preferenceFormCtrl', [
 
   			}
 ]);
+
+
