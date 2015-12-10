@@ -3,6 +3,24 @@ div.background {
     opacity: 0.4;
 }
 
+.md-toolbar{
+    min-height: 10px;
+    height: 40px;
+    font-size: 10px;
+}
+
+.md-toolbar-tools{
+    font-size: 14px;
+    font-weight: 1;
+    letter-spacing: 0.215em;
+    height: 110%;
+}
+
+.mainIconBtn{
+    min-width: 30px;
+    width: 45px;
+}
+
 .contentArea{
 	clear:both;
     left:15%;
@@ -20,8 +38,8 @@ div.background {
 }
 
 .btn-danger {
-    opacity: 0.2;
+    opacity: 0.5;
     filter: alpha(opacity=40); /* msie */
     background-color: #000;
-    z-index: 2
+    z-index: 4
 }

@@ -1,5 +1,22 @@
+		//pseudo database
+		function random_character() {
+		    var chars = "0123456789abcdefghijklmnopqurstuvwxyzABCDEFGHIJKLMNOPQURSTUVWXYZ";
+		    return chars.substr( Math.floor(Math.random() * 62), 1);
+		}
+		var userDB = [];
+		for(var i=0; i<150; i++){
+			var user = {
+				'name': random_character()+"_userID_"+i,
+				'title': "Title",
+				'phone': "902xx"+i,
+				'tagline': "Tagline for userID"+ i,
+				'enabled': true
+			}
+			userDB.push(user);
+		}
+
 var app = angular
-      .module('lunchedIn', ['ngMaterial', 'ngRoute'])
+      .module('lunchedIn', ['ngMaterial', 'ngRoute', 'ngMdIcons'])
 
 app.config(['$routeProvider', function($routeProvider) {
    $routeProvider.
@@ -26,19 +43,9 @@ app.config(['$routeProvider', function($routeProvider) {
 app.controller('UserDisplay', [
 	'$scope',
 	function( $scope ){
+
 		$scope.message = "This page will be used to display users";
-		$scope.users = [
-			{	name:'user1',
-				title: 'Senior Designer',
-				level: 3,
-				phone: 123414,
-				enabled: false },
-			{	name:'user2',
-				title: 'Business Associate',
-				level: 1,
-				phone: 7588739188,
-				enabled: false }
-		];
+		$scope.users = userDB;
 
 		$scope.toggle = function(){
 			//$scope.enabled = !$scope.enabled;

@@ -11,14 +11,15 @@
 
 <body ng-app="lunchedIn" ng-cloak>
 	  
-    <md-toolbar class="md-theme-indigo" layout="row" flex>
-       	<h1 class="md-toolbar-tools">LunchedIn.</h1>
-        <a href="#mates"> Mates </a>
-        <a href="#preferences"> Pref </a>
-        <a href="#matches"> Matches </a>
+    <!--https://klarsys.github.io/angular-material-icons/-->
+    <md-toolbar class="md-toolbar" layout="row" flex>
+       	<h1 class="md-toolbar-tools">LUNCHEDIN.</h1>
+        <md-button href="#mates" class='mainIconBtn'> <ng-md-icon icon="favorite" style="fill: white" size="24"></ng-md-icon>  </md-button>
+        <md-button href="#preferences" class='mainIconBtn'> <ng-md-icon icon="account_box" style="fill: white" size="24"></ng-md-icon>  </md-button>
+        <md-button href="#matches" class='mainIconBtn'> <ng-md-icon icon="home" style="fill: white" size="24"></ng-md-icon>  </md-button>
   	</md-toolbar>
 
-    <div ng-view>
+    <div class='contentArea' ng-view>
 
     </div>
 
@@ -31,6 +32,7 @@
 
     <!-- Angular Material Javascript now available via Google CDN; version 0.11.2 used here -->
     <script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.11.2/angular-material.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular-material-icons/0.6.0/angular-material-icons.min.js"></script> 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 
  	<script src="app.js"></script>

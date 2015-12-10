@@ -1,16 +1,16 @@
 <!--Mates-->
 <div class='md-padding' layout="row" layout-wrap flex>
-<md-button ng-repeat="user in users | orderBy: '-level' " ng-class="{true: 'btn-primary', false: 'btn-danger'}[!user.enabled]" ng-click="user.enabled = !user.enabled"> <!--{{!user.enabled && 'Archive' || 'Unarchive'}}> -->
-  <md-card flex="100" style:"width:200px;">
-    <md-card-title>
-      <md-card-title-text>
-        <span class="md-headline">{{user.name}}</span><br>
-        <span class="md-subhead">{{user.title}}</span>
-      </md-card-title-text>
-    </md-card-title>
-    {{user.enabled}}
-  </md-card>
-</md-button>
+  <md-button ng-repeat="user in users | orderBy: '-level' " ng-class="{true: 'btn-primary', false: 'btn-danger'}[!user.enabled]" ng-click="user.enabled = !user.enabled"> <!--{{!user.enabled && 'Archive' || 'Unarchive'}}> -->
+    <md-card class='contactCards'>
+      <md-card-title>
+        <md-card-title-text>
+          <span class="md-headline">{{user.name}}</span><br>
+          <span class="md-subhead">{{user.title}}</span>
+        </md-card-title-text>
+      </md-card-title>
+      {{user.enabled}}
+    </md-card>
+  </md-button>
 </div>
 
 <!-- testing code 
