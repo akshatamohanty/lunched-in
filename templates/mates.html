@@ -5,27 +5,42 @@
       <md-autocomplete md-selected-item="selectedUser"
           md-search-text="searchText" md-items="item in querySearch(searchText)" md-item-text="item.name"
           placeholder="Search for a user">
-        <span md-highlight-text="searchText">{{user.name}} </span>
+        <span md-highlight-text="searchText">{{user.name}}</span>
       </md-autocomplete>
       <md-chip-template>{{$chip.name}}</md-chip-template>
 </md-chips>
 
- <md-tabs md-selected="selectedIndex" md-border-bottom md-autoselect>
-      <md-tab ng-repeat="tab in tabs">
-    <div class='md-padding' layout="row" layout-wrap flex>
-      <md-card class='contactCards' ng-repeat="user in querySearch(tablabel) | orderBy: '-level' ">
-          <md-card-title>
-            <md-card-title-text>
-              <span class="md-headline">{{user.name}}</span><br>
-              <span class="md-subhead">{{user.title}}</span>
-              <h6 class="transition"><i>"{{user.tagline}}"</i></h6>
-            </md-card-title-text>
-          </md-card-title>
-          <md-button ng-click="user.enabled = !user.enabled" aria-label="Click to add or remove">
-             <ng-md-icon ng-attr-icon="{{user.enabled ? 'block' : 'add_circle'}}" style="fill: {{user.enabled ? 'red' : 'green'}}" size="24"></ng-md-icon>
-          </md-button>
-      </md-card>
-    </div>
+ <md-tabs md-selected="selectedIndex" md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink>
+    <md-tab ng-repeat="tab in tabs"
+              label="{{tab.title}}"> 
+            <div class='md-padding' layout="row" layout-wrap flex>
+              <md-card ng-repeat="user in (selectedUsers.length ? selectedUsers : querySearch(tab.title, true)) | orderBy: '-level' ">
+                  <div class='contactCards' classlayout='column'>
+                    <div class='contactCards' id='username'>
+                        {{user.name}}
+
+                        <br>
+                        <i class='contactCards' id='usertitle'>{{user.title}}<i>
+
+                    </div> 
+                    <br>
+                    <div class='contactCards' id='userpicture'>
+                        <ng-md-icon ng-attr-icon='perm_identity' size="100"></ng-md-icon>
+                    </div>
+                    <div class='contactCards' id='usertagline'>
+                      "{{user.tagline}}"
+                    </div>
+
+                      <div class='contactCards' id='btn-user-sel-placeholder'>
+                            <md-button class='contactCards' id='btn-user-sel' ng-click="user.enabled = !user.enabled" aria-label="Click to add or remove" layout='column'>
+                             <ng-md-icon ng-attr-icon="{{user.enabled ? 'block' : 'add_circle'}}" style="fill: {{user.enabled ? 'red' : 'green'}}" size="24"></ng-md-icon>
+                             </md-button>
+                      </div>
+
+                  </div>
+              </md-card>
+            </div> 
+    </md-tab>
 </md-tabs>
 
 

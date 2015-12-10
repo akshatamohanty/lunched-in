@@ -34,3 +34,35 @@ div.background {
     font-size: 12px;
 }
 
+.contactCards{
+    width: 150px;
+    text-align: center;
+}
+
+.contactCards   #username{
+        font-size: 14px;
+        text-align: left;
+        background-color: #E4D1D1;
+        z-index: 4;
+        height: 50px;
+}
+
+.contactCards    #usertitle{
+        font-size: 12px
+}
+
+.contactCards    #userpicture{
+        font-size: 12px
+        height: 40%;
+}
+
+.contactCards   #usertagline{
+       font-size: 12px
+}
+
+.contactCards  #btn-user-sel-placeholder{
+    min-height: 10px;
+    height: 40px;
+    width: 40px;
+}
+

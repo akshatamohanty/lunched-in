@@ -43,10 +43,21 @@ app.config(['$routeProvider', function($routeProvider) {
 app.controller('UserDisplay', [
 	'$scope',
 	function( $scope ){
-		$scope.chars = "ABCDEFGHIJKLMNOPQURSTUVWXYZ";
+		
+		var chars = "ABCDEFGHIJKLMNOPQURSTUVWXYZ";
+		var tabs = [];
+		for(var c=0; c<26; c++){
+			var t = {};
+			t.title = chars[c];
+			tabs.push(t);
+		}
+		$scope.tabs = tabs;
+    	$scope.selectedIndex = 0;
+
 		$scope.message = "This page will be used to display users";
 		$scope.users = userDB.map(function (c) {
 	        				c._lowername = c.name.toLowerCase();
+	        				c._title = c.title.toLowerCase();
 	        				return c;
 	      				});
 
@@ -68,17 +79,20 @@ app.controller('UserDisplay', [
 	    /**
 	     * Search for cuisines.
 	     */
-	    function querySearch (query) {
-	      var results = query ? $scope.users.filter(createFilterFor(query)) : [];
+	    function querySearch (query, exact) {
+	      var results = query ? $scope.users.filter(createFilterFor(query, exact)) : [];
 	      return results;
 	    }
 	    /**
 	     * Create filter function for a query string
 	     */
-	    function createFilterFor(query) {
+	    function createFilterFor(query, exact) {
 	      var lowercaseQuery = angular.lowercase(query);
 	      return function filterFn(user) {
-			        return (user._lowername.indexOf(lowercaseQuery) === 0)
+	      			if(exact)
+	      				return (user._lowername.indexOf(lowercaseQuery) === 0)
+	      			else
+			        	return (user._lowername.indexOf(lowercaseQuery) > -1 || user._lowername.indexOf(lowercaseQuery) > -1)
 			     };
 	    }
 
