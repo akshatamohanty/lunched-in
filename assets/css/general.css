@@ -30,16 +30,7 @@ div.background {
     box-shadow: 0 0 3px #ccc;
 }
 
-.carddemoBasicUsage .card-media {
-  background-color: #999999; }
-
-.btn-primary {
-
+.md-chip-template{
+    font-size: 12px;
 }
 
-.btn-danger {
-    opacity: 0.5;
-    filter: alpha(opacity=40); /* msie */
-    background-color: #000;
-    z-index: 4
-}

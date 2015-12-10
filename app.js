@@ -1,6 +1,6 @@
 		//pseudo database
 		function random_character() {
-		    var chars = "0123456789abcdefghijklmnopqurstuvwxyzABCDEFGHIJKLMNOPQURSTUVWXYZ";
+		    var chars = "ABCDEFGHIJKLMNOPQURSTUVWXYZ";
 		    return chars.substr( Math.floor(Math.random() * 62), 1);
 		}
 		var userDB = [];
@@ -34,7 +34,7 @@ app.config(['$routeProvider', function($routeProvider) {
    }).
    
    otherwise({
-      redirectTo: '/addStudent'
+      redirectTo: '/matches'
    });
 	
 }]);
@@ -43,34 +43,48 @@ app.config(['$routeProvider', function($routeProvider) {
 app.controller('UserDisplay', [
 	'$scope',
 	function( $scope ){
-
+		$scope.chars = "ABCDEFGHIJKLMNOPQURSTUVWXYZ";
 		$scope.message = "This page will be used to display users";
-		$scope.users = userDB;
+		$scope.users = userDB.map(function (c) {
+	        				c._lowername = c.name.toLowerCase();
+	        				return c;
+	      				});
 
-		$scope.toggle = function(){
-			//$scope.enabled = !$scope.enabled;
-		}
-
-		$scope.addUser = function(){
-			if(!$scope.name || $scope.name === '') { return; }
-			
-			$scope.users.push(
-				{	
-					name: $scope.name,
-					title: $scope.title, 
-					level: $scope.level,
-					phone: $scope.phone
-				});
-  			
-  			$scope.name = '';
-  			$scope.title = '';
-  			$scope.level = '';
-  			$scope.phone = '';
-		};
+		$scope.selectedItem = null;
+		$scope.searchText = null;
+		$scope.querySearch = querySearch;
+		$scope.selectedUsers = [];
+		$scope.transformChip = transformChip;
+    
+	    /**
+	     * Return the proper object when the append is called.
+	     */
+	    function transformChip(chip) {
+	      // If it is an object, it's already a known chip
+	      if (angular.isObject(chip)) {
+	        return chip;
+	      }
+	    }
+	    /**
+	     * Search for cuisines.
+	     */
+	    function querySearch (query) {
+	      var results = query ? $scope.users.filter(createFilterFor(query)) : [];
+	      return results;
+	    }
+	    /**
+	     * Create filter function for a query string
+	     */
+	    function createFilterFor(query) {
+	      var lowercaseQuery = angular.lowercase(query);
+	      return function filterFn(user) {
+			        return (user._lowername.indexOf(lowercaseQuery) === 0)
+			     };
+	    }
 
 	}
 
-]);
+])
 
 app.controller('preferenceFormCtrl', [
 			'$scope',

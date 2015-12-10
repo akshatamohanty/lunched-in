@@ -1,17 +1,33 @@
 <!--Mates-->
-<div class='md-padding' layout="row" layout-wrap flex>
-  <md-button ng-repeat="user in users | orderBy: '-level' " ng-class="{true: 'btn-primary', false: 'btn-danger'}[!user.enabled]" ng-click="user.enabled = !user.enabled"> <!--{{!user.enabled && 'Archive' || 'Unarchive'}}> -->
-    <md-card class='contactCards'>
-      <md-card-title>
-        <md-card-title-text>
-          <span class="md-headline">{{user.name}}</span><br>
-          <span class="md-subhead">{{user.title}}</span>
-        </md-card-title-text>
-      </md-card-title>
-      {{user.enabled}}
-    </md-card>
-  </md-button>
-</div>
+<md-chips ng-model="selectedUsers" md-autocomplete-snap
+              md-transform-chip="transformChip($chip)"
+              md-require-match=true>
+      <md-autocomplete md-selected-item="selectedUser"
+          md-search-text="searchText" md-items="item in querySearch(searchText)" md-item-text="item.name"
+          placeholder="Search for a user">
+        <span md-highlight-text="searchText">{{user.name}} </span>
+      </md-autocomplete>
+      <md-chip-template>{{$chip.name}}</md-chip-template>
+</md-chips>
+
+ <md-tabs md-selected="selectedIndex" md-border-bottom md-autoselect>
+      <md-tab ng-repeat="tab in tabs">
+    <div class='md-padding' layout="row" layout-wrap flex>
+      <md-card class='contactCards' ng-repeat="user in querySearch(tablabel) | orderBy: '-level' ">
+          <md-card-title>
+            <md-card-title-text>
+              <span class="md-headline">{{user.name}}</span><br>
+              <span class="md-subhead">{{user.title}}</span>
+              <h6 class="transition"><i>"{{user.tagline}}"</i></h6>
+            </md-card-title-text>
+          </md-card-title>
+          <md-button ng-click="user.enabled = !user.enabled" aria-label="Click to add or remove">
+             <ng-md-icon ng-attr-icon="{{user.enabled ? 'block' : 'add_circle'}}" style="fill: {{user.enabled ? 'red' : 'green'}}" size="24"></ng-md-icon>
+          </md-button>
+      </md-card>
+    </div>
+</md-tabs>
+
 
 <!-- testing code 
 <div>
