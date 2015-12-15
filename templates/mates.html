@@ -1,4 +1,4 @@
-<!--Mates-->
+Mates-->
 <md-chips ng-model="selectedUsers" md-autocomplete-snap
               md-transform-chip="transformChip($chip)"
               md-require-match=true>
@@ -13,9 +13,42 @@
  <md-tabs md-selected="selectedIndex" md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink>
     <md-tab ng-repeat="tab in tabs"
               label="{{tab.title}}"> 
-            <div class='md-padding' layout="row" layout-wrap flex>
-              <md-card ng-repeat="user in (selectedUsers.length ? selectedUsers : querySearch(tab.title, true)) | orderBy: '-level' ">
-                  <div class='contactCards' classlayout='column'>
+<!--             <div class='md-padding' layout="row" layout-wrap flex> -->
+              <div class="row active-with-click">
+                     <div class="col-md-4 col-sm-6 col-xs-12" ng-repeat="user in (selectedUsers.length ? selectedUsers : querySearch(tab.title, true))">
+                                  <article class="material-card Red">
+                                      <h2>
+                                          <span>{{ user.name }}</span>
+                                          <strong>
+                                              <i class="fa fa-fw fa-star"></i>
+                                              {{user.title}}
+                                          </strong>
+                                      </h2>
+                                      <div class="mc-content">
+                                          <div class="img-container">
+                                              <img class="img-responsive" src="{{user.picture}}">
+                                          </div>
+                                          <div class="mc-description">
+                                              {{ user.tagline }}
+                                          </div>
+                                      </div>
+                                      <a class="mc-btn-action">
+                                          <i class="fa fa-bars"></i>
+                                      </a>
+                                      <div class="mc-footer">
+                                          <h4>
+                                              Social
+                                          </h4>
+                                          <a class="fa fa-fw fa-facebook"></a>
+                                          <a class="fa fa-fw fa-twitter"></a>
+                                          <a class="fa fa-fw fa-linkedin"></a>
+                                          <a class="fa fa-fw fa-google-plus"></a>
+                                      </div>
+                                  </article>
+                      </div>
+              </div>
+
+<!--                   <div class='contactCards' classlayout='column'>
                     <div class='contactCards' id='username'>
                         {{user.name}}
 
@@ -37,7 +70,7 @@
                              </md-button>
                       </div>
 
-                  </div>
+                  </div> -->
               </md-card>
             </div> 
     </md-tab>
@@ -53,4 +86,4 @@
 	  <input type="text" ng-model="phone"> Phone </input> <br>
 	  <md-button class="md-raised">Add User!</md-button>
 	</form>
-</div> -->
+</div> 

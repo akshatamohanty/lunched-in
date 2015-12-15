@@ -6,11 +6,12 @@
 		var userDB = [];
 		for(var i=0; i<150; i++){
 			var user = {
-				'name': random_character()+"_userID_"+i,
-				'title': "Title",
+				'name': random_character()+"Christopher Walken",
+				'title': "Senior Architect",
 				'phone': "902xx"+i,
-				'tagline': "Tagline for userID"+ i,
-				'enabled': true
+				'tagline': "The Deer Hunter",
+				'enabled': true,
+				'picture': 'http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg'
 			}
 			userDB.push(user);
 		}
@@ -174,3 +175,32 @@ app.controller('preferenceFormCtrl', [
 ]);
 
 
+$(function() {
+        $('.material-card > .mc-btn-action').click(function () {
+            var card = $(this).parent('.material-card');
+            var icon = $(this).children('i');
+            icon.addClass('fa-spin-fast');
+
+            if (card.hasClass('mc-active')) {
+                card.removeClass('mc-active');
+
+                window.setTimeout(function() {
+                    icon
+                        .removeClass('fa-arrow-left')
+                        .removeClass('fa-spin-fast')
+                        .addClass('fa-bars');
+
+                }, 800);
+            } else {
+                card.addClass('mc-active');
+
+                window.setTimeout(function() {
+                    icon
+                        .removeClass('fa-bars')
+                        .removeClass('fa-spin-fast')
+                        .addClass('fa-arrow-left');
+
+                }, 800);
+            }
+        });
+    });
