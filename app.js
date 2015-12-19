@@ -44,6 +44,36 @@ app.config(['$routeProvider', function($routeProvider) {
 app.controller('UserDisplay', [
 	'$scope',
 	function( $scope ){
+
+		$scope.load = function(){
+			$('.material-card > .mc-btn-action').click(function () { 
+			                      var card = $(this).parent('.material-card');
+			                      var icon = $(this).children('i');
+			                      icon.addClass('fa-spin-fast');
+
+			                      if (card.hasClass('mc-active')) {
+			                          card.removeClass('mc-active');
+
+			                          window.setTimeout(function() {
+			                              icon
+			                                  .removeClass('fa-arrow-left')
+			                                  .removeClass('fa-spin-fast')
+			                                  .addClass('fa-bars');
+
+			                          }, 800);
+			                      } else {
+			                          card.addClass('mc-active');
+
+			                          window.setTimeout(function() {
+			                              icon
+			                                  .removeClass('fa-bars')
+			                                  .removeClass('fa-spin-fast')
+			                                  .addClass('fa-arrow-left');
+
+			                          }, 800);
+			                      }
+			                  });
+		}
 		
 		var chars = "ABCDEFGHIJKLMNOPQURSTUVWXYZ";
 		var tabs = [];
@@ -96,6 +126,8 @@ app.controller('UserDisplay', [
 			        	return (user._lowername.indexOf(lowercaseQuery) > -1 || user._lowername.indexOf(lowercaseQuery) > -1)
 			     };
 	    }
+
+	    $scope.load();
 
 	}
 
@@ -174,33 +206,3 @@ app.controller('preferenceFormCtrl', [
   			}
 ]);
 
-
-$(function() {
-        $('.material-card > .mc-btn-action').click(function () {
-            var card = $(this).parent('.material-card');
-            var icon = $(this).children('i');
-            icon.addClass('fa-spin-fast');
-
-            if (card.hasClass('mc-active')) {
-                card.removeClass('mc-active');
-
-                window.setTimeout(function() {
-                    icon
-                        .removeClass('fa-arrow-left')
-                        .removeClass('fa-spin-fast')
-                        .addClass('fa-bars');
-
-                }, 800);
-            } else {
-                card.addClass('mc-active');
-
-                window.setTimeout(function() {
-                    icon
-                        .removeClass('fa-bars')
-                        .removeClass('fa-spin-fast')
-                        .addClass('fa-arrow-left');
-
-                }, 800);
-            }
-        });
-    });
