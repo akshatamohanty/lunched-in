@@ -127,8 +127,7 @@ app.controller('UserDisplay', [
 			     };
 	    }
 
-	    $scope.load();
-
+	    //$scope.load();
 	}
 
 ])
