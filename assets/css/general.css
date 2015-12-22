@@ -16,6 +16,9 @@ div.background {
     height: 110%;
 }
 
+.md-tab{
+    padding: 12px;
+}
 .mainIconBtn{
     min-width: 30px;
     width: 45px;
@@ -30,9 +33,18 @@ div.background {
     box-shadow: 0 0 3px #ccc;
 }
 
+.md-autocomplete-suggestions li{
+
+}
+
 .md-chip-template{
     font-size: 12px;
 }
+
+.btn-mate-selection{
+ 
+}
+
 /*
 .contactCards{
     width: 150px;

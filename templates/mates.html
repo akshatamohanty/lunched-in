@@ -15,7 +15,7 @@
               label="{{tab.title}}">  
           <div class="row active-with-click">
             <div class="col-md-4 col-sm-6 col-xs-12" ng-repeat="user in (selectedUsers.length ? selectedUsers : querySearch(tab.title, true))">
-                              <article class="material-card Red">
+                              <article class="material-card {{user.enabled ? 'Red' : 'Blue'}}">
                                   <h2>
                                       <span>{{user.name}}</span>
                                       <strong>
@@ -35,11 +35,7 @@
                                       <i class="fa fa-bars"></i>
                                   </a>
                                   <div class="mc-footer">
-                                      <h4>
-                                          Have lunch?
-                                      </h4>
-                                      <a class="fa fa-fw fa-facebook" ng-click="user.enabled = !user.enabled"></a>
-<!--                                       <ng-md-icon ng-attr-icon="{{user.enabled ? 'block' : 'add_circle'}}" style="fill: {{user.enabled ? 'red' : 'green'}}" size="24"></ng-md-icon> -->
+                                      <ng-md-icon class='btn-mate-selection' ng-click="user.enabled = !user.enabled" ng-attr-icon="{{user.enabled ? 'block' : 'add_circle'}}" style="fill: {{user.enabled ? 'red' : 'green'}}" size="45"></ng-md-icon>
                                   </div>
                               </article>
             </div>
