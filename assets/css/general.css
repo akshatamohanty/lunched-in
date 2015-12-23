@@ -19,6 +19,7 @@ div.background {
 .md-tab{
     padding: 12px;
 }
+
 .mainIconBtn{
     min-width: 30px;
     width: 45px;
@@ -29,7 +30,7 @@ div.background {
     left:15%;
     position:absolute;
     width:70%;
-    height:900px;
+    height:900%;
     box-shadow: 0 0 3px #ccc;
 }
 

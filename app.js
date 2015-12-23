@@ -110,20 +110,17 @@ app.controller('UserDisplay', [
 	    /**
 	     * Search for cuisines.
 	     */
-	    function querySearch (query, exact) {
-	      var results = query ? $scope.users.filter(createFilterFor(query, exact)) : [];
+	    function querySearch (query) {
+	      var results = query ? $scope.users.filter(createFilterFor(query)) : [];
 	      return results;
 	    }
 	    /**
 	     * Create filter function for a query string
 	     */
-	    function createFilterFor(query, exact) {
+	    function createFilterFor(query) {
 	      var lowercaseQuery = angular.lowercase(query);
 	      return function filterFn(user) {
-	      			if(exact)
-	      				return (user._lowername.indexOf(lowercaseQuery) === 0)
-	      			else
-			        	return (user._lowername.indexOf(lowercaseQuery) > -1 || user._lowername.indexOf(lowercaseQuery) > -1)
+	      			return (user._lowername.indexOf(lowercaseQuery) === 0)
 			     };
 	    }
 
