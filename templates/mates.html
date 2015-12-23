@@ -1,5 +1,5 @@
 <!--Mates-->
-<md-chips ng-model="selectedUsers" md-autocomplete-snap
+<!-- <md-chips ng-model="selectedUsers" md-autocomplete-snap
               md-transform-chip="transformChip($chip)"
               md-require-match=true>
       <md-autocomplete md-selected-item="selectedUser"
@@ -8,14 +8,14 @@
         <span md-highlight-text="searchText">{{user.name}}</span>
       </md-autocomplete>
       <md-chip-template>{{$chip.name}}</md-chip-template>
-</md-chips>
+</md-chips> -->
 
  <md-tabs md-selected="selectedIndex" md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink>
     <md-tab ng-repeat="tab in tabs"
               label="{{tab.title}}">  
           <div class="row active-with-click">
             <div class="col-md-4 col-sm-6 col-xs-12" ng-repeat="user in (selectedUsers.length ? selectedUsers : querySearch(tab.title))">
-                              <article class="material-card {{user.enabled ? 'Red' : 'Blue'}}">
+                              <article class="material-card {{user.enabled ? 'Green' : 'Grey'}}">
                                   <h2>
                                       <span>{{user.name}}</span>
                                       <strong>

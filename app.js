@@ -1,20 +1,55 @@
-		//pseudo database
-		function random_character() {
-		    var chars = "ABCDEFGHIJKLMNOPQURSTUVWXYZ";
-		    return chars.substr( Math.floor(Math.random() * 62), 1);
-		}
-		var userDB = [];
-		for(var i=0; i<150; i++){
-			var user = {
-				'name': random_character()+"Christopher Walken",
-				'title': "Senior Architect",
-				'phone': "902xx"+i,
-				'tagline': "The Deer Hunter",
-				'enabled': true,
-				'picture': 'http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg'
-			}
-			userDB.push(user);
-		}
+var user = [{
+		'name': "James Potter",
+		'title': "Senior Architect",
+		'phone': "902xx"+i,
+		'tagline': "Prongs",
+		'enabled': true,
+		'picture': 'http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg',
+		'cuisine': []
+	},
+	{
+		'name': "Sirius Black",
+		'title': "Junior Architect",
+		'phone': "902xx"+i,
+		'tagline': "Padfoot",
+		'enabled': false,
+		'picture': 'http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg',
+		'cuisine': []
+	},
+	{
+		'name': "Peter Pettigrew",
+		'title': "Finance",
+		'phone': "902xx"+i,
+		'tagline': "Wormtail",
+		'enabled': false,
+		'picture': 'http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg',
+		'cuisine': []
+	},
+	{
+		'name': "Albus Dumbledore",
+		'title': "Director",
+		'phone': "902xx"+i,
+		'tagline': "Phoenix",
+		'enabled': true,
+		'picture': 'http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg',
+		'cuisine': []
+	},
+	{
+		'name': "Remus Lupin",
+		'title': "HR",
+		'phone': "902xx"+i,
+		'tagline': "Moony",
+		'enabled': true,
+		'picture': 'http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg',
+		'cuisine': []
+	}
+]
+
+var userDB = [];
+for(var i=0; i<150; i++){
+	userDB.push(user[Math.floor(Math.random()*5)]);
+}
+
 
 var app = angular
       .module('lunchedIn', ['ngMaterial', 'ngRoute', 'ngMdIcons'])
@@ -168,29 +203,95 @@ app.controller('preferenceFormCtrl', [
 					     };
 			    }
 
-			    function loadCuisines() {
-			      var cuisines = [
-			        {
-			          'name': 'Indian',
-			          'resCount': 12
-			        },
-			        {
-			          'name': 'Chinese',
-			          'resCount': 15
-			        },
-			        {
-			          'name': 'Japanese',
-			          'resCount': 2
-			        },
-			        {
-			          'name': 'Thai',
-			          'resCount': 4
-			        },
-			        {
-			          'name': 'Italian',
-			          'resCount': 7
-			        }
-			      ];
+
+			   	function loadCuisines() {
+						      var cuisines = [
+						        {
+						          'name': 'American',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Chinese',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Continental',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Cuban',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'French',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Greek',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Indian',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Indonesian',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Italian',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Japanese',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Korean',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Lebanese',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Malaysian',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Mexican',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Pakistani',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Russian',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Singaporean',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Spanish',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Thai',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Tibetan',
+						          'icon': 'pictureaddress'
+						        },
+						        {
+						          'name': 'Vietnamese',
+						          'icon': 'pictureaddress'
+						        }
+
+						      ];
 
 			      return cuisines.map(function (c) {
 			        c._lowername = c.name.toLowerCase();
