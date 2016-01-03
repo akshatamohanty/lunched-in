@@ -1,0 +1,60 @@
+
+<!--Mates-->
+<md-chips ng-model="selectedUsers" md-autocomplete-snap
+              md-transform-chip="transformChip($chip)"
+              md-require-match=true>
+      <md-autocomplete md-selected-item="selectedUser"
+          md-search-text="searchText" md-items="item in querySearch(searchText)" md-item-text="item.name"
+          placeholder="Search for a user">
+        <span md-highlight-text="searchText">{{user.name}}</span>
+      </md-autocomplete>
+      <md-chip-template>{{$chip.name}}</md-chip-template>
+</md-chips> 
+
+ <md-tabs md-selected="selectedIndex" md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink>
+    <md-tab ng-repeat="tab in tabs"
+              label="{{tab.title}}">  
+          <div class="row active-with-click"> 
+            <div class="col-md-4 col-sm-6 col-xs-12" ng-repeat="user in (selectedUsers.length ? selectedUsers : querySearch(tab.title))">
+                              <article class="material-card {{user.enabled ? 'Green' : 'Grey'}}">
+                                  <h2>
+                                      <span>{{user.name}}</span>
+                                      <strong>
+                                          <i class="fa fa-fw fa-star"></i>
+                                          {{user.title}}
+                                      </strong>
+                                  </h2>
+                                  <div class="mc-content">
+                                      <div class="img-container">
+                                          <img class="img-responsive" src=".\assets\images\people\thumb-tom-hanks.jpg">
+                                      </div>
+                                      <div class="mc-description">
+                                          {{user.tagline}}
+                                      </div>
+                                  </div>
+                                  <a class="mc-btn-action">
+                                      <i class="fa fa-bars"></i>
+                                  </a>
+                                  <div class="mc-footer">
+                                      <ng-md-icon class='btn-mate-selection' ng-click="user.enabled = !user.enabled" ng-attr-icon="{{user.enabled ? 'block' : 'add_circle'}}" style="fill: {{user.enabled ? 'red' : 'green'}}" size="45"></ng-md-icon>
+                                  </div>
+                              </article>
+            </div>
+          </div>
+     </md-tab>
+</md-tabs>
+
+{{load()}}
+
+
+
+<!-- testing code 
+<div>
+	<form ng-submit="addUser()">
+	  <input type="text" ng-model="name"> Name </input> <br>
+	  <input type="text" ng-model="title"> Title </input> <br>
+	  <input type="text" ng-model="level"> Level </input> <br>
+	  <input type="text" ng-model="phone"> Phone </input> <br>
+	  <md-button class="md-raised">Add User!</md-button>
+	</form>
+</div> 
