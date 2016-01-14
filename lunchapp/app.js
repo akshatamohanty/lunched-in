@@ -1,60 +1,96 @@
+// This file does the following
+// Configures the application
+// Connects to the database
+// creates the mongoose models
+// defines routes for the RESTful application
+// define routes for the angular application
+// set the app to list on a port so we can view it on the browser
+
+
+// set up =====================================
 var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-
-var routes = require('./routes/index');
-var users = require('./routes/users');
-
 var app = express();
+var mongoose = require('mongoose');
+var morgan = require('morgan');
+var bodyParser = require('body-parser');
+var methodOverride = require('method-override');
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+// configuration ==============================
+mongoose.connect('mongodb://127.0.0.1:27017/data');
+
+
+app.use(express.static(__dirname + '/public'));
+app.use(morgan('dev'));
+app.use(bodyParser.urlencoded({'extended':'true'}));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.json({ type: 'application/vnd.api+json'}));
+app.use(methodOverride());
 
-app.use('/', routes);
-app.use('/users', users);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+// define model ========================
+var User = mongoose.model('User', {
+  name: String,
+  tagline: String,
 });
 
-// error handlers
+// routes ================
 
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
-  });
-}
+   //api -------------
+   app.get('/api/users', function(req, res){
 
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
-});
+      //use mongoose to get all users in the database
+      User.find(function(err, users){
 
+            if(err)
+              res.send(err);
 
-module.exports = app;
+            res.json(users);
+
+      });
+   })
+
+   // creating a new user
+   app.post('/api/users', function(req, res){
+
+        User.create({
+              name: req.body.text, 
+        }, function(err, user){
+
+            if(err)
+              res.send(err);
+
+            User.find(function(err, users){
+                
+                if(err)
+                    res.send(err)
+
+                res.json(users);
+            });
+        });
+ });
+
+   // deleting a user
+   app.delete('/api/users/:user_id', function(req, res){
+      User.remove({
+        _id : req.params.user_id
+      }, function( err, user ){
+         if(err)
+           res.send(err);
+
+         User.find(function(err, users){
+              if(err)
+                res.send(err);
+
+              res.join(users);
+         });
+      });
+   });
+
+   app.get('*', function(req, res){
+        res.sendfile('./public/index.html');
+   });
+
+// listen (start app with node app.js)
+
+app.listen(8080);
+console.log("App listening on port 8080");
