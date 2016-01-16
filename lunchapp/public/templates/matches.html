@@ -1,1 +1,16 @@
-This is the matches+history page 
+<b>Today's Match:</b>
+<br>
+With :
+{{ today.participants }}
+<br>
+At:
+{{ today.restaurant}}
+<br><br>
+<b>History:</b>
+<div ng-repeat="lunch in lunches">
+	On {{ lunch.date }} <br>
+	With {{ lunch.participants}} <br>
+	To {{ lunch.restaurant }}
+	<br>
+	<br>
+</div>

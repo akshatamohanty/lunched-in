@@ -16,7 +16,7 @@
               label="{{tab.title}}">  
           <div class="row active-with-click"> 
             <div class="col-md-4 col-sm-6 col-xs-12" ng-repeat="user in (selectedUsers.length ? selectedUsers : querySearch(tab.title))">
-                              <article class="material-card {{user.enabled ? 'Green' : 'Grey'}}">
+                              <article class="material-card Green">
                                   <h2>
                                       <span>{{user.name}}</span>
                                       <strong>
@@ -44,7 +44,7 @@
      </md-tab>
 </md-tabs>
 
-{{load()}}
+<!-- {{load()}} -->
 
 
 
