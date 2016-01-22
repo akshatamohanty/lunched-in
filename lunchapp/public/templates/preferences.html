@@ -1,35 +1,53 @@
-{{ userDetails.name }}
-<br>
-{{ userDetails.title }}
-<br>
-{{ userDetails.tagline }}
-<br>
-{{ userDetails.phone }}
-
 <div ng-controller="preferenceFormCtrl as ctrl">
-   <!--  <md-chips ng-model="selectedCuisines" md-autocomplete-snap
-              md-transform-chip="transformChip($chip)"
-              md-require-match=true>
-      <md-autocomplete md-selected-item="selectedItem"
-          md-search-text="searchText" md-items="item in querySearch(searchText)" md-item-text="item.name"
-          placeholder="Search for a cuisine">
-        <span md-highlight-text="searchText">{{item.name}} </span>
-      </md-autocomplete>
-      <md-chip-template>
-        <span>
-          <strong>{{$chip.name}}</strong>
-          <em>({{$chip.resCount}})</em>
-        </span>
-      </md-chip-template>
-    </md-chips>
-    <br /> -->
-  <h2 class="md-title">Cuisine Options</h2>
-	<md-list>
-	      <md-list-item class="md-2-line cuisine" ng-repeat="cuisine in cuisines" layout="row"
-	          layout-wrap>
-	        <div class="md-item-text md-whiteframe-z1" flex>
-	          {{cuisine.name}}
-	        </div>
-	      </md-list-item>
-	</md-list>
+<md-content md-theme="docs-dark" layout-gt-sm="row" layout-padding>
+    <div>
+      <md-input-container>
+        <label>Name</label>
+        <input ng-model="userDetails.name" disabled>
+      </md-input-container>
+      <md-input-container>
+        <label>Password</label>
+        <input ng-model="userDetails.password" disabled>
+      </md-input-container>
+      <md-input-container>
+        <label>Title</label>
+        <input ng-model="userDetails.title" disabled>
+      </md-input-container>
+      <md-input-container>
+        <label>Email</label>
+        <input ng-model="userDetails.email" type="email" disabled>
+      </md-input-container>
+      <md-input-container>
+        <label>Phone</label>
+        <input ng-model="userDetails.email" type="email" disabled>
+      </md-input-container>
+    </div>
+  </md-content>
+  <md-content layout-padding>
+    <div>
+      <md-input-container>
+        <label>Picture</label>
+      </md-input-container>
+      <form name="userForm">
+        <div layout-gt-xs="row"> Available Dates
+          <md-datepicker md-placeholder="Enter date">
+          </md-datepicker>
+        </div>
+        <div>
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Cuisine</label>
+            <md-select ng-model="user.cuisine">
+              <md-option ng-repeat="cuisine in cuisines">
+                {{cuisine}}
+              </md-option>
+            </md-select>
+          </md-input-container>
+        </div>
+        <md-input-container class="md-block">
+          <label>Tagline</label>
+          <textarea ng-model="userDetails.tagline" columns="1" md-maxlength="150" rows="2"></textarea>
+        </md-input-container>
+      </form>
+    </div>
+  </md-content>
 </div>

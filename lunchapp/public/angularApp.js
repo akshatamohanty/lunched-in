@@ -20,9 +20,14 @@ app.config(["$routeProvider", function($routeProvider) {
       templateUrl: "templates/matches.html", 
       controller: "MatchesDisplayCtrl"
    }).
+
+   when("/login", {
+	  templateUrl: "templates/login.html", 
+	  controller: "MatchesDisplayCtrl"
+   }).
    
    otherwise({
-      redirectTo: "/matches/1"
+      redirectTo: "/login"
    });
 	
 }]);

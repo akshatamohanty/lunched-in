@@ -6,6 +6,11 @@
 // define routes for the angular application
 // set the app to list on a port so we can view it on the browser
 
+// get scehemas
+require('./models/user');
+require('./models/match');
+require('./models/restaurant');
+
 
 // set up =====================================
 var express = require('express');
@@ -15,10 +20,20 @@ var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+
 
 // configuration ==============================
 mongoose.connect('mongodb://127.0.0.1:27017/test');
 
+var UserSchema = require('./models/user');
+var RestaurantSchema = require('./models/restaurant');
+var MatchSchema = require('./models/match');
+
+var User = mongoose.model('User', UserSchema);
+var Restaurant = mongoose.model('Restaurant', RestaurantSchema);
+var Match = mongoose.model('Match', MatchSchema);
 
 app.use(express.static(__dirname + '/public'));
 app.use(morgan('dev'));
@@ -27,147 +42,156 @@ app.use(bodyParser.json());
 app.use(bodyParser.json({ type: 'application/vnd.api+json'}));
 app.use(methodOverride());
 
-// define model ========================
-var User = mongoose.model('User', {
-  uid: Number,
-  name: String , 
-  title: String,
-  phone: String,
-  tagline: String,
-  picture: String,
-  cuisine: [String]
-});
+app.use(passport.initialize());
+app.use(passport.session());
+//app.use(app.router);
 
-var Lunch = mongoose.model('Lunch', {
-  date: String , 
-  restaurant: String,
-  participants: [Number]
-});
+// populating
+var populate = function(){
+      // populating the model with the userDatabase
+    dummyUsers = [{
+        uid: 1, 
+        name: "JamesPotter",
+        title: "Senior Architect",
+        phone: "902xx",
+        tagline: "Prongs",
+        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
+        cuisine: ["chinese"], 
+        blocked: []
+      },
+      {
+        uid: 2, 
+        name: "SiriusBlack",
+        title: "Junior Architect",
+        phone: "902xx",
+        tagline: "Padfoot",
+        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
+        cuisine: ["italian"],
+        blocked: []
+      },
+      {
+        uid: 3, 
+        name: "PeterPettigrew",
+        title: "Finance",
+        phone: "902xx",
+        tagline: "Wormtail",
+        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
+        cuisine: ["mexican"],
+        blocked: []
+      },
+      {
+        uid:4, 
+        name: "AlbusDumbledore",
+        title: "Director",
+        phone: "902xx",
+        tagline: "Phoenix",
+        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
+        cuisine: ["indian"],
+        blocked: []
+      },
+      {
+        uid: 5, 
+        name: "RemusLupin",
+        title: "HR",
+        phone: "902xx",
+        tagline: "Moony",
+        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
+        cuisine: ["thai"],
+        blocked: []
+      }
+    ]
 
-// populating the model with the userDatabase
-dummyUsers = [{
-    uid: 1, 
-    name: "James Potter",
-    title: "Senior Architect",
-    phone: "902xx",
-    tagline: "Prongs",
-    picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
-    cuisine: ["chinese"], 
-    blocked: []
-  },
-  {
-    uid: 2, 
-    name: "Sirius Black",
-    title: "Junior Architect",
-    phone: "902xx",
-    tagline: "Padfoot",
-    picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
-    cuisine: ["italian"],
-    blocked: []
-  },
-  {
-    uid: 3, 
-    name: "Peter Pettigrew",
-    title: "Finance",
-    phone: "902xx",
-    tagline: "Wormtail",
-    picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
-    cuisine: ["mexican"],
-    blocked: []
-  },
-  {
-    uid:4, 
-    name: "Albus Dumbledore",
-    title: "Director",
-    phone: "902xx",
-    tagline: "Phoenix",
-    picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
-    cuisine: ["indian"],
-    blocked: []
-  },
-  {
-    uid: 5, 
-    name: "Remus Lupin",
-    title: "HR",
-    phone: "902xx",
-    tagline: "Moony",
-    picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
-    cuisine: ["thai"],
-    blocked: []
-  }
-]
+    dummyLunch = [
+      {
+        date: "date1" , 
+        restaurant: "res1",
+        participants: [1, 2, 5, 3]
+      },
+      {
+        date: "date2" , 
+        restaurant: "res2",
+        participants: [5, 2, 4, 1]
+      }
+    ]
 
-dummyLunch = [
-  {
-    date: "date1" , 
-    restaurant: "res1",
-    participants: [1, 2, 5, 3]
-  },
-  {
-    date: "date2" , 
-    restaurant: "res2",
-    participants: [5, 2, 4, 1]
-  }
-]
+    for(var i=0; i<5; i++){
 
-for(var i=0; i<5; i++){
+      // populating 5 dummy users
+      User.create(
+            {   
+                'name': dummyUsers[i].name,
+                'title': dummyUsers[i].title,
+                'password': 'pass'
+            }
+            , function(err, user){
 
-  // populating 5 dummy users
-  User.create(
-        {   
-            'uid': dummyUsers[i].uid,
-            'name': dummyUsers[i].name,
-            'title': dummyUsers[i].title,
-            'phone': dummyUsers[i].phone,
-            'tagline': dummyUsers[i].tagline,
-            'picture': dummyUsers[i].picture,
-            'cuisine': dummyUsers[i].cuisine
-        }
-        , function(err, user){
-
-            if(err)
-              console.log(err);
-
-            User.find(function(err, users){
-                
                 if(err)
-                    console.log(err)
+                  console.log(err);
 
-                console.log(users);
+                User.find(function(err, users){
+                    
+                    if(err)
+                        console.log(err)
+
+                    console.log(users);
+                });
             });
-        });
 
-  // populating 2 dummy lunches
-  if( i < 2){
-    Lunch.create(
-          {   
-              'date': dummyLunch[i].date, 
-              'restaurant': dummyLunch[i].restaurant,
-              'participants': dummyLunch[i].participants
-          }
-          , function(err, user){
+    }
 
-              if(err)
-                console.log(err);
-
-              Lunch.find(function(err, lunches){
-                  
-                  if(err)
-                      console.log(err)
-
-                  console.log(lunches);
-              });
-          });
-  }
+    console.log(dummyUsers.length + ' dummy users populated');
 }
-
-console.log(dummyUsers.length + ' dummy users populated');
-console.log(dummyLunch.length + ' dummy lunches populated');
+populate();
 
 // routes ================
 
-   //api -------------
-   app.get('/api/users/:user_id', function(req, res){
+  app.post('/login',
+    passport.authenticate('local', {
+      successRedirect: '/loginSuccess',
+      failureRedirect: '/loginFailure'
+    })
+  );
+
+  app.get('/loginFailure', function(req, res, next) {
+    res.send('Failed to authenticate');
+  });
+
+  app.get('/loginSuccess', function(req, res, next) {
+    res.send('Successfully authenticated');
+  });
+
+  passport.serializeUser(function(user, done) {
+    done(null, user);
+  });
+
+  passport.deserializeUser(function(user, done) {
+    done(null, user);
+  });
+
+  passport.use(new LocalStrategy(function(username, password, done) {
+    process.nextTick(function() {
+      User.find({
+        'name': username, 
+        }, function(err, user) {
+              if (err) {
+                return done(err);
+              }
+
+             if (!user) {
+                return done(null, false);
+              } 
+
+              if (user.password != password) { 
+                return done(null, false);
+              }
+
+              return done(null, user);
+      });
+    });
+  }));
+
+  //api -------------
+  app.get('/api/users/:user_id', function(req, res){
 
       //use mongoose to get all users in the database
       User.find(function(err, users){
@@ -196,32 +220,6 @@ console.log(dummyLunch.length + ' dummy lunches populated');
 
    });
 
-/*   // creating a new user
-   app.post('/api/users', function(req, res){
-
-        User.create(
-        {   'name': req.name,
-            'title': req.title,
-            'phone': req.phone,
-            'tagline': req.tagline,
-            'picture': req.picture,
-            'cuisine': req.cuisine
-        }
-        , function(err, user){
-
-            if(err)
-              res.send(err);
-
-            User.find(function(err, users){
-                
-                if(err)
-                    res.send(err)
-
-                res.json(users);
-            });
-        });
- });*/
-
    // deleting a user
    app.delete('/api/users/:user_id', function(req, res){
       User.remove({
@@ -243,7 +241,7 @@ console.log(dummyLunch.length + ' dummy lunches populated');
   app.get('/api/matches/:user_id', function(req, res){
       
       //use mongoose to get all lunches for this user in the database
-      Lunch.find( { 
+      Match.find( { 
         participants : req.params.user_id
       }, function(err, lunches){
 

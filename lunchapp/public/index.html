@@ -20,13 +20,17 @@
         html {
             position: relative;
             min-height: 100%;
+            background-color: #ECEFF1;
         }
         body {
-            background-color: #ECEFF1;
-            color: #37474F;
+            background-color: 'white';
             font-family: 'Raleway', sans-serif;
             font-weight: 300;
             font-size: 16px;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 980px;
+            box-shadow: 0 0 6px #ccc;
         }
         h1, h2, h3 {
             font-weight: 200;
@@ -41,12 +45,12 @@
     <!--https://klarsys.github.io/angular-material-icons/-->
     <md-toolbar class="md-toolbar" layout="row" flex>
        	<h1 class="md-toolbar-tools">LUNCHEDIN.</h1>
-        <md-button href="#mates/1" class='mainIconBtn' aria-label='Mates'> <ng-md-icon icon="favorite" style="fill: white" size="24"></ng-md-icon>  </md-button>
-        <md-button href="#preferences/1" class='mainIconBtn' aria-label='Preferences'> <ng-md-icon icon="account_box" style="fill: white" size="24"></ng-md-icon>  </md-button>
-        <md-button href="#matches/1" class='mainIconBtn'aria-label='Matches'> <ng-md-icon icon="home" style="fill: white" size="24"></ng-md-icon>  </md-button>
+        <md-button href="#mates/1" class='mainIconBtn' aria-label='Mates'> <ng-md-icon icon="favorite" style="fill: white" size="35"></ng-md-icon>  </md-button>
+        <md-button href="#preferences/1" class='mainIconBtn' aria-label='Preferences'> <ng-md-icon icon="account_box" style="fill: white" size="35"></ng-md-icon>  </md-button>
+        <md-button href="#matches/1" class='mainIconBtn'aria-label='Matches'> <ng-md-icon icon="home" style="fill: white" size="35"></ng-md-icon>  </md-button>
   	</md-toolbar>
 
-    <div class='contentArea' ng-view>
+    <div ng-view>
 
     </div>
 
