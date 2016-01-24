@@ -11,10 +11,15 @@ require('./models/user');
 require('./models/match');
 require('./models/restaurant');
 
+// only for testing
+var dUsers = require('./dummyUsers');
+var dLunches = require('./dummyLunches');
+
 
 // set up =====================================
 var express = require('express');
 var app = express();
+
 var mongoose = require('mongoose');
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
@@ -22,6 +27,9 @@ var methodOverride = require('method-override');
 
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+
+var expressSession = require('express-session');
+var cookieParser = require('cookie-parser'); // the session is stored in a cookie, so we use this to parse it
 
 
 // configuration ==============================
@@ -42,125 +50,68 @@ app.use(bodyParser.json());
 app.use(bodyParser.json({ type: 'application/vnd.api+json'}));
 app.use(methodOverride());
 
+// use cookie parser and express session with proper resave etc - to get the session to work
+app.use(cookieParser());
+app.use(expressSession({
+                  secret:'somesecrettokenhere',     
+                  resave: true,
+                  saveUninitialized: true
+                }));
+
 app.use(passport.initialize());
 app.use(passport.session());
+
 //app.use(app.router);
 
-// populating
-var populate = function(){
-      // populating the model with the userDatabase
-    dummyUsers = [{
-        uid: 1, 
-        name: "JamesPotter",
-        title: "Senior Architect",
-        phone: "902xx",
-        tagline: "Prongs",
-        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
-        cuisine: ["chinese"], 
-        blocked: []
-      },
-      {
-        uid: 2, 
-        name: "SiriusBlack",
-        title: "Junior Architect",
-        phone: "902xx",
-        tagline: "Padfoot",
-        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
-        cuisine: ["italian"],
-        blocked: []
-      },
-      {
-        uid: 3, 
-        name: "PeterPettigrew",
-        title: "Finance",
-        phone: "902xx",
-        tagline: "Wormtail",
-        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
-        cuisine: ["mexican"],
-        blocked: []
-      },
-      {
-        uid:4, 
-        name: "AlbusDumbledore",
-        title: "Director",
-        phone: "902xx",
-        tagline: "Phoenix",
-        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
-        cuisine: ["indian"],
-        blocked: []
-      },
-      {
-        uid: 5, 
-        name: "RemusLupin",
-        title: "HR",
-        phone: "902xx",
-        tagline: "Moony",
-        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
-        cuisine: ["thai"],
-        blocked: []
-      }
-    ]
 
-    dummyLunch = [
-      {
-        date: "date1" , 
-        restaurant: "res1",
-        participants: [1, 2, 5, 3]
-      },
-      {
-        date: "date2" , 
-        restaurant: "res2",
-        participants: [5, 2, 4, 1]
-      }
-    ]
+// set up database ==== only for testing === 
+  var populate = function(){ console.log("adding");
+    
+    User.remove( {}, function(err, results) {
+          
+          console.log(results);
 
-    for(var i=0; i<5; i++){
+          for(var i=0; i<dUsers.length; i++){
+              // populating 5 dummy users
+              User.create(
+                    {   
+                        'name': dUsers[i].name,
+                        'title': dUsers[i].title,
+                        'password': 'pass'
+                    }
+                    , function(err, user){
 
-      // populating 5 dummy users
-      User.create(
-            {   
-                'name': dummyUsers[i].name,
-                'title': dummyUsers[i].title,
-                'password': 'pass'
-            }
-            , function(err, user){
+                        if(err)
+                          console.log(err);
 
-                if(err)
-                  console.log(err);
+                        User.find(function(err, users){
+                            
+                            if(err)
+                                console.log(err)
 
-                User.find(function(err, users){
-                    
-                    if(err)
-                        console.log(err)
+                            //console.log(users);
+                        });
+                    });
 
-                    console.log(users);
-                });
-            });
+              }
 
-    }
+            console.log(dUsers.length + ' dummy users populated');
+        });
 
-    console.log(dummyUsers.length + ' dummy users populated');
-}
-populate();
+  }
+  populate();
+
 
 // routes ================
 
   app.post('/login',
     passport.authenticate('local', {
-      successRedirect: '/loginSuccess',
-      failureRedirect: '/loginFailure'
+      successRedirect: '/#/matches',
+      failureRedirect: '/login'
     })
   );
 
-  app.get('/loginFailure', function(req, res, next) {
-    res.send('Failed to authenticate');
-  });
-
-  app.get('/loginSuccess', function(req, res, next) {
-    res.send('Successfully authenticated');
-  });
-
-  passport.serializeUser(function(user, done) {
+  passport.serializeUser(function(user, done) { 
     done(null, user);
   });
 
@@ -169,95 +120,86 @@ populate();
   });
 
   passport.use(new LocalStrategy(function(username, password, done) {
-    process.nextTick(function() {
-      User.find({
-        'name': username, 
-        }, function(err, user) {
-              if (err) {
-                return done(err);
-              }
+      process.nextTick(function() {
+        User.find({
+          'name': username, 
+          }, function(err, user) {
 
-             if (!user) {
-                return done(null, false);
-              } 
+                if (err) {
+                  return done(err);
+                }
 
-              if (user.password != password) { 
-                return done(null, false);
-              }
+                if (!user) {
+                  return done(null, false);
+                } 
 
-              return done(null, user);
+                if (user[0].password != password) { 
+                  return done(null, false);
+                }
+
+                return done(null, user);
+        });
       });
-    });
   }));
 
+  app.get('/logout', function(req, res){
+    req.logOut();  //<- known problem - use the below instead
+    //req.session.destroy()
+    res.send('Loggedout');
+  });
+
   //api -------------
-  app.get('/api/users/:user_id', function(req, res){
+  app.get('/api/users', function(req, res){
 
-      //use mongoose to get all users in the database
-      User.find(function(err, users){
+      if(req.isAuthenticated()){
+        //use mongoose to get all users in the database
+        User.find(function(err, users){
 
-            if(err)
-              res.send(err);
-
-            console.log("hey there", users);
-            res.json(users);
-
-      });
-   });
-
-  app.get('/api/user_pref/:user_id', function(req, res){
-
-      //use mongoose to get the particular user
-      User.find({ 
-        uid : req.params.user_id
-      },function(err, user_details){
-
-            if(err)
-              res.send(err);
-
-            res.json(user_details);
-      });
-
-   });
-
-   // deleting a user
-   app.delete('/api/users/:user_id', function(req, res){
-      User.remove({
-        _id : req.params
-      }, function( err, user ){
-         if(err)
-           res.send(err);
-
-         User.find(function(err, users){
               if(err)
                 res.send(err);
 
-              res.join(users);
-         });
-      });
-   });
+              res.json(users);
+
+        });
+      } 
+      else
+        res.send('Please login');
+  });
+
+  app.get('/api/user_pref', function(req, res){
+
+      if(req.isAuthenticated())
+        res.json(req.session.passport.user[0]);
+      else
+        res.send('Please login');
+
+  });
 
    // getting today's lunch match for a user
-  app.get('/api/matches/:user_id', function(req, res){
+  app.get('/api/matches', function(req, res){
       
-      //use mongoose to get all lunches for this user in the database
-      Match.find( { 
-        participants : req.params.user_id
-      }, function(err, lunches){
+      if(req.isAuthenticated()){
+              //use mongoose to get all lunches for this user in the database
+          Match.find( { 
+            participants : req.user
+          }, function(err, lunches){
 
-            if(err)
-              res.send(err);
+                if(err)
+                  res.send(err);
 
-            res.json(lunches);
+                res.json(lunches);
 
-      });
+          });
+      }
+      else
+        res.send('Please login');
 
    });
 
 
-  app.get('*', function(req, res){
-        res.sendFile('./public/index.html');
-   });
+  app.get('*', function(req, res){ console.log("unknown api")
+        res.send('unknown api');
+  });
 
 // listen (start app with node app.js)
 

@@ -6,28 +6,24 @@ var app = angular
 app.config(["$routeProvider", function($routeProvider) {
    $routeProvider.
    
-   when("/mates/:param", {
+   when("/mates", {
       templateUrl: "templates/mates.html", 
       controller: "UserDisplay"
    }).
    
-   when("/preferences/:param", {
+   when("/preferences", {
       templateUrl: "templates/preferences.html", 
       controller: "preferenceFormCtrl"
    }).
 
-   when("/matches/:param", {
+   when("/matches", {
       templateUrl: "templates/matches.html", 
       controller: "MatchesDisplayCtrl"
    }).
 
-   when("/login", {
-	  templateUrl: "templates/login.html", 
-	  controller: "MatchesDisplayCtrl"
-   }).
-   
    otherwise({
-      redirectTo: "/login"
+	  templateUrl: "templates/login.html", 
+	  //controller: "MatchesDisplayCtrl"
    });
 	
 }]);
@@ -39,10 +35,10 @@ app.controller("UserDisplay", [
 
 		var userDB = [];
 
-		$http.get("/api/users/" + $routeParams.param)
+		$http.get("/api/users")
 			.success( function(data){
 				userDB = data;
-				console.log(data);
+				console.log("Getting user", data);
 
 				//jquery
 				$(".material-card > .mc-btn-action").click(function () { 
@@ -138,11 +134,11 @@ app.controller("preferenceFormCtrl", [
 				$scope.userDetails = {}; 
 
 				// user preference options
-				$http.get("/api/user_pref/" + $routeParams.param)
+				$http.get("/api/user_pref")
 						.success( function(data){
 
-							$scope.userDetails = data[0];
-							//console.log("preference", data);
+							$scope.userDetails = data;
+							console.log("preference", data);
 
 						})
 						.error(function(data){
@@ -294,10 +290,10 @@ app.controller("MatchesDisplayCtrl", [
 
 				$scope.lunches = [];
 
-				$http.get("/api/matches/" + $routeParams.param )
+				$http.get("/api/matches")
 						.success( function(data){
 							$scope.lunches = data; 
-							console.log(data);
+							console.log("lunches", data);
 						})
 						.error( function( data ){
 							console.log("Error: ", data);
