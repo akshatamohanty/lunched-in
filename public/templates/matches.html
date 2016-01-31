@@ -1,13 +1,15 @@
 <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.css' rel='stylesheet' />
 
-<div style="border: thin solid black; padding: 30px; max-width: 400px;">
-	<b>Date:</b> {{ today.date }} 
-	<br>
-	<b>Time:</b> {{ today.time }} 
-</div>
+<md-card style="border: thin solid black; padding: 30px; max-width: 400px;">
+	<div >
+		<b>Date:</b> {{ today.date }} 
+		<br>
+		<b>Time:</b> {{ today.time }} 
+	</div>
+</md-card>
 
-<div style="border: thin solid black; max-width: 400px;"  layout wrap>
+<md-card style="border: thin solid black; max-width: 400px;"  layout wrap>
 	<br>
 	With :
 	<div ng-repeat = "user in today.participants" style="padding: 10px">
@@ -16,9 +18,9 @@
           <div>{{ user.name }}</div>
  	</div>
 	<br>
-</div>
+</md-card>
 
-<div style="border: thin solid black; position:float">
+<md-card style="border: thin solid black; position:float">
 	At:
 	{{ today.location.name }}
 	<br><br>
@@ -77,9 +79,9 @@
 		initMap();
 	</script>
 	
-</div>
+</md-card>
 
-<div>
+<md-card>
 	<b>History:</b>
 	<div ng-repeat="match in matches">
 		On {{ match.date }} <br>
@@ -88,4 +90,4 @@
 		<br>
 		<br>
 	</div>
-</div>
+</md-card>

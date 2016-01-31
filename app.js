@@ -44,7 +44,7 @@ var cookieParser = require('cookie-parser'); // the session is stored in a cooki
 var options = { server: { socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 } }, 
                 replset: { socketOptions: { keepAlive: 1, connectTimeoutMS : 30000 } } };       
  
-mongoose.connect(process.env.MONGOLAB_URI, function (error) {
+mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://127.0.0.1:27017/test', function (error) {
     if (error) console.error(error);
     else console.log('mongo connected');
 });
