@@ -48,7 +48,7 @@ var options = { server: { socketOptions: { keepAlive: 1, connectTimeoutMS: 30000
 var mongodbUri = 'mongodb://heroku_mk2bx4cj:pa6hck9smbfrfl3mpmblb5khu2@ds031832.mongolab.com:31832/heroku_mk2bx4cj
 ';
  
-mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://127.0.0.1:27017/test', options);
+mongoose.connect(MONGOLAB_URI || 'mongodb://127.0.0.1:27017/test', options);
 //mongoose.connect(mongodbUri, options);
 var conn = mongoose.connection;             
  
