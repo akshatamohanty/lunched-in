@@ -1,0 +1,91 @@
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.css' rel='stylesheet' />
+
+<div style="border: thin solid black; padding: 30px; max-width: 400px;">
+	<b>Date:</b> {{ today.date }} 
+	<br>
+	<b>Time:</b> {{ today.time }} 
+</div>
+
+<div style="border: thin solid black; max-width: 400px;"  layout wrap>
+	<br>
+	With :
+	<div ng-repeat = "user in today.participants" style="padding: 10px">
+	<user-avatar></user-avatar>
+          <span></span>
+          <div>{{ user.name }}</div>
+ 	</div>
+	<br>
+</div>
+
+<div style="border: thin solid black; position:float">
+	At:
+	{{ today.location.name }}
+	<br><br>
+	<div id='map-canvas' style = "width: 100%; height: 100%; z-index: 10"></div>
+	
+	<script>
+		
+		function initMap() {
+			  	
+		  	var pointA = new google.maps.LatLng(1.2744465, 103.8421503),
+		    pointB = new google.maps.LatLng(1.31014298, 103.81468448),
+		    myOptions = {
+		      zoom: 7,
+		      center: pointA
+		    },
+		    map = new google.maps.Map(document.getElementById('map-canvas'), myOptions),
+		    // Instantiate a directions service.
+		    directionsService = new google.maps.DirectionsService,
+		    directionsDisplay = new google.maps.DirectionsRenderer({
+		      map: map
+		    }),
+		    markerA = new google.maps.Marker({
+		      position: pointA,
+		      title: "point A",
+		      label: "A",
+		      map: map
+		    }),
+		    markerB = new google.maps.Marker({
+		      position: pointB,
+		      title: "point B",
+		      label: "B",
+		      map: map
+		    });
+
+		  // get route from A to B
+		  calculateAndDisplayRoute(directionsService, directionsDisplay, pointA, pointB);
+
+		}
+
+
+
+		function calculateAndDisplayRoute(directionsService, directionsDisplay, pointA, pointB) {
+		  directionsService.route({
+		    origin: pointA,
+		    destination: pointB,
+		    travelMode: google.maps.TravelMode.DRIVING
+		  }, function(response, status) {
+		    if (status == google.maps.DirectionsStatus.OK) {
+		      directionsDisplay.setDirections(response);
+		    } else {
+		      window.alert('Directions request failed due to ' + status);
+		    }
+		  });
+		}
+
+		initMap();
+	</script>
+	
+</div>
+
+<div>
+	<b>History:</b>
+	<div ng-repeat="match in matches">
+		On {{ match.date }} <br>
+		With {{ match.participants}} <br>
+		To {{ match.restaurant }}
+		<br>
+		<br>
+	</div>
+</div>

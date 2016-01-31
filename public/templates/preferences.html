@@ -1,0 +1,72 @@
+<div ng-controller="preferenceFormCtrl as ctrl" layout="column" ng-cloak class="md-inline-form">
+<md-button ng-click=editUserPreference()>Save!</md-button>
+<md-content layout="row" layout-padding>
+      <md-input-container>
+        <label>Name</label>
+        <input ng-model="userDetails.name" disabled> 
+      </md-input-container>
+      <md-input-container>
+        <label>Title</label>
+        <input ng-model="userDetails.title" disabled>
+      </md-input-container>
+      <md-input-container>
+        <label>Password</label>
+        <input ng-model="userDetails.password">
+      </md-input-container>
+</md-content>
+<md-content layout-gt-lg="row" layout-padding>
+      <md-input-container>
+        <label>Email</label>
+        <input ng-model="userDetails.email" type="email" disabled>
+      </md-input-container>
+      <md-input-container>
+        <label>Phone</label>
+        <input ng-model="userDetails.phone" disabled>
+      </md-input-container>
+      <md-input-container>
+        <label>Picture</label>
+      </md-input-container>
+</md-content>
+<md-content layout-padding>
+<div>
+      <md-input-container>
+        <label>Tagline</label>
+        <input ng-model="userDetails.tagline">
+      </md-input-container>
+</div>
+    <div layout="row" layout-wrap>
+      <div flex="50" flex-gt-sm="70" layout="column">
+        <div>
+          <fieldset class="standard" >
+              <legend><b>Cuisine Selection</b></legend>
+              <div layout="row" layout-wrap flex>
+                <div flex="20" ng-repeat="cuisine in cuisines" >
+                  <md-checkbox ng-checked="exists(cuisine.name, userDetails.cuisine)" ng-click="toggle(cuisine.name, userDetails.cuisine)">
+                    {{ cuisine.name }} 
+                  </md-checkbox>
+                </div>
+              </div>
+            </fieldset>
+        </div>
+      </div>
+    </div>
+
+    <div layout="row" layout-wrap>
+      <div flex="50" flex-gt-sm="50" layout="column">
+        <div>
+          <fieldset class="standard" >
+              <legend><b>Availablity</b></legend>
+              <div layout="row" layout-wrap flex>
+                <div flex="50" ng-repeat="day in days" >
+                  <md-checkbox ng-checked="exists(day, userDetails.available)" ng-click="toggle(day, userDetails.available)">
+                    {{ day }} 
+                  </md-checkbox>
+                </div>
+              </div>
+            </fieldset>
+        </div>
+      </div>
+    </div>
+
+</md-content>
+</div>
