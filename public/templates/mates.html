@@ -1,4 +1,5 @@
 <!--Mates-->
+<md-button ng-click="saveMates()"> Save </md-button>
 <md-chips ng-model="selectedUsers" md-autocomplete-snap
               md-transform-chip="transformChip($chip)"
               md-require-match=true>
@@ -13,13 +14,18 @@
 <md-tabs md-selected="selectedIndex" md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink>
     <md-tab ng-repeat="tab in tabs" label="{{tab.title}}"> 
         <div class='md-padding' layout="row" layout-wrap flex>
-          <md-card ng-repeat="user in (selectedUsers.length ? selectedUsers : querySearch(tab.title)) ">
+          <!-- <md-card ng-repeat="user in (selectedUsers.length ? selectedUsers : querySearch(tab.title)) "> -->
+          
+          <md-card ng-repeat="user in users" style="width: 25%; height: 55%"  ng-show="checkInitial(tab.title, user.name)" >
               <div class='contactCards' classlayout='column'>
-                <div class='contactCards' id='username'>
+                <center>
+                <div class='contactCards' id='username'><b>
                     {{user.name}}
-
+                    </b>
                     <br>
                     <i class='contactCards' id='usertitle'>{{user.title}}<i>
+                    <div ng-show="containsObject(user, 'known')"> Known user </div>
+                    <div ng-show="containsObject(user, 'blocked')"> Blocked user </div>
 
                 </div> 
                 <br>
@@ -29,14 +35,24 @@
                 <div class='contactCards' id='usertagline'>
                   "{{user.tagline}}"
                 </div>
-<!-- 
+
                 <div class='contactCards' id='btn-user-sel-placeholder'>
-                      <md-button class='contactCards' id='btn-user-sel'  aria-label="Click to add or remove" layout='column'>
-                      </md-button>
-                </div> -->
+<!--                     <md-button ng-click="addToList(user, "known")" ng-show="!containsObject(user, 'blocked')">
+                    <span ng-show="containsObject(user, 'known')"> Remove from Known </span>
+                    <span ng-show="!containsObject(user, 'known')"> Add to Known </span>
+                    </md-button>
+                    <md-button ng-click="addToList(user, "block")" ng-show="!containsObject(user, 'known')">
+                    <span ng-show="containsObject(user, 'blocked')"> Remove from Blocked </span>
+                    <span ng-show="!containsObject(user, 'blocked')"> Add to Blocked </span>
+                    </md-button> -->
+                    <md-button ng-click="addToList(user, 'known')"> Add to Known </md-button>
+                    <md-button ng-click="addToList(user, 'blocked')"> Block </md-button>
+                </div>
 
               </div>
+              </center>
           </md-card>
+
       </div> 
     </md-tab>
 </md-tabs>

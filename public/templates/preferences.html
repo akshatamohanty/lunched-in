@@ -1,4 +1,5 @@
 <div ng-controller="preferenceFormCtrl as ctrl" layout="column" ng-cloak class="md-inline-form">
+  <center>
   <md-card>
     <md-content layout="row" layout-padding>
           <md-input-container>
@@ -40,12 +41,12 @@
   </md-card>
   <md-card>
       <div layout="row" layout-wrap>
-        <div flex="50" flex-gt-sm="70" layout="column">
+        <div flex="50" flex-gt-sm="100" layout="column">
           <div>
             <fieldset class="standard" >
                 <legend><b>Cuisine Selection</b></legend>
                 <div layout="row" layout-wrap flex>
-                  <div flex="20" ng-repeat="cuisine in cuisines" >
+                  <div flex="15" ng-repeat="cuisine in cuisines" >
                     <md-checkbox ng-checked="exists(cuisine.name, userDetails.cuisine)" ng-click="toggle(cuisine.name, userDetails.cuisine)">
                       {{ cuisine.name }} 
                     </md-checkbox>
@@ -59,12 +60,12 @@
 
   <md-card>
       <div layout="row" layout-wrap>
-        <div flex="50" flex-gt-sm="50" layout="column">
+        <div flex="50" flex-gt-sm="100" layout="row">
           <div>
             <fieldset class="standard" >
                 <legend><b>Availablity</b></legend>
                 <div layout="row" layout-wrap flex>
-                  <div flex="50" ng-repeat="day in days" >
+                  <div flex="35" ng-repeat="day in days" >
                     <md-checkbox ng-checked="exists(day, userDetails.available)" ng-click="toggle(day, userDetails.available)">
                       {{ day }} 
                     </md-checkbox>
@@ -76,4 +77,5 @@
       </div>
   </md-card>
   <md-button ng-click=editUserPreference()>Save!</md-button>
+</center>
 </div>

@@ -1,7 +1,7 @@
 
 
 var app = angular
-      .module("lunchedIn", ["ngMaterial", "ngRoute", "ngMdIcons"])
+      .module("lunchedIn", ["ngMaterial", "ngRoute", "ngMdIcons", "ngDialog"])
 
 app.config(["$routeProvider", function($routeProvider) {
    $routeProvider.
@@ -35,6 +35,13 @@ app.directive('userAvatar', function() {
 	};
 });
 
+app.controller("login", [ 
+	"$scope", "$http", "$ngDialog",
+	function( $scope, $http ){
+
+	}
+]);
+
 app.controller("MainCtrl", [
 		"$scope", "$http", 
 		function($scope, $http){
@@ -57,7 +64,9 @@ app.controller("UserDisplay", [
 	function( $scope, $http, $routeParams ){
 
 		$scope.users = [];
+		$scope.userDetails = {};
 
+		// get all users data
 		$http.get("/api/users")
 			.success( function(data){
 
@@ -75,6 +84,22 @@ app.controller("UserDisplay", [
 				console.log("Error:" + data);
 			});
 
+		// get current user data
+		$http.get("/api/user_pref")
+				.success( function(data){
+
+					if(data.statusCode == 302){
+						$window.location.href = '/login'
+					}
+
+					$scope.userDetails = data;
+					//console.log("preference", data);
+
+				})
+				.error(function(data){
+					console.log("Error:" + data);
+				});
+
 		var chars = "ABCDEFGHIJKLMNOPQURSTUVWXYZ";
 		var tabs = [];
 		for(var c=0; c<26; c++){
@@ -88,7 +113,6 @@ app.controller("UserDisplay", [
 		$scope.message = "This page will be used to display users";
 		$scope.users = $scope.users.map(function (c) {
 	        				c._lowername = c.name.toLowerCase();
-	        				c._title = c.title.toLowerCase();
 	        				return c;
 	      				});
 
@@ -97,6 +121,64 @@ app.controller("UserDisplay", [
 		$scope.querySearch = querySearch;
 		$scope.selectedUsers = [];
 		$scope.transformChip = transformChip;
+
+		$scope.checkInitial = checkInitial; 
+
+		$scope.containsObject = containsObject; 
+		$scope.addToList = addToList; 
+
+		$scope.saveMates = saveMates; 
+
+		$scope.isCurrentUser = isCurrentUser; 
+
+		function isCurrentUser( user ){
+
+		}
+
+		// http post to modify mates
+		function saveMates(){
+			$http.post('/api/edit_mates', $scope.userDetails)
+							 .success(function(data){
+							 	console.log($scope.userDetails._id);
+							 	console.log("user updated", data);
+							 })
+							 .error(function(data){
+							 	console.log('Error:', data);
+							 });
+		}
+
+		function containsObject(obj, list) {
+		    var i;
+		    for (i = 0; i < list.length; i++) {
+		        if (JSON.stringify(list[i]) == JSON.stringify(obj)) {
+		        	//console.log(obj.name, "is contained in", list)
+		            return true;
+		        }
+		    }
+
+		    //console.log(obj.name, "is not contained in", list);
+		    return false;
+		}
+
+		function addToList( user, list ){
+
+			if ( containsObject( user, $scope.userDetails[list] ) )
+				console.log("Already ", list)
+			else 
+				$scope.userDetails[list].push(user);
+
+		}
+
+		function checkInitial( intial, string ){
+			// check if the user is the current - dont display self to self!
+			if( $scope.userDetails.name == string ){
+				//console.log("Self detected!")
+				return false; 
+			}
+
+			var result = angular.lowercase(string[0]) == angular.lowercase(intial);
+			return result;
+		}
     
 	    /**
 	     * Return the proper object when the append is called.
@@ -120,7 +202,7 @@ app.controller("UserDisplay", [
 	     * Create filter function for a query string
 	     */
 	    function createFilterFor(query) {
-	      var lowercaseQuery = angular.lowercase(query); console.log("query", lowercaseQuery);
+	      var lowercaseQuery = angular.lowercase(query); 
 	      return function filterFn(user) {
 	      			return (user._lowername.indexOf(lowercaseQuery) === 0)
 			     };

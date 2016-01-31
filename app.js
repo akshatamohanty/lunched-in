@@ -108,12 +108,12 @@ app.use(passport.session());
                         'name': dUsers[i].name,
                         'title': dUsers[i].title,
                         'password': 'pass',
-                        'tagline': 'dummytagline', 
+                        'tagline': dUsers[i].tagline, 
                         'phone': '90123892',
                         'email': 'something@something.com',
-                        'picture': 'http://somepicture.com',
-                        'available': ['Monday', 'Friday'],
-                        'cuisine': ['Chinese']
+                        'picture': dUsers[i].picture,
+                        'available': [],
+                        'cuisine': []
                     }
                     , function(err, user){
 
@@ -267,6 +267,35 @@ app.use(passport.session());
             req.session.passport.user[0].tagline = req.body.tagline; 
             req.session.passport.user[0].cuisine = req.body.cuisine;
             req.session.passport.user[0].available = req.body.available;
+
+            res.json(req.session.passport.user[0]._id);
+      }
+      else{
+        res.statusCode = 302;
+      }
+  });
+
+  app.post('/api/edit_mates', function(req, res){
+      if(req.isAuthenticated()){
+        
+          User.findOneAndUpdate(
+                      { 
+                         "_id": new ObjectId(req.session.passport.user[0]._id)
+                      }, 
+                      {
+                          known: req.body.known, 
+                          blocked: req.body.blocked,  
+                      }, 
+                      { multi: false }, 
+                      function(){
+                        console.log("updated from server!");
+                      }
+            )
+
+
+            // update the logged in user
+            req.session.passport.user[0].known = req.body.known;
+            req.session.passport.user[0].blocked = req.body.blocked;
 
             res.json(req.session.passport.user[0]._id);
       }

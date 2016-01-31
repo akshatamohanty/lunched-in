@@ -16,6 +16,10 @@
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/material-cards.css">
+
+    <link rel="stylesheet" href="http://pixelcrafts.com/soo/css/ngDialog.css">
+    <link rel="stylesheet" href="http://pixelcrafts.com/soo/css/ngDialog-theme-default.css">
+    
     <style type="text/css">
         html {
             position: relative;
@@ -52,7 +56,7 @@
         <md-button href="#logout" class='mainIconBtn'aria-label='Logout'> <ng-md-icon icon="mail" style="fill: white" size="35"></ng-md-icon>  </md-button>
   	</md-toolbar>
 
-    <div ng-show='!loggedIn'>
+    <div controller = 'login'>
         <form action="/login" method="post">
           <div>
             <label>Username:</label>
@@ -89,6 +93,8 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/angular-material-icons/0.6.0/angular-material-icons.min.js"></script> 
 
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <script src="http://pixelcrafts.com/soo/lib/angular/ngDialog.min.js"></script>
 
  	<script src="angularApp.js"></script>
 
