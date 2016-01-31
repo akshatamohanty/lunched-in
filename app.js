@@ -43,16 +43,22 @@ var cookieParser = require('cookie-parser'); // the session is stored in a cooki
  */
 var options = { server: { socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 } }, 
                 replset: { socketOptions: { keepAlive: 1, connectTimeoutMS : 30000 } } };       
+ 
+mongoose.connect(process.env.MONGOLAB_URI, function (error) {
+    if (error) console.error(error);
+    else console.log('mongo connected');
+});
 
- 
-var mongodbUri = 'mongodb://heroku_mk2bx4cj:pa6hck9smbfrfl3mpmblb5khu2@ds031832.mongolab.com:31832/heroku_mk2bx4cj
-';
- 
-mongoose.connect(mongodbUri || 'mongodb://127.0.0.1:27017/test', options);
 //mongoose.connect(mongodbUri, options);
 var conn = mongoose.connection;             
  
 conn.on('error', console.error.bind(console, 'connection error:'));  
+
+// listen (start app with node app.js)
+conn.once('open', function() {
+  // Wait for the database connection to establish, then start the app.   
+                  
+});
  
 /***** ... ***/
 var UserSchema = require('./models/user');
@@ -273,9 +279,5 @@ app.use(passport.session());
         res.send('Error!');
   });
 
-// listen (start app with node app.js)
-conn.once('open', function() {
-  // Wait for the database connection to establish, then start the app.   
-  app.listen(8080);
-  console.log("App listening on port 8080");                      
-});
+app.listen(8080);
+console.log("App listening on port 8080");    
