@@ -47,6 +47,86 @@ dummyUsers = [{
         picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
         cuisine: ["thai"],
         blocked: []
+      },
+      {
+        uid: 6, 
+        name: "HarryPotter",
+        title: "HR",
+        phone: "902xx",
+        tagline: "TheBoyWhoLived",
+        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
+        cuisine: ["thai"],
+        blocked: []
+      },
+            {
+        uid: 5, 
+        name: "HermioneGranger",
+        title: "HR",
+        phone: "902xx",
+        tagline: "TenPointsToGryffindor!",
+        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
+        cuisine: ["thai"],
+        blocked: []
+      },
+            {
+        uid: 5, 
+        name: "RonWeasley",
+        title: "HR",
+        phone: "902xx",
+        tagline: "Checkmate!",
+        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
+        cuisine: ["thai"],
+        blocked: []
+      },
+      {
+        uid: 5, 
+        name: "DracoMalfoy",
+        title: "HR",
+        phone: "902xx",
+        tagline: "Mudblood!",
+        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
+        cuisine: ["thai"],
+        blocked: []
+      },
+            {
+        uid: 5, 
+        name: "RubeusHagrid",
+        title: "HR",
+        phone: "902xx",
+        tagline: "DragonLover!",
+        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
+        cuisine: ["thai"],
+        blocked: []
+      },
+            {
+        uid: 5, 
+        name: "SeverusSnape",
+        title: "HR",
+        phone: "902xx",
+        tagline: "Always!",
+        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
+        cuisine: ["thai"],
+        blocked: []
+      },
+            {
+        uid: 5, 
+        name: "NevilleLongbottom",
+        title: "HR",
+        phone: "902xx",
+        tagline: "Dumbledore's Army!",
+        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
+        cuisine: ["thai"],
+        blocked: []
+      },
+            {
+        uid: 5, 
+        name: "LunaLovegood",
+        title: "HR",
+        phone: "902xx",
+        tagline: "Loony!",
+        picture: "http://u.lorenzoferrara.net/marlenesco/material-card/thumb-christopher-walken.jpg",
+        cuisine: ["thai"],
+        blocked: []
       }
     ]
 

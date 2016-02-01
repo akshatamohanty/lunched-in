@@ -65,6 +65,7 @@ var UserSchema = require('./models/user');
 var RestaurantSchema = require('./models/restaurant');
 var MatchSchema = require('./models/match');
 var DailyPoolSchema = require('./models/dailypool');
+var PairSchema = require('./models/pair');
 
 var ObjectId = mongoose.Types.ObjectId;
 
@@ -72,6 +73,7 @@ var User = mongoose.model('User', UserSchema);
 var Restaurant = mongoose.model('Restaurant', RestaurantSchema);
 var Match = mongoose.model('Match', MatchSchema);
 var DailyPool = mongoose.model('DailyPool', DailyPoolSchema);
+var Pair = mongoose.model('Pair', PairSchema);
 
 app.use(express.static(__dirname + '/public'));
 app.use(morgan('dev'));
@@ -95,7 +97,7 @@ app.use(passport.session());
 
 
 // set up database ==== only for testing === 
-  var populate = function(){ console.log("adding");
+var populate = function() { 
     
     User.remove( {}, function(err, results) {
           
@@ -112,21 +114,16 @@ app.use(passport.session());
                         'phone': '90123892',
                         'email': 'something@something.com',
                         'picture': dUsers[i].picture,
-                        'available': [],
-                        'cuisine': []
+                        'available': ['Monday', 'Tuesday'],
+                        'cuisine': ['Chinese', 'Thai', 'Indian'],
+                        'blocked': [],
+                        'known': []
                     }
                     , function(err, user){
 
                         if(err)
                           console.log(err);
 
-                        User.find(function(err, users){
-                            
-                            if(err)
-                                console.log(err)
-
-                            //console.log(users);
-                        });
                     });
 
               }
@@ -134,6 +131,7 @@ app.use(passport.session());
             console.log(dUsers.length + ' dummy users populated');
         });
 
+    setTimeout(matchingWithMongo, 3000);
   }
   populate();
 
@@ -226,7 +224,7 @@ app.use(passport.session());
       if(req.isAuthenticated()){
               //use mongoose to get all lunches for this user in the database
           Match.find( { 
-            participants : req.user
+            participants : req.user._id
           }, function(err, lunches){
 
                 if(err)
@@ -308,7 +306,381 @@ app.use(passport.session());
         res.send('Error!');
   });
 
-app.listen(process.env.PORT || 3000, function(){
-  console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
-});
-console.log("App listening on port 8080");    
+  app.listen(process.env.PORT || 3000, function(){
+    console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
+  });
+  console.log("App listening on port 8080");    
+
+
+/*function matchingAlgorithm(){
+  // populate daily pool
+  var dayMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+   
+  var today = new Date();
+  var day = today.getDay();
+
+  var userPool = [];
+
+  function retrieveUserPool(weekday, callback) {
+
+    User.find({ available : weekday }).sort({ blockedCount: -1, knownCount: 1 }).all( 
+      function(err, users) {
+          if (err) {
+            callback(err, null);
+          } else {
+            callback(null, users[0]);
+          }
+      });
+
+  };
+
+  retrieveUserPool(dayMap[day], function(err, user) {
+  if (err) {
+    console.log(err);
+  }
+
+      userPool = user;
+  });
+
+  // function checks if either of the users have blocked each other
+  function userMutualBlock( user1, user2 ){
+
+  }
+
+  // returns number status to check is users are mutual friends or one way friends
+  function userMutualFriends( user1, user2 ){
+
+  }
+
+  // returns array of users that aren't mutually blocked with the current user
+  function findCompatible( user, userList ){
+
+    var compatible = [];
+    for(var i=0; i<userList.length; i++){
+        if( !userMutualBlock(user, userList[i]) )
+          compatible.push(userList[i]);
+    }
+
+    return compatible;
+
+  }
+
+  function findFriend( user, userList ){
+
+    var two_way_friends = [];
+    var one_way_friends = [];
+    for(var i=0; i<userList.length; i++){
+
+        if( userMutualFriends(user, userList[i]) == 1 )
+          one_way_friends.push(userList[i]);
+        else if( userMutualFriends(user, userList[i]) == 2 )
+          two_way_friends.push(userList[i]);
+    }
+
+    return [ one_way_friends, two_way_friends ];
+  }
+
+  function findCompatibleCuisine( user, userList ){
+
+  }
+
+  var userNo = 0; 
+  var pairs = [];
+  while(userPool.length > 0){
+
+    // extract most difficult user
+    var user = userPool.splice(userNo, 1);
+
+    // find compatible users from the remaining users
+    var compatible = findCompatible(user, userPool);
+
+    var friends = findFriend( user, compatible );
+    // find friend of user
+    var finalFriendList = friends[1].length ? friends[1] : friends[0];
+    if(finalFriendList.length == 0)
+        finalFriendList = compatible;  // all unknown to user
+
+    if(compatible.length == 0)
+      continue; // user discarded
+
+    var cuisineCompatible = findCompatibleCuisine( user, finalFriendList );
+
+    // if cuisineCompatible is a non zero set then select from cuisine compatible or go to finalfriendlist
+    var pairMatePool = cuisineCompatible.concat(finalFriendList);  // redundancu to be solved
+
+    var i=0;
+    var pairmate; 
+    var thirdMatePool = [];
+    var pseudo = [];
+    while( thirdMatePool.length == 0 && i < pairMatePool.length ){
+      
+      pairmate = pairMatePool[i];
+      thirdMatePool = findCompatible( pairmate, compatible );
+
+
+
+      i++;
+    
+    }
+
+    if(thirdMatePool.length == 0)
+      // no hope!
+    else{
+        // find friend for third mate compatible with the other two
+        var i=0;
+        var thirdmate; 
+        var fourthMatePool = [];
+        while( fourthMatePool.length == 0 && i < thirdMatePool.length ){
+        
+            thirdmate = thirdMatePool[i];
+            fourthMatePool = findFriend( thirdmate, thirdMatePool );
+
+            i++;
+      
+        }
+        if(fourthMatePool.length == 0)
+          // make group of three
+        else
+
+    }
+
+
+    
+
+
+    // remove pairmate from user pool
+    
+    // find compatible friends for the pair
+    
+
+    if(thirdMatePool.length == 0 )
+      // no idea what to do then!
+    else{}
+
+}*/
+
+
+function matchingWithMongo(){
+
+  function findPairMatch( currPair, usedPairs ){
+          
+      var second;
+      // find second mate
+      Pair.find({
+        'data': currPair.date,
+        'ids': { $nin: [].concat(usedPairs.map(function(c){ return c._id })) },
+        'ids': { $nin: currPair.blocked }, 
+        'blocked': { $nin: currPair.ids },
+        'cuisine': { $in: user.cuisine }
+      }).sort({'blockedCount': -1, 'knownCount': 1}).exec(
+          function(err, users){
+              if(err) console.log(err);
+
+              // this user matches everything
+              if(users.length){
+                second = users[0];
+              }else{ 
+                 Pair.find({
+                        'data': currPair.date,
+                        'ids': { $nin: [].concat(usedPairs.map(function(c){ return c._id })) },
+                        'ids': { $nin: currPair.blocked }, 
+                        'blocked': { $nin: currPair.ids }
+                    }).sort({'blockedCount': -1, 'knownCount': 1}).exec(
+                            function(err, users){
+                              if(err) console.log(err);
+
+                              // this user matches everything
+                              if(users.length){
+                                second = users[0];
+                              }
+                          })
+                  }
+          })
+
+      return second; 
+  }  
+
+  function findPair( user, used ){
+      
+      var second;
+      // find second mate
+      User.find({
+        _id: { $nin: used.map(function(c){ return c._id }) },
+        _id: { $nin: user.blocked }, 
+        blocked: { $not: user },
+        _id: { $in: user.known },
+        known: user._id, 
+        cuisine: { $in: user.cuisine }
+      }).sort({'blockedCount': -1, 'knownCount': 1}).exec(
+          function(err, users){
+              if(err) console.log(err);
+
+              // this user matches everything
+              if(users.length){
+                second = users[0];
+              }else{
+                 
+                 User.find({
+                        '_id': { $nin: used.map(function(c){ return c._id }) },
+                        '_id': { $nin: user.blocked }, 
+                        'blocked': { $not: user },
+                        '_id': { $in: user.known },
+                        'known': user._id, 
+                    }).sort({'blockedCount': -1, 'knownCount': 1}).exec(
+                      function(err, users){
+                          if(err) console.log(err);
+
+                          // this user matches everything
+                          if(users.length){
+                            second = users[0];
+                          }else{
+                             User.find({
+                                          '_id': { $nin: used.map(function(c){ return c._id }) },
+                                          '_id': { $nin: user.blocked }, 
+                                          'blocked': { $not: user },
+                                          '_id': { $in: user.known },
+                                        }).sort({'blockedCount': -1, 'knownCount': 1}).exec(
+                                          function(err, users){
+                                              if(err) console.log(err);
+
+                                              // this user matches everything
+                                              if(users.length){
+                                                second = users[0];
+                                              }else{
+                                                 User.find({
+                                                      '_id': { $nin: used.map(function(c){ return c._id }) },
+                                                      '_id': { $nin: user.blocked }, 
+                                                      'blocked': { $not: user },
+                                                    }).sort({'blockedCount': -1, 'knownCount': 1}).exec(
+                                                      function(err, users){
+                                                          if(err) console.log(err);
+
+                                                          // this user matches everything
+                                                          if(users.length){
+                                                            second = users[0];
+                                                          }else{
+                                                             console.log("no option for user");
+                                                          }
+                                                      }) 
+                                              }
+                                      }) 
+                          }
+                      }) 
+              }
+          }
+      ) 
+
+      return second; 
+  }
+
+  var dayMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+   
+  var today = new Date();
+  var day = today.getDay(); 
+
+  var userPool = [];
+
+  //use mongoose to get all available users in the database and populating userPool
+  var message;
+  User.find({
+    available: dayMap[day]
+  }).sort({'blockedCount':-1, 'knownCount':1}).exec(function(err, users){
+
+        if(err)
+          message = err;
+
+        userPool = users;
+       //console.log("userPool", users);
+
+        // populating daily pool 
+        DailyPool.remove( {}, function(err, results) {
+        
+              DailyPool.create({ 
+                    date: Date(),
+                    participants: userPool.map(function(c){ return c._id }) 
+                  }, 
+                  function (err, pool) {
+                        if (err) return handleError(err);
+                        // saved!
+                        //console.log("daily pool populated", pool);
+                        matching();
+                        function matching(){
+                            var used = [];
+                            var pair = [];
+
+                            //pairing
+                            for(var userNo=0; userNo < userPool.length; userNo++){
+                                
+                                var user = userPool[userNo];
+                                used.push(user);
+
+                                var second = findPair(user, used);
+
+                                if(second != undefined){
+                                  used.push(second);
+                                  pairs.push(user, second);
+                                }
+                            }
+
+                            // create or find-update the pairs 
+                            for(var pairNo=0; pairNo < pair.length; pairNo++){
+
+                                var updatedData = {
+                                  'date': Date(),
+                                  'ids': [ pair[pairNo][0]._id,  pair[pairNo][1]._id],
+                                  'cuisines': pair[pairNo][0].cuisine.concat( pair[pairNo][1].cuisine ),
+                                  'blocked': pair[pairNo][0].blocked.concat( pair[pairNo][1].blocked ),
+                                  'known': pair[pairNo][0].known.concat( pair[pairNo][1].known ),
+                                }
+
+                                Pair.create( updatedData,
+                                              function(err, doc){
+                                                    if (err) console.log("error:", err);
+
+                                                    pair[pairNo] = doc;  // pair becomes an array of objects
+                                              });
+                            }
+
+                            //remove matches for testing
+                            Match.remove(function(err, results) {
+                              // do something with results
+                              console.log("removing matches");
+                            });
+
+                            console.log("pairs", pair);
+                            var usedPair = [];
+                            var secondPair;
+                            for(var pairNo=0; pairNo < pair.length; pairNo++){
+
+                                var currentPair = pair[pairNo];
+                                usedPair.push(currentPair);
+
+                                secondPair = findPairMatch( currentPair, usedPair );
+                                if(secondPair != undefined){
+                                  
+                                  usedPair.push(secondPair);
+
+                                  // find a location
+
+
+                                  // create the match
+                                  Match.create({
+                                      date: Date(), 
+                                      participants: currentPair.ids.concat(secondPair.ids),
+                                      dropouts: [],
+                                      location: "someRestaurant"
+                                    }, function(err, doc){
+                                          if(err) console.log("error:", err);
+
+                                          console.log("Match Made!");
+
+                                  })
+                                
+                                }
+                            }
+                          }
+                  })   
+        });
+  });
+
+}

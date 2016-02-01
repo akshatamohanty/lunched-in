@@ -150,7 +150,7 @@ app.controller("UserDisplay", [
 		function containsObject(obj, list) {
 		    var i;
 		    for (i = 0; i < list.length; i++) {
-		        if (JSON.stringify(list[i]) == JSON.stringify(obj)) {
+		        if (list[i]._id == obj._id) {
 		        	//console.log(obj.name, "is contained in", list)
 		            return true;
 		        }
@@ -363,7 +363,7 @@ app.controller("MatchesDisplayCtrl", [
 
 				$scope.matches = [];
 
-/*				$http.get("/api/matches")
+				$http.get("/api/matches")
 						.success( function(data){
 
 							$scope.matches = data; 
@@ -371,17 +371,17 @@ app.controller("MatchesDisplayCtrl", [
 						})
 						.error( function( data ){
 							console.log("Error: ", data);
-						});*/
+						});
 				
 				// checking for lunch today
-/*				for(var i=0; i < $scope.matches.length; i++ ){
+				for(var i=0; i < $scope.matches.length; i++ ){
 					var lunch = $scope.matches[i];
 					if(lunch.date == Date()){
 						$scope.today = lunch;
 						$scope.today.message = "Lunch today!";
 						$scope.matches.splice(i, 1);
 					}
-					else*/
+					else
 						$scope.today = {
 							"message" : "No Lunch Today",
 							"date" : new Date().toJSON().slice(0,10),
@@ -393,7 +393,7 @@ app.controller("MatchesDisplayCtrl", [
 							              'latLong': [ 1.31014298, 103.81468448 ] 
 										}
 						}
-				//}
+				}
 
 				console.log("today", $scope.today);
 

@@ -1,15 +1,12 @@
 var mongoose = require('mongoose');
 
-var userSchema = {
-	name: { type: String, required: true}, 
-	password: { type: String, required: true }, 
-	title: { type: String, required: true}, 
-	picture: { type: String, match: /^http:\/\//i }, 
-	email: { type: String }, 
-	phone: { type: String }, 
-	tagline: { type: String }, 
+var pairSchema = {
+	date: Date, 
+	ids: [ {
+    		type: mongoose.Schema.Types.ObjectId, ref: 'User'
+ 		 } 
+  	], 
 	cuisine: [String],
-	available: [String],
 	blocked: [ {
     		type: mongoose.Schema.Types.ObjectId, ref: 'User'
  		 } 
@@ -20,7 +17,7 @@ var userSchema = {
 	]
 };
 
-var schema = new mongoose.Schema( userSchema );
+var schema = new mongoose.Schema( pairSchema );
 
 schema.virtual('knownCount').get(function(){
 	return (this.known.length);
@@ -31,4 +28,4 @@ schema.virtual('blockedCount').get(function(){
 
 
 module.exports = schema; 
-module.exports.userSchema = userSchema; 
+module.exports.pairSchema = pairSchema; 

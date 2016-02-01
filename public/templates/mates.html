@@ -1,5 +1,5 @@
 <!--Mates-->
-<md-button ng-click="saveMates()"> Save </md-button>
+<!-- 
 <md-chips ng-model="selectedUsers" md-autocomplete-snap
               md-transform-chip="transformChip($chip)"
               md-require-match=true>
@@ -9,17 +9,18 @@
         <span md-highlight-text="searchText">{{user.name}}</span>
       </md-autocomplete>
       <md-chip-template>{{$chip.name}}</md-chip-template>
-</md-chips>
+</md-chips> -->
 
+<md-button ng-click="saveMates()"> Save </md-button>
 <md-tabs md-selected="selectedIndex" md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink>
     <md-tab ng-repeat="tab in tabs" label="{{tab.title}}"> 
         <div class='md-padding' layout="row" layout-wrap flex>
           <!-- <md-card ng-repeat="user in (selectedUsers.length ? selectedUsers : querySearch(tab.title)) "> -->
           
-          <md-card ng-repeat="user in users" style="width: 25%; height: 55%"  ng-show="checkInitial(tab.title, user.name)" >
+          <md-card ng-repeat="user in users" style="width: 25%; height: 45%"  ng-show="checkInitial(tab.title, user.name)" >
               <div class='contactCards' classlayout='column'>
                 <center>
-                <div class='contactCards' id='username'><b>
+                <div class='contactCards' id='username'><b><br>
                     {{user.name}}
                     </b>
                     <br>
@@ -30,7 +31,7 @@
                 </div> 
                 <br>
                 <div class='contactCards' id='userpicture'>
-                    <ng-md-icon ng-attr-icon='perm_identity' size="100"></ng-md-icon>
+                    <ng-md-icon ng-attr-icon='perm_identity' size="40"></ng-md-icon>
                 </div>
                 <div class='contactCards' id='usertagline'>
                   "{{user.tagline}}"
