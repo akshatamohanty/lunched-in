@@ -368,34 +368,36 @@ app.controller("MatchesDisplayCtrl", [
 
 							$scope.matches = data; 
 							console.log("matches", data);
+
+							// checking for lunch today
+							for(var i=0; i < $scope.matches.length; i++ ){
+								var lunch = $scope.matches[i];
+								if(lunch.date){
+									$scope.today = lunch;
+									$scope.today.message = "Lunch today!";
+									$scope.matches.splice(i, 1);
+								}
+								else
+									$scope.today = {
+										"message" : "No Lunch Today",
+										"date" : new Date().toJSON().slice(0,10),
+										"time" : "13.00 PM",
+										"participants": [{'name':'user1'},
+															{'name':'user2'},
+																{'name':'user3'}],
+										"location": { 'name': 'dummy restaurant name',
+										              'latLong': [ 1.31014298, 103.81468448 ] 
+													}
+									}
+							}
+
+							console.log("today", $scope.today);
 						})
 						.error( function( data ){
 							console.log("Error: ", data);
 						});
 				
-				// checking for lunch today
-				for(var i=0; i < $scope.matches.length; i++ ){
-					var lunch = $scope.matches[i];
-					if(lunch.date == Date()){
-						$scope.today = lunch;
-						$scope.today.message = "Lunch today!";
-						$scope.matches.splice(i, 1);
-					}
-					else
-						$scope.today = {
-							"message" : "No Lunch Today",
-							"date" : new Date().toJSON().slice(0,10),
-							"time" : "13.00 PM",
-							"participants": [{'name':'user1'},
-												{'name':'user2'},
-													{'name':'user3'}],
-							"location": { 'name': 'dummy restaurant name',
-							              'latLong': [ 1.31014298, 103.81468448 ] 
-										}
-						}
-				}
 
-				console.log("today", $scope.today);
 
 			}
 
