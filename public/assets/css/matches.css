@@ -1,0 +1,25 @@
+.md-card{
+	border: thin solid black; 
+}
+
+#dateTime{
+	text-align: center;
+	border: thin solid black; 
+	padding: 30px; 
+	width: 60%;
+	height: 15%;
+	font-family: inherit;
+	font-size: 16px;
+}
+
+#ptp{
+	width: 35%;
+	height: 60%;	
+	float: right;
+}
+
+#map{
+	width: 55%;
+	height: 70%;
+	padding: 0;
+}

@@ -1,26 +1,26 @@
 <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.css' rel='stylesheet' />
-<center>
-	<md-card style="border: thin solid black; padding: 30px; max-width: 400px;">
+	<center>
+	<md-card id='dateTime'>
 		<div >
-			<b>Date:</b> {{ today.date }} 
+			<b>Date:</b> {{ today.date.substr(0,10) }} 
 			<br>
-			<b>Time:</b> {{ today.time }} 
+			<b>Time:</b> {{ today.date.substr(11, 17) }} 
 		</div>
 	</md-card>
+</center>
 
-	<md-card style="border: thin solid black; max-width: 400px;"  layout wrap>
+	<md-card id="ptp" layout wrap>
 		<br>
 		With :
 		<div ng-repeat = "user in today.participants" style="padding: 10px">
 		<user-avatar></user-avatar>
-	          <span></span>
-	          <div>{{ user.name }}</div>
+	          <div>{{ user.name }} <div>{{ user.tagline }}</div></div>
 	 	</div>
 		<br>
 	</md-card>
 
-	<md-card style="border: thin solid black; position:float">
+	<md-card id="map">
 		At:
 		{{ today.location.name }}
 		<br><br>
@@ -83,12 +83,12 @@
 
 	<md-card>
 		<b>History:</b>
-		<div ng-repeat="match in matches">
-			On {{ match.date }} <br>
-			With {{ match.participants}} <br>
-			To {{ match.restaurant }}
-			<br>
-			<br>
+		<div ng-repeat="match in matches">	<md-card>
+			On <br> {{ match.date.substr(0,10) }} 
+			At <br> {{ match.date.substr(11, 17) }} 
+			With <br> <div ng-repeat = "user in match.participants" style="padding: 10px">
+			{{ user.name }} </div>
+			To {{ match.location }}
+			<br>	</md-card>
 		</div>
 	</md-card>
-</center>
