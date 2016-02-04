@@ -1,3 +1,33 @@
+html {
+    position: relative;
+    background-color: #CCCCFF;
+    height: 100%;
+}
+body {
+    background: #f0f0f0 url('images/bg.gif'); 
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    font-size: 62.5%; 
+    margin-left: auto;
+    margin-right: auto;
+    height: auto;
+    max-width: 980px;
+    box-shadow: 0 0 6px #ccc;  
+    color: #313131;
+    line-height: 1; 
+}
+h1, h2, h3 {
+    font-weight: 100;
+}
+
+#appname {
+    font-size: 90%;
+    color: #FFFFFF;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
 div.background {
     /*background: url("../images/background/officelunch.jpg");*/
     opacity: 0.4;
@@ -5,15 +35,12 @@ div.background {
 
 .md-toolbar{
     min-height: 10px;
-    height: 60px;
-    font-size: 10px;
+    height: 24px;
+    max-height: 24px;
 }
 
 .md-toolbar-tools{
-    font-size: 26px;
-    font-weight: 1;
-    letter-spacing: 0.215em;
-    height: 110%;
+    font-size: 18px;
 }
 
 .md-tab{
@@ -22,55 +49,7 @@ div.background {
 
 .mainIconBtn{
     min-width: 50px;
-    width: 45px;
-    height: 45px;
+    width: 24px;
+    height: 24px;
 }
 
-.md-autocomplete-suggestions li{
-
-}
-
-.md-chip-template{
-    font-size: 12px;
-}
-
-.btn-mate-selection{
- 
-}
-
-.btn-cuisine-selection{
-    
-}
-
-/*
-.contactCards{
-    width: 150px;
-    text-align: center;
-}
-
-.contactCards   #username{
-        font-size: 14px;
-        text-align: left;
-        background-color: #E4D1D1;
-        z-index: 4;
-        height: 50px;
-}
-
-.contactCards    #usertitle{
-        font-size: 12px
-}
-
-.contactCards    #userpicture{
-        font-size: 12px
-        height: 40%;
-}
-
-.contactCards   #usertagline{
-       font-size: 12px
-}
-
-.contactCards  #btn-user-sel-placeholder{
-    min-height: 10px;
-    height: 40px;
-    width: 40px;
-}*/

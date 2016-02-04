@@ -7,11 +7,6 @@
 // set the app to list on a port so we can view it on the browser
 
 // get scehemas
-/*require('./models/user');
-require('./models/match');
-require('./models/restaurant');
-require('./models/dailypool');*/
-
 // only for testing
 var dUsers = require('./dummyUsers');
 var dLunches = require('./dummyLunches');
@@ -40,25 +35,13 @@ var cookieParser = require('cookie-parser'); // the session is stored in a cooki
  * We recommend setting socket options at both the server and replica set level.
  * We recommend a 30 second connection timeout because it allows for 
  * plenty of time in most operating environments.
- */
-var options = { server: { socketOptions: { keepAlive: 1, connectTimeoutMS: 30000 } }, 
-                replset: { socketOptions: { keepAlive: 1, connectTimeoutMS : 30000 } } };       
+ */     
  
 mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://127.0.0.1:27017/test', function (error) {
     if (error) console.error(error);
     else console.log('mongo connected');
 });
 
-//mongoose.connect(mongodbUri, options);
-var conn = mongoose.connection;             
- 
-conn.on('error', console.error.bind(console, 'connection error:'));  
-
-// listen (start app with node app.js)
-conn.once('open', function() {
-  // Wait for the database connection to establish, then start the app.   
-                  
-});
  
 /***** ... ***/
 var UserSchema = require('./models/user');
@@ -197,11 +180,11 @@ var populate = function() {
       });
   }));
 
-  app.get('/loginStatus', function(req, res){
+  app.get('/api/loginStatus', function(req, res){
       if(req.isAuthenticated())
-        return true;
+        res.send(true);
       else
-        return false;
+        res.send(false);
   });
 
   app.get('/logout', function(req, res){
@@ -556,4 +539,4 @@ var populate = function() {
 
 
   //calling the matching algorithm every 5 seconds
-  setInterval(matchingAlgorithm, 86400000);
+  setInterval(matchingAlgorithm, 120000);

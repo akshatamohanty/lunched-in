@@ -1,7 +1,7 @@
 
 
 var app = angular
-      .module("lunchedIn", ["ngMaterial", "ngRoute", "ngMdIcons", "ngDialog"])
+      .module("lunchedIn", ["ngMaterial", "ngRoute", "ngMdIcons"])
 
 app.config(["$routeProvider", function($routeProvider) {
    $routeProvider.
@@ -35,20 +35,13 @@ app.directive('userAvatar', function() {
 	};
 });
 
-app.controller("login", [ 
-	"$scope", "$http", "$ngDialog",
-	function( $scope, $http ){
-
-	}
-]);
-
 app.controller("MainCtrl", [
 		"$scope", "$http", 
 		function($scope, $http){
 			
 			$scope.loggedIn = false; 
 			
-			$http.get("/loginStatus")
+			$http.get("/api/loginStatus")
 									.success( function(data){
 										console.log("loggedin", data);
 										$scope.loggedIn = data;
