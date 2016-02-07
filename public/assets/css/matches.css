@@ -1,25 +1,39 @@
-.md-card{
-	border: thin solid black; 
-}
-
-#dateTime{
+#date{
 	text-align: center;
-	border: thin solid black; 
-	padding: 30px; 
-	width: 60%;
-	height: 15%;
+	width: 30%;
+	height: 10%;
 	font-family: inherit;
 	font-size: 16px;
 }
 
-#ptp{
-	width: 35%;
-	height: 60%;	
-	float: right;
+#time{
+	text-align: center;
+	width: 30%;
+	height: 10%;
+	font-family: inherit;
+	font-size: 16px;
+}
+
+#participants{
+	width: 60%;
+	height: 35%;	
+	font-size: 16px;
 }
 
 #map{
 	width: 55%;
-	height: 70%;
+	height: 65%;
 	padding: 0;
+}
+
+.image--cover {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-right: 20px;
+  margin-left: 30px;
+  margin-bottom: 20px;
+
+  object-fit: cover;
+  object-position: center right;
 }

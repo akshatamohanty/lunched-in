@@ -539,4 +539,4 @@ var populate = function() {
 
 
   //calling the matching algorithm every 5 seconds
-  setInterval(matchingAlgorithm, 43200000);
+  setInterval(matchingAlgorithm, 600000);

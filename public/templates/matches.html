@@ -1,23 +1,22 @@
 <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.css' rel='stylesheet' />
-	<center>
-	<md-card id='dateTime'>
-		<div >
-			<b>Date:</b> {{ today.date.substr(0,10) }} 
-			<br>
-			<b>Time:</b> {{ today.date.substr(11, 17) }} 
-		</div>
-	</md-card>
-</center>
+<center>
 
-	<md-card id="ptp" layout wrap>
-		<br>
-		With :
-		<div ng-repeat = "user in today.participants" style="padding: 10px">
-		<user-avatar></user-avatar>
-	          <div>{{ user.name }} <div>{{ user.tagline }}</div></div>
+	<md-card id="participants" layout wrap>
+		<div ng-repeat = "user in today.participants" style="padding: 10px">  
+          	<div class="wrapper">
+				<img src="http://i2.cdn.turner.com/cnnnext/dam/assets/140926165711-john-sutter-profile-image-large-169.jpg" alt="" class="image--cover" />
+		   	</div>
+		   	<div>{{ user.name }}</div>
 	 	</div>
 		<br>
+	</md-card>
+
+	<md-card id='date'>
+		<b>Date:</b> {{ today.date.substr(0,10) }} 
+	</md-card>
+	<md-card id='time'>
+		<b>Time:</b> {{ today.date.substr(11, 17) }} 
 	</md-card>
 
 	<md-card id="map">
@@ -92,3 +91,5 @@
 			<br>	</md-card>
 		</div>
 	</md-card>
+
+</center>
