@@ -1,6 +1,7 @@
 <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.css' rel='stylesheet' />
 
+<div ng-show='today != undefined'>
 <center>
 	<md-card id="participants" layout wrap>
 		<div ng-repeat = "user in today.participants">  
@@ -91,4 +92,17 @@
 	</md-card>
 </center>
 
+</div>
+
+<center>
+<div ng-show='today == undefined' id='noMatch'> 
+
+	<md-card>
+	Sorry! 
+	<br>
+	No match today! :(
+	<br>
+	</md-card>
+
+</div>
 </center>

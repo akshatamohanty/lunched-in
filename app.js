@@ -135,7 +135,7 @@ var populate = function() {
         });
 
     // initial runnning
-    setTimeout(matchingAlgorithm, 3000);
+    //setTimeout(matchingAlgorithm, 3000);
   }
   populate();
 
