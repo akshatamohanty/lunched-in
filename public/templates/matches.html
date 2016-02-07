@@ -1,26 +1,26 @@
 <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.13.1/mapbox-gl.css' rel='stylesheet' />
-<center>
 
+<center>
 	<md-card id="participants" layout wrap>
-		<div ng-repeat = "user in today.participants" style="padding: 10px">  
-          	<div class="wrapper">
-				<img src="http://i2.cdn.turner.com/cnnnext/dam/assets/140926165711-john-sutter-profile-image-large-169.jpg" alt="" class="image--cover" />
-		   	</div>
+		<div ng-repeat = "user in today.participants">  
+			<img src="http://i2.cdn.turner.com/cnnnext/dam/assets/140926165711-john-sutter-profile-image-large-169.jpg" alt="" class="image--cover" />
 		   	<div>{{ user.name }}</div>
 	 	</div>
-		<br>
 	</md-card>
+</center>
 
+<center>
 	<md-card id='date'>
 		<b>Date:</b> {{ today.date.substr(0,10) }} 
 	</md-card>
 	<md-card id='time'>
 		<b>Time:</b> {{ today.date.substr(11, 17) }} 
 	</md-card>
+</center>
 
+<center>
 	<md-card id="map">
-		At:
 		{{ today.location.name }}
 		<br><br>
 		<div id='map-canvas' style = "width: 100%; height: 100%; z-index: 10"></div>
@@ -79,17 +79,16 @@
 		</script>
 		
 	</md-card>
+</center>
 
-	<md-card>
-		<b>History:</b>
-		<div ng-repeat="match in matches">	<md-card>
-			On <br> {{ match.date.substr(0,10) }} 
-			At <br> {{ match.date.substr(11, 17) }} 
-			With <br> <div ng-repeat = "user in match.participants" style="padding: 10px">
-			{{ user.name }} </div>
-			To {{ match.location }}
-			<br>	</md-card>
-		</div>
+<center>
+	<md-card id='history' ng-repeat="match in matches" layout wrap>
+		On <br> {{ match.date.substr(0,10) }}  {{ match.date.substr(11, 17) }}  At {{ match.location }}
+		<div class="wrapper" ng-repeat = "user in match.participants">
+			<img id='history_ptp' src="http://i2.cdn.turner.com/cnnnext/dam/assets/140926165711-john-sutter-profile-image-large-169.jpg"/>
+			<div>{{ user.name }}</div>
+	   	</div>
 	</md-card>
+</center>
 
 </center>
