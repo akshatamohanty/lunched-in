@@ -4,45 +4,48 @@
 }
 
 #participants{
-	width: 60%;
+	width: 250px;
+/*	vertical-align: center;
+	
 	height: 25%;	
-	font-size: 16px;
+	font-size: 14px;
 	padding: 10px;
+	float: left;*/
 }
 
 #date{
 	text-align: center;
-	width: 29%;
-	height: 10%;
+	width: 200px;
+/*	height: 10%;
 	font-family: inherit;
 	font-size: 16px;
-	float: left;
-	margin-left: 20%;
+	margin-left: 10px;
+	float:left;*/
 }
 
 #time{
 	text-align: center;
-	width: 29%;
-	height: 10%;
+	width: 200px;
+/*	height: 10%;
 	font-family: inherit;
 	font-size: 16px;
-	float:right;
-	margin-right: 20%;
+	display: block;
+	margin-right: 10px;
+	float: right;*/
 }
 
 #map{
-	width: 60%;
-	height: 65%;
-	padding: 0;
+	width: 460px;
+	height: 370px;
 }
 
 .image--cover {
-  width: 80px;
-  height: 80px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  margin-right: 20px;
+/*  margin-right: 50px;
   margin-left: 30px;
-  margin-bottom: 20px;
+  margin-bottom: 20px;*/
 
   object-fit: cover;
   object-position: center right;
@@ -58,8 +61,8 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  margin-right: 20px;
-  margin-left: 30px;
+  margin-right: 30px;
+  margin-left: 40px;
   margin-bottom: 20px;
 
   object-fit: cover;

@@ -116,7 +116,7 @@ var populate = function() {
                         'tagline': dUsers[i].tagline, 
                         'phone': '90123892',
                         'email': 'something@something.com',
-                        'picture': dUsers[i].picture,
+                        'picture': 'http://i2.cdn.turner.com/cnnnext/dam/assets/140926165711-john-sutter-profile-image-large-169.jpg',
                         'available': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
                         'cuisine': ['Chinese', 'Thai', 'Indian'],
                         'blocked': [],
@@ -135,7 +135,7 @@ var populate = function() {
         });
 
     // initial runnning
-    //setTimeout(matchingAlgorithm, 3000);
+    setTimeout(matchingAlgorithm, 3000);
   }
   populate();
 
@@ -291,10 +291,9 @@ var populate = function() {
                       }, 
                       { multi: false }, 
                       function(){
-                        console.log("updated from server!");
+                        console.log("updated from server!"); setTimeout(matchingAlgorithm, 3000);
                       }
             )
-
 
             // update the logged in user
             req.session.passport.user[0].known = req.body.known;
@@ -539,4 +538,4 @@ var populate = function() {
 
 
   //calling the matching algorithm every 5 seconds
-  setInterval(matchingAlgorithm, 600000);
+  setInterval(matchingAlgorithm, 43200000);

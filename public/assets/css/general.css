@@ -20,20 +20,20 @@ h1, h2, h3 {
     font-weight: 100;
 }
 
-#appname {
+/*#appname {
     font-size: 90%;
     color: #FFFFFF;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     position: relative;
     overflow: hidden;
-}
+}*/
 
 div.background {
     /*background: url("../images/background/officelunch.jpg");*/
     opacity: 0.4;
 }
 
-.md-toolbar{
+/*.md-toolbar{
     min-height: 10px;
     height: 24px;
     max-height: 24px;
@@ -41,15 +41,32 @@ div.background {
 
 .md-toolbar-tools{
     font-size: 18px;
-}
+}*/
 
 .md-tab{
     padding: 12px;
 }
 
 .mainIconBtn{
+    padding: 10px;
     min-width: 50px;
     width: 24px;
     height: 24px;
+}
+
+.pref {
+    height: 10%;
+    font-size: 16px;
+}
+
+
+.userpicture{
+/*  border-radius: 50%;*/
+/*  margin-right: 50px;
+  margin-left: 30px;
+  margin-bottom: 20px;*/
+
+  object-fit: cover;
+  object-position: center right;
 }
 
