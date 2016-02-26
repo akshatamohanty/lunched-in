@@ -2,6 +2,10 @@
 
 var app = angular
       .module("lunchedIn", ["ngMaterial", "ngRoute", "ngMdIcons"])
+      .config(function($mdThemingProvider) {
+		  $mdThemingProvider.theme('default')
+		    .primaryPalette('red')
+		});
 
 app.config(["$routeProvider", function($routeProvider) {
    $routeProvider.

@@ -1,72 +1,54 @@
 html {
-    position: relative;
-    background-color: #CCCCFF;
-    height: 100%;
-}
-body {
-    background: #f0f0f0 url('images/bg.gif'); 
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-weight: 300;
-    font-size: 62.5%; 
-    margin-left: auto;
-    margin-right: auto;
-    height: auto;
-    max-width: 980px;
-    box-shadow: 0 0 6px #ccc;  
-    color: #313131;
-    line-height: 1; 
-}
-h1, h2, h3 {
-    font-weight: 100;
+    font-family: 'Roboto', sans-serif;
 }
 
-/*#appname {
-    font-size: 90%;
-    color: #FFFFFF;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    position: relative;
-    overflow: hidden;
-}*/
-
-div.background {
-    /*background: url("../images/background/officelunch.jpg");*/
-    opacity: 0.4;
+#loginPage{
+    position: absolute;
+    background-image: url('..//images//background//loginPage1.jpg');
+    background-size: cover;
+    background-position: top-left;
+    width:100%; 
+    height:100%;
 }
 
-/*.md-toolbar{
-    min-height: 10px;
-    height: 24px;
-    max-height: 24px;
+#loginModule{
+    position:absolute;
+    top: 50%;
+    left: 50%;
+    width:30em;
+    margin-top: -200px; /*set to a negative number 1/2 of your height*/
+    margin-left: -15em; /*set to a negative number 1/2 of your width*/
+    border: 1px solid #ccc;
+    border-radius: 10px 10px 10px 10px;
+    font-family: 'Roboto', sans-serif;
+    background-color: white;
+    font-size: 1.0em;
+    text-transform: none;
+    opacity: 0.8;
 }
 
-.md-toolbar-tools{
-    font-size: 18px;
-}*/
-
-.md-tab{
-    padding: 12px;
+.loginTabs md-tab-item{
+    text-transform: none;
+    font-family: 'Roboto', sans-serif;
 }
 
-.mainIconBtn{
-    padding: 10px;
-    min-width: 50px;
-    width: 24px;
-    height: 24px;
+#resetTab{
+    text-transform: uppercase;
+    font-family: 'Arial', sans-serif;
 }
 
-.pref {
-    height: 10%;
-    font-size: 16px;
+.loginBtn {
+  font-family: 'Roboto', sans-serif;
+  color : white;
+  background-color: rgb(221, 71, 61);
+  border-radius: 10px;
+  font-size: 1.0em;
+  text-transform: none;
+  margin-left: 40%;
 }
 
-
-.userpicture{
-/*  border-radius: 50%;*/
-/*  margin-right: 50px;
-  margin-left: 30px;
-  margin-bottom: 20px;*/
-
-  object-fit: cover;
-  object-position: center right;
+.passwordMatchMessage{
+    color: green;
+    margin-left: 2%;
+    font-family: 'Roboto', sans-serif;
 }
-
