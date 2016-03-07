@@ -8,6 +8,7 @@ var userSchema = {
 	email: { type: String }, 
 	phone: { type: String }, 
 	tagline: { type: String }, 
+	nationality: { type: String },
 	cuisine: [String],
 	available: [String],
 	blocked: [ {
@@ -21,6 +22,10 @@ var userSchema = {
 };
 
 var schema = new mongoose.Schema( userSchema );
+
+schema.virtual('username').get(function(){
+	return (this.email);
+});
 
 schema.virtual('knownCount').get(function(){
 	return (this.known.length);

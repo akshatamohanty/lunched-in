@@ -1,16 +1,11 @@
-// This file does the following
-// Configures the application
-// Connects to the database
-// creates the mongoose models
-// defines routes for the RESTful application
-// define routes for the angular application
-// set the app to list on a port so we can view it on the browser
-
-// get scehemas
-// only for testing
-var dUsers = require('./dummyUsers');
-var dLunches = require('./dummyLunches');
-
+/* This file does the following
+ * Configures the application
+ * Connects to the database
+ * creates the mongoose models
+ * defines routes for the RESTful application
+ * define routes for the angular application
+ * set the app to list on a port so we can view it on the browser
+ */
 
 // set up =====================================
 var express = require('express');
@@ -27,9 +22,10 @@ var LocalStrategy = require('passport-local').Strategy;
 var expressSession = require('express-session');
 var cookieParser = require('cookie-parser'); // the session is stored in a cookie, so we use this to parse it
 
+var async = require('async');
+
 
 // configuration ==============================
-// mongoose.connect('mongodb://127.0.0.1:27017/test');
 /* 
  * Mongoose by default sets the auto_reconnect option to true.
  * We recommend setting socket options at both the server and replica set level.
@@ -42,8 +38,9 @@ mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://127.0.0.1:27017/test', f
     else console.log('mongo connected');
 });
 
- 
-/***** ... ***/
+
+/***** Models Set-up ***/
+var AdminSchema = require('./models/admin');
 var UserSchema = require('./models/user');
 var RestaurantSchema = require('./models/restaurant');
 var MatchSchema = require('./models/match');
@@ -52,6 +49,7 @@ var PairSchema = require('./models/pair');
 
 var ObjectId = mongoose.Types.ObjectId;
 
+var Admin = mongoose.model('Admin', AdminSchema);
 var User = mongoose.model('User', UserSchema);
 var Restaurant = mongoose.model('Restaurant', RestaurantSchema);
 var Match = mongoose.model('Match', MatchSchema);
@@ -76,78 +74,68 @@ app.use(expressSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
-//app.use(app.router);
 
 
 // set up database ==== only for testing === 
-var populate = function() {
+var clearDatabase = function( database, stringName, callback ){
 
-    // create a restaurant - for testing purpose - delete later
-    Restaurant.remove({}, function(err, doc){
-            if(err) console.log("error deleting restuarants", err);
+  database.remove({}, function(err, doc){
+        if(err) console.log("Error: ", stringName, " Database has not been reset. ", err);
 
-            Restaurant.create({
-              name: 'FoodCourt', 
-              cuisine: [ 'Chinese', 'Thai', 'Indian' ]
-            }, function(err, doc){
-                if(err) console.log("error createing restuarant");
+        console.log(stringName, " Database has been reset."); 
 
-                console.log("restaurant created");
-            })
+        if(callback)
+          callback;   
     });
 
-    Match.remove({}, function(err, doc){
-      if(err) console.log("matches not removed", err);
+}
 
-      console.log("matches removed");
-    });
+var addToDatabase = function( database, jsonObject, stringName, callback ){
     
-    User.remove( {}, function(err, results) {
-          
-          console.log(results);
+    database.create( jsonObject, 
+                  function(err, user){
 
-          for(var i=0; i<dUsers.length; i++){
-              // populating 5 dummy users
-              User.create(
-                    {   
-                        'name': dUsers[i].name,
-                        'title': dUsers[i].title,
-                        'password': 'pass',
-                        'tagline': dUsers[i].tagline, 
-                        'phone': '90123892',
-                        'email': 'something@something.com',
-                        'picture': 'http://i2.cdn.turner.com/cnnnext/dam/assets/140926165711-john-sutter-profile-image-large-169.jpg',
-                        'available': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-                        'cuisine': ['Chinese', 'Thai', 'Indian'],
-                        'blocked': [],
-                        'known': []
+                      if(err)
+                        console.log("Error: Unable to add to ", stringName, err);
+
+                      console.log("Added to ", stringName);
+
+                      if(callback)
+                        callback;   
+                  });
+}
+
+
+
+var initialize = function() {
+    var primaryAdmin =  {   
+                        name: 'Administrator',
+                        username: 'admin@trylunchedin.com',
+                        password: 'helloworld123',
+                        adminStatus: true
                     }
-                    , function(err, user){
+    var dummyUser =  {   
+                        name: 'Jane Doe',
+                        email: 'janedoe@aedas.sg',
+                        password: '123',
+                        title: 'Senior Designer'
+                    }
+    clearDatabase( Admin, "Admin", addToDatabase( Admin, primaryAdmin, "Admin", null) );
+    clearDatabase( User, "User", addToDatabase( User, dummyUser, "User", null) );
+    clearDatabase( Restaurant, "Restaurants", null );
+    clearDatabase( Match, "Matches", null);
 
-                        if(err)
-                          console.log(err);
-
-                    });
-
-              }
-
-            console.log(dUsers.length + ' dummy users populated');
-        });
-
-    // initial runnning
-    setTimeout(matchingAlgorithm, 3000);
-  }
-  populate();
-
+}
+initialize();
 
 // routes ================
 
-  app.post('/login',
-    passport.authenticate('local', {
-      successRedirect: '/#/matches',
-      failureRedirect: '/login'
-    })
-  );
+  /*
+   *
+   * User Authentication
+   *
+   */
+
 
   passport.serializeUser(function(user, done) { 
     done(null, user);
@@ -157,58 +145,112 @@ var populate = function() {
     done(null, user);
   });
 
+  //
+  //  defining the passport local strategy for authenticating user
+  //
   passport.use(new LocalStrategy(function(username, password, done) {
       process.nextTick(function() {
-        User.find({
-          'name': username, 
-          }, function(err, user) {
 
-                if (err) {
-                  return done(err);
-                }
+        User.find({ 
+                        'email' : username, //remember! virtuals can't be queried unless exposed!
+                        'password' : password 
+                      }, 
+                        function(err, user) {
 
-                if (!user) {
-                  return done(null, false);
-                } 
+                            if (!err && user.length){
+                              console.log("Found in User");
+                              return done(null, user); 
+                            }
+                              
 
-                if (user[0].password != password) { 
-                  return done(null, false);
-                }
+                            // Find in Admin database if not found in users
+                            Admin.find({ 
+                                            'username' : username, 
+                                            'password' : password 
+                                          }, function(err, user) {
+                                                
 
-                return done(null, user);
-        });
-      });
+                                                if (!err && user.length){
+                                                  console.log("Found in Admins");
+                                                  return done(null, user); 
+                                                }
+                                                
+                                                // fail! 
+                                                done(null, false); 
+                                          });
+                       }); 
+      }) 
   }));
 
-  app.get('/api/loginStatus', function(req, res){
-      if(req.isAuthenticated())
-        res.send(true);
-      else
-        res.send(false);
-  });
+  app.post('/login',
+    passport.authenticate('local', { 
+                                   successRedirect: '/#matches',
+                                   failureRedirect: '/#mates'
+                                 })
+  );
 
   app.get('/logout', function(req, res){
-    req.logOut();  //<- known problem - use the below instead
-    //req.session.destroy()
-    res.send('Loggedout');
+    req.logout();
+    res.send('/');
   });
 
-  //api -------------
-  app.get('/api/users', function(req, res){
+  app.get('/api/getLoggedInUser', function(req, res){
 
       if(req.isAuthenticated()){
-        //use mongoose to get all users in the database
-        User.find(function(err, users){
+        res.json(req.session.passport.user[0]);       
+      }
+      else
+        res.json(null);
 
-              if(err)
-                res.send(err);
+  });
 
-              res.json(users);
+  /*
+   * LunchApp APIs
+   * 
+   */
 
-        });
+  //api -------------
+  
+  // Sends all the users in the database 
+  app.get('/api/users', function(req, res){
+
+      //
+      // This authentication is important for every request to the API 
+      //
+      if(req.isAuthenticated()){   //!! TODO: find if this is safe? I think there's a loophole - if req can be tampered around with
+        
+            // get mongoose to extract all users in the database
+            User.find(function(err, users){
+
+                    if(err)
+                      res.send(err);
+
+                    // if user is admin - send all information 
+                    if( req.session.passport.user[0].adminStatus ){
+                          console.log("Admin Request Approved: Sending complete data", users);
+                          res.json(users);
+                    }
+                    else{
+                          console.log("Compressing Data");
+                          var compressedUserData = users.map( function(user){
+                               return {
+                                      name: user.name, 
+                                      title: user.title, 
+                                      picture: user.picture, 
+                                      email: user.email, 
+                                      phone: user.phone, 
+                                      tagline: user.tagline, 
+                                      nationality: user.nationality
+                               }
+                          })
+
+                          res.json(compressedUserData);
+                    }
+            });
+
       } 
       else{
-        res.statusCode = 302;
+        res.send('Request not authenticated');
       }
   });
 
@@ -225,22 +267,188 @@ var populate = function() {
    // getting today's lunch match for a user
   app.get('/api/matches', function(req, res){
       
-      if(req.isAuthenticated()){ 
-              //use mongoose to get all lunches for this user in the database
-          Match.find( { 
-            'participants._id': req.session.passport.user[0]._id
-          }, function(err, lunches){
+      if(req.isAuthenticated()){   //!! TODO: find if this is safe? I think there's a loophole - if req can be tampered around with
 
-                if(err)
-                  res.send(err);
+            var lunchInfo;
+            // if user is admin - send all information 
+            if( req.session.passport.user[0].adminStatus ){
 
-                console.log("matches found:", lunches);
-                res.json(lunches);
+                  console.log("Admin Request Approved: Sending complete data of matches");
+                  
+                  Match.find( function(err, lunches){
 
-          });
+                        if(err)
+                          res.send(err);
+
+                        lunchInfo = lunches
+
+                  });
+            }
+            else{
+                   
+                  console.log("Single User detected");
+                  //use mongoose to get all lunches for this user in the database
+                  Match.find( { 
+                    'participants._id': req.session.passport.user[0]._id
+                  }, function(err, lunches){
+
+                        if(err)
+                          res.send(err);
+
+                        console.log("Number of lunches found for user: ", lunches.length);
+                        lunchInfo = lunches
+
+                  });
+
+                  res.json(lunchInfo);
+            }
+
+      } 
+      else{
+        res.send('Request not authenticated');
       }
 
-   });
+
+  });
+
+  app.get('/api/runMatchAlgorithm', function(req, res){
+      
+      // only Admins can run the algorithm
+      if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+            matchingAlgorithm();
+            res.send(true);
+      }
+      else{
+        res.send('Request not authenticated');
+      }
+  })
+
+  app.post('/api/add_User', function(req, res){
+
+      // only Admins can add new users
+      if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+
+            // add only if no user with same email exists
+            User.find({
+              'email' : req.body.email
+            }, function(err, user){
+
+                if(err) console.log("Error while adding user", err);
+
+                // user is always an array - remember this!
+                if(user.length == 0)
+                  addToDatabase( User, req.body, "User", null )
+                
+                res.send("Admin Request Approved: Added new user");
+
+            })
+
+      }
+      else{
+        res.send('Request not authenticated');
+      }
+
+  })
+
+  app.post('/api/delete_User', function(req, res){
+
+      // only Admins can delete users
+      if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+
+            // add only if no user with same email exists
+            User.find({
+              'email' : req.body.email
+            })
+            .remove( function(err, user){
+
+                if(err) console.log("Error while deleting user", err);
+                
+                res.send("Admin Request Approved: Deleted User");
+
+            }); 
+
+      }
+      else{
+        res.send('Request not authenticated');
+      }
+
+  })
+
+  app.get('/api/restaurants', function(req, res){
+      //
+      // This authentication is important for every request to the API 
+      //
+      if(req.isAuthenticated()){   //!! TODO: find if this is safe? I think there's a loophole - if req can be tampered around with
+        
+            // get mongoose to extract all users in the database
+            Restaurant.find(function(err, restaurants){
+
+                    if(err)
+                      res.send(err);
+
+                    // if user is admin - send all information 
+                    if( req.session.passport.user[0].adminStatus ){
+                          console.log("Admin Request Approved: Sending complete data", restaurants);
+                          res.json(restaurants);
+                    }
+            });
+
+      } 
+      else{
+        res.send('Request not authenticated');
+      }
+  })
+
+  app.post('/api/add_Restaurant', function(req, res){
+      // only Admins can add new users
+      if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+
+            // add only if no user with same email exists
+            Restaurant.find({
+              'code' : req.body.code
+            }, function(err, restaurant){
+
+                if(err) console.log("Error while adding restaurant", err);
+
+                // user is always an array - remember this!
+                if(restaurant.length == 0)
+                  addToDatabase( Restaurant, req.body, "Restaurant", null )
+                
+                res.send("Admin Request Approved: Added new restaurant");
+
+            })
+
+      }
+      else{
+        res.send('Request not authenticated');
+      }
+  })
+
+  app.post('/api/delete_Restaurant', function(req, res){
+      // only Admins can delete users
+      if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+
+            // add only if no user with same email exists
+            Restaurant.find({
+              'code' : req.body.code
+            })
+            .remove( function(err, user){
+
+                if(err) console.log("Error while deleting restaurant", err);
+                
+                res.send("Admin Request Approved: Deleted Restaurant");
+
+            }); 
+
+      }
+      else{
+        res.send('Request not authenticated');
+      }
+  })
+
+  app.post('/api/edit_Restaurant', function(req, res){
+
+  })
 
   app.post('/api/edit_pref', function(req, res){
 
@@ -279,6 +487,8 @@ var populate = function() {
   });
 
   app.post('/api/edit_mates', function(req, res){
+      
+      // authenticate the request - to ensure no one gets information without correct access rights
       if(req.isAuthenticated()){
         
           User.findOneAndUpdate(
@@ -291,7 +501,8 @@ var populate = function() {
                       }, 
                       { multi: false }, 
                       function(){
-                        console.log("updated from server!"); setTimeout(matchingAlgorithm, 3000);
+                        console.log("updated from server!"); 
+                        setTimeout(matchingAlgorithm, 3000);
                       }
             )
 
@@ -301,18 +512,17 @@ var populate = function() {
 
             res.json(req.session.passport.user[0]._id);
       }
-      else{
-        res.statusCode = 302;
-      }
+
   });
 
-  app.get('*', function(req, res){ console.log("unknown api")
-        res.send('Error!');
+  app.get('*', function(req, res){ 
+        res.send('Sorry! We haven\'t written this API yet! Got a suggestion? Mail us at admin@trylunchedin.com!');
   });
 
   app.listen(process.env.PORT || 3000, function(){
     console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
   });
+
   console.log("App listening on port 8080");    
 
 
@@ -538,4 +748,4 @@ var populate = function() {
 
 
   //calling the matching algorithm every 5 seconds
-  setInterval(matchingAlgorithm, 43200000);
+  //setInterval(matchingAlgorithm, 43200000);
