@@ -142,6 +142,16 @@ th {
 }
 </style>
 <div id='pref_for_admin' ng-show=loggedInUser.adminStatus>
+  Cuisine List <br>
+  {{ cuisines }} <br>
+  Adding Cuisine: {{ newCuisine }}
+  <md-input-container>
+      <input type="text" ng-model="newCuisine" aria-label="cuisineName"></input> 
+  </md-input-container>
+  <md-button ng-click="addCuisine()"> Add Cuisine </md-button>
+
+  <br><br>
+  
   Restaurant Table
   <h3><center> User Panel </center></h1>
 

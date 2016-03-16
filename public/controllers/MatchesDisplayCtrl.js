@@ -9,6 +9,7 @@ app.controller("MatchesDisplayCtrl", [
 					$http.get("/api/matches")
 						.success( function(data){
 							$scope.matches = data; 
+							console.log("Matches:", data)
 						})
 						.error( function( data ){
 							console.log("Error: ", data);
@@ -18,6 +19,7 @@ app.controller("MatchesDisplayCtrl", [
 				$scope.match = function(){
 					$http.get('/api/runMatchAlgorithm')
 						 .success( function(data){
+						 	console.log("Algorithm ran successfully!")
 						 	getMatches();
 						 })
 						 .error( function(err){

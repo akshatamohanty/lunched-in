@@ -7,131 +7,33 @@ app.controller("preferenceFormCtrl", [
 								'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'	
 								]
 
-				// should be a factory
-				$scope.cuisines = [
-										{
-								          "name": "American",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Chinese",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Continental",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Cuban",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "French",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Greek",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Indian",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Indonesian",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Italian",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Japanese",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Korean",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Lebanese",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Malaysian",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Mexican",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Pakistani",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Russian",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Singaporean",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Spanish",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Thai",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Tibetan",
-								          "icon": "pictureaddress"
-								        },
-								        {
-								          "name": "Vietnamese",
-								          "icon": "pictureaddress"
-								        }
+				/********** Admin Component - Cuisine Related ********************/
+				// get the cuisines from the server
+				$scope.cuisines = []
+				$scope.newCuisine = "";
 
-								]
-
-				// user preference options
-/*				$http.get("/api/user_pref")
+				function refreshCuisineList(){
+					console.log("Refreshing Cuisine List");
+					$http.get("/api/cuisines")
 						.success( function(data){
 
-							if(data.statusCode == 302){
-								$window.location.href = '/login'
-							}
-
-							$scope.userDetails = data;
-							//console.log("preference", data);
+							$scope.cuisines = data;
 
 						})
 						.error(function(data){
 							console.log("Error:" + data);
-						});*/
-		
-		      	
-		      	$scope.toggle = function (item, list) {
-		      		if (list == undefined) { return };
-		        	var idx = list.indexOf(item);
-		        	if (idx > -1) list.splice(idx, 1);
-		        	else list.push(item);
-		      	};
+						});
+				}
+				// initialization
+				refreshCuisineList();
+				
 
-		      	$scope.exists = function (item, list) {
-		      		//console.log("exists", item, list.indexOf(item) > -1);
-		      		if (list == undefined) { return };
-		        	return list.indexOf(item) > -1;
-		      	};
-
-
-				$scope.editUserPreference = function (){
-					$http.post('/api/edit_pref', $scope.userDetails)
+				$scope.addCuisine = function( cuisineName, cuisinePicture ){ console.log("Adding Cuisine", $scope.newCuisine);
+					$http.post('/api/addCuisine', { 'cuisineName': $scope.newCuisine })
 										 .success(function(data){
-										 	console.log($scope.userDetails._id);
-										 	console.log("user updated", data);
+										 	console.log("New Cuisine Added");
+										 	$scope.cuisines = data;
+										 	$scope.newCuisine = "";
 										 })
 										 .error(function(data){
 										 	console.log('Error:', data);
@@ -139,6 +41,7 @@ app.controller("preferenceFormCtrl", [
 				}
 
 
+				/*************** admin Component : Restaurant related **********************/
 				$scope.restaurants;
 				$scope.newRestaurant = {
 					'code': "0001",
@@ -189,6 +92,51 @@ app.controller("preferenceFormCtrl", [
 
 			    	refreshRestaurantList();
 			    }
+
+
+
+			    				// user preference options
+/*				$http.get("/api/user_pref")
+						.success( function(data){
+
+							if(data.statusCode == 302){
+								$window.location.href = '/login'
+							}
+
+							$scope.userDetails = data;
+							//console.log("preference", data);
+
+						})
+						.error(function(data){
+							console.log("Error:" + data);
+						});*/
+		
+		      	
+		      	/*************** user component *********************************/
+		      	$scope.toggle = function (item, list) {
+		      		if (list == undefined) { return };
+		        	var idx = list.indexOf(item);
+		        	if (idx > -1) list.splice(idx, 1);
+		        	else list.push(item);
+		      	};
+
+		      	$scope.exists = function (item, list) {
+		      		//console.log("exists", item, list.indexOf(item) > -1);
+		      		if (list == undefined) { return };
+		        	return list.indexOf(item) > -1;
+		      	};
+
+
+				$scope.editUserPreference = function (){
+					$http.post('/api/edit_pref', $scope.userDetails)
+										 .success(function(data){
+										 	console.log($scope.userDetails._id);
+										 	console.log("user updated", data);
+										 })
+										 .error(function(data){
+										 	console.log('Error:', data);
+										 });
+				}
 
   			}
 ]);

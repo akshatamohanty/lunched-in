@@ -7,6 +7,16 @@
  * set the app to list on a port so we can view it on the browser
  */
 
+// GLOBAL VARIABLES
+var primaryAdmin =  {   
+                        name: 'Administrator',
+                        username: 'admin@trylunchedin.com',
+                        password: '123',
+                        adminStatus: true
+                    }
+
+var cuisineList = [];
+
 // set up =====================================
 var express = require('express');
 var app = express();
@@ -108,12 +118,6 @@ var addToDatabase = function( database, jsonObject, stringName, callback ){
 
 
 var initialize = function() {
-    var primaryAdmin =  {   
-                        name: 'Administrator',
-                        username: 'admin@trylunchedin.com',
-                        password: 'helloworld123',
-                        adminStatus: true
-                    }
     var dummyUser =  {   
                         name: 'Jane Doe',
                         email: 'janedoe@aedas.sg',
@@ -254,7 +258,8 @@ initialize();
       }
   });
 
-  app.get('/api/user_pref', function(req, res){
+  // deprecated - same as logged in user - delete this
+/*  app.get('/api/user_pref', function(req, res){
 
       if(req.isAuthenticated())
         res.json(req.session.passport.user[0]);
@@ -262,7 +267,7 @@ initialize();
         res.statusCode = 302;
       }
 
-  });
+  });*/
 
    // getting today's lunch match for a user
   app.get('/api/matches', function(req, res){
@@ -299,10 +304,8 @@ initialize();
                         lunchInfo = lunches
 
                   });
-
-                  res.json(lunchInfo);
             }
-
+            res.send(lunchInfo);
       } 
       else{
         res.send('Request not authenticated');
@@ -310,6 +313,40 @@ initialize();
 
 
   });
+
+  app.get('/api/cuisines', function(req, res){
+      
+      // anyone who is authenticated can get the cuisinelist
+      if( req.isAuthenticated() ){
+            res.send(cuisineList);
+      }
+      else{
+        res.send('Request not authenticated');
+      }
+  })
+
+  // Admin Only APIs
+  app.post('/api/addCuisine', function(req, res){
+
+      // only Admins can add new users
+      if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+
+            // add a cuisine to the cuisine list if it doesn't exist already
+            if(cuisineList.indexOf(req.body.cuisineName) == -1){
+                cuisineList.push(req.body.cuisineName);
+                console.log("New Cuisine:", req.body.cuisineName, "added.");
+                console.log("All Cuisines:", cuisineList);
+                res.send(cuisineList);
+            }
+            else
+              console.log("Cuisine already exists!");
+
+      }
+      else{
+        res.send('Request not authenticated');
+      }
+
+  })
 
   app.get('/api/runMatchAlgorithm', function(req, res){
       
@@ -446,46 +483,103 @@ initialize();
       }
   })
 
-  app.post('/api/edit_Restaurant', function(req, res){
-
-  })
-
-  app.post('/api/edit_pref', function(req, res){
+  // name changed from user_pref to edit_user - change in angular app - public
+  app.post('/api/edit_User', function(req, res){
 
       if(req.isAuthenticated()){
         
-          User.findOneAndUpdate(
-                      { 
-                         "_id": new ObjectId(req.session.passport.user[0]._id)
-                      }, 
-                      {
-                          password: req.body.password, 
-                          picture: req.body.picture,  
-                          tagline: req.body.tagline, 
-                          cuisine: req.body.cuisine,
-                          available: req.body.available
-                      }, 
-                      { multi: false }, 
-                      function(){
-                        console.log("updated from server!");
-                      }
-            )
+          // if user is admin - the body of the request will have email of the user which is to be updated
+          if( req.session.passport.user[0].adminStatus ){
+
+                  User.findOneAndUpdate(
+                              { 
+                                 'email': req.body.email
+                              }, 
+                              {
+                                    name: req.body.name, 
+                                    password: req.body.password, 
+                                    title: req.body.title, 
+                                    picture: req.body.picture, 
+                                    //email: req.body.email, 
+                                    phone: req.body.phone, 
+                                    tagline: req.body.tagline, 
+                                    nationality: req.body.nationality,
+                                    cuisine: req.body.cuisine,
+                                    available: req.body.available,
+                                    blocked: req.body.blocked,
+                                    known: req.body.known
+                              }, 
+                              { multi: false }, 
+                              function(){
+                                console.log("Updated user details");
+                              }
+                    )
+
+                    res.json("Success");   
+          }
+          else{
+                  User.findOneAndUpdate(
+                              { 
+                                 "_id": new ObjectId(req.session.passport.user[0]._id)
+                              }, 
+                              {
+                                  password: req.body.password, 
+                                  picture: req.body.picture,  
+                                  tagline: req.body.tagline, 
+                                  cuisine: req.body.cuisine,
+                                  available: req.body.available
+                              }, 
+                              { multi: false }, 
+                              function(){
+                                console.log("Updated loggedIn user details");
+                              }
+                    )
 
 
-            // update the logged in user
-            req.session.passport.user[0].password =  req.body.password;
-            req.session.passport.user[0].picture = req.body.picture;
-            req.session.passport.user[0].tagline = req.body.tagline; 
-            req.session.passport.user[0].cuisine = req.body.cuisine;
-            req.session.passport.user[0].available = req.body.available;
+                    // update the logged in user
+                    req.session.passport.user[0].password =  req.body.password;
+                    req.session.passport.user[0].picture = req.body.picture;
+                    req.session.passport.user[0].tagline = req.body.tagline; 
+                    req.session.passport.user[0].cuisine = req.body.cuisine;
+                    req.session.passport.user[0].available = req.body.available;
 
-            res.json(req.session.passport.user[0]._id);
-      }
-      else{
-        res.statusCode = 302;
+                    res.json(req.session.passport.user[0]._id);            
+          }
       }
   });
 
+  // name changed from user_pref to edit_user - change in angular app - public
+  app.post('/api/editRestaurant', function(req, res){
+
+      if(req.isAuthenticated()){
+        
+          // if user is admin - the body of the request will have email of the user which is to be updated
+          if( req.session.passport.user[0].adminStatus ){
+
+                  User.findOneAndUpdate(
+                              { 
+                                 'code': req.body.code
+                              }, 
+                              {
+                                  //code: { type: String, require: true},
+                                  name: req.body.name, 
+                                  address: req.body.address,
+                                  cuisine: req.body.cuisine,
+                                  scheduled: req.body.scheduled,
+                                  total: req.body.total
+                              }, 
+                              { multi: false }, 
+                              function(){
+                                console.log("Updated restaurant details");
+                              }
+                    )
+
+                    res.json("Successfully updated restaurant details");   
+          }
+      }
+  });
+
+  // deprecated - same as edit_User - delete after configuring angular app
   app.post('/api/edit_mates', function(req, res){
       
       // authenticate the request - to ensure no one gets information without correct access rights
@@ -501,8 +595,7 @@ initialize();
                       }, 
                       { multi: false }, 
                       function(){
-                        console.log("updated from server!"); 
-                        setTimeout(matchingAlgorithm, 3000);
+                        console.log("Updated mate selection for the user"); 
                       }
             )
 
@@ -727,7 +820,7 @@ initialize();
                       }, function(err, doc){
                           if(err) console.log(err);
 
-                          console.log("Match created");
+                          console.log("Match created:", doc);
                       })
 
                     }

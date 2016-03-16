@@ -8,7 +8,9 @@ app.controller("UserDisplay", [
 		$scope.newUser = {  'name': 'John Doe', 
 							'email': 'johndoe@aedas.sg', 
 							'password': 'pass',
-							'title': 'Senior Designer'
+							'title': 'Senior Designer',
+							'cuisine': ['Chinese', 'Indian'],
+							'available' : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] 
 						 };
 
 		// get all users data
