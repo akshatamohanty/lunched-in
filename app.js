@@ -17,6 +17,51 @@ var primaryAdmin =  {
 
 var cuisineList = [];
 
+var test = function(){
+  // loads the dummyUsers from the database
+  var dummyUsers = require('./dummyUsers');
+  console.log(dummyUsers.length, "users loaded.");
+  
+  // pre-process the user data - change to array etc
+  for(var i=0; i<dummyUsers.length; i++){
+      var user = dummyUsers[i]; 
+
+      if(user.cuisine == 0)
+        user.cuisine = [];
+      else 
+        user.cuisine = user.cuisine.replace(/\s/g, '').split(',');
+
+      if(user.available == 0)
+        user.available = [];
+      else
+        user.available = user.available.replace(/\s/g, '').split(',');
+
+      user.picture = "http://picture.com"
+
+      addToDatabase( User, user, "User", null);
+  }
+
+    // loads the dummyUsers from the database
+  var dummyRestaurants = require('./dummyRestaurants');
+  console.log(dummyRestaurants.length, "restaurants loaded.");
+  
+  // pre-process the user data - change to array etc
+  for(var i=0; i<dummyRestaurants.length; i++){
+      var restaurant = dummyRestaurants[i]; 
+
+      if(restaurant.cuisine == 0)
+        restaurant.cuisine = [];
+      else 
+        restaurant.cuisine = restaurant.cuisine.replace(/\s/g, '').split(',');
+
+      addToDatabase( Restaurant, restaurant, "Restaurant", null);
+  }
+
+
+  // loads the restaurants from the database
+}
+
+
 // set up =====================================
 var express = require('express');
 var app = express();
@@ -92,7 +137,7 @@ var clearDatabase = function( database, stringName, callback ){
   database.remove({}, function(err, doc){
         if(err) console.log("Error: ", stringName, " Database has not been reset. ", err);
 
-        console.log(stringName, " Database has been reset."); 
+        //console.log(stringName, " Database has been reset."); 
 
         if(callback)
           callback;   
@@ -108,7 +153,7 @@ var addToDatabase = function( database, jsonObject, stringName, callback ){
                       if(err)
                         console.log("Error: Unable to add to ", stringName, err);
 
-                      console.log("Added to ", stringName);
+                      //console.log("Added to ", stringName);
 
                       if(callback)
                         callback;   
@@ -118,19 +163,20 @@ var addToDatabase = function( database, jsonObject, stringName, callback ){
 
 
 var initialize = function() {
-    var dummyUser =  {   
+/*    var dummyUser =  {   
                         name: 'Jane Doe',
                         email: 'janedoe@aedas.sg',
                         password: '123',
                         title: 'Senior Designer'
-                    }
+                    }*/
     clearDatabase( Admin, "Admin", addToDatabase( Admin, primaryAdmin, "Admin", null) );
-    clearDatabase( User, "User", addToDatabase( User, dummyUser, "User", null) );
+    clearDatabase( User, "User", null/*addToDatabase( User, dummyUser, "User", null)*/ );
     clearDatabase( Restaurant, "Restaurants", null );
     clearDatabase( Match, "Matches", null);
 
 }
 initialize();
+setTimeout(test, 5000);
 
 // routes ================
 
@@ -274,7 +320,6 @@ initialize();
       
       if(req.isAuthenticated()){   //!! TODO: find if this is safe? I think there's a loophole - if req can be tampered around with
 
-            var lunchInfo;
             // if user is admin - send all information 
             if( req.session.passport.user[0].adminStatus ){
 
@@ -285,7 +330,7 @@ initialize();
                         if(err)
                           res.send(err);
 
-                        lunchInfo = lunches
+                        res.send(lunches);
 
                   });
             }
@@ -301,11 +346,10 @@ initialize();
                           res.send(err);
 
                         console.log("Number of lunches found for user: ", lunches.length);
-                        lunchInfo = lunches
+                        res.send(lunches);
 
                   });
             }
-            res.send(lunchInfo);
       } 
       else{
         res.send('Request not authenticated');
@@ -842,3 +886,4 @@ initialize();
 
   //calling the matching algorithm every 5 seconds
   //setInterval(matchingAlgorithm, 43200000);
+

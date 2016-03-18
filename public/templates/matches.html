@@ -191,7 +191,7 @@ th {
         <th>Locations</th>
         <tr ng-repeat="match in matches">
           <td>{{ match.date }} </td>
-          <td>{{ match.participants }} </td>
+          <td><div ng-repeat="participant in match.participants">{{ participant.name }} </div></td>
           <td>{{ march.dropouts }}</td>
           <td>{{ restaurant.location }} </td>
         </tr>

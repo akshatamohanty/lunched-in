@@ -1,0 +1,147 @@
+Code,Name,Address,Zip,Phone,Price,Cuisine,Halal,Vegetarian
+D1,Restaurant#01,"70 Anson Road
+Singapore ",79905,6222 0031,2," Thai,  Western ",TRUE,TRUE
+D2,Restaurant#02,"12 Gopeng St
+Singapore ",78877,6238 5863,0," Thai,  French ,  Korean ,  Vietnamese ,  Western , Indian ",FALSE,TRUE
+D3,Restaurant#03,"100 Tras St
+Singapore ",569922,6694 8809,2," Vietnamese ,  Korean ,  Chinese ,  Thai, Indian ,  French ",FALSE,FALSE
+D4,Restaurant#04,"15 Enggor Street
+Singapore ",79716,,0," Chinese ,  Western , Indian ,  French ,  Korean ",TRUE,TRUE
+D5,Restaurant#05,"100 Tras Street
+Singapore",79027,6604 9622,3," Korean ,  French ",FALSE,FALSE
+D6,Restaurant#06,"100 Tras Street
+Singapore",79027,,2," Thai,  Western , Indian ,  Chinese ,  Vietnamese ",TRUE,TRUE
+D7,Restaurant#07,"12 Gopeng Street
+Singapore",78877,6534 8765,3," French ,  Vietnamese , Indian ,  Thai,  Korean ,  Chinese ,  Western ",FALSE,TRUE
+D8,Restaurant#08,"1 Tanjong Pagar Plaza
+Singapore",82001,,1," Vietnamese , Indian ,  Chinese ,  Thai,  Western ",TRUE,TRUE
+D9,Restaurant#09,"1 Tras Link
+Singapore ",78867,6604 8891,0," Thai,  Western ",FALSE,FALSE
+D10,Restaurant#10,"6 Tanjong Pagar Plaza
+Singapore ",81006,,0," Thai,  French ,  Korean ,  Vietnamese ,  Western , Indian ",TRUE,TRUE
+D11,Restaurant#11,Singapore ,78877,,0," Vietnamese ,  Korean ,  Chinese ,  Thai, Indian ,  French ",TRUE,TRUE
+D12,Restaurant#12,"80 Anson Road
+Singapore ",79907,,1," Chinese ,  Western , Indian ,  French ,  Korean ",TRUE,TRUE
+D13,Restaurant#13,"5 Hoe Chiang Road
+Singapore ",89312,,0," Korean ,  French ",TRUE,TRUE
+D14,Restaurant#14,"12 Gopeng St
+Singapore ",78877,6224 6002,0," Thai,  Western , Indian ,  Chinese ,  Vietnamese ",FALSE,TRUE
+D15,Restaurant#15,"Orchid Hotel
+Singapore ",78867,6604 8891,2," French ,  Vietnamese , Indian ,  Thai,  Korean ,  Chinese ,  Western ",FALSE,FALSE
+D16,Restaurant#16,"1 Tanjong Pagar Plaza
+Singapore ",82001,8202 0522,0," Vietnamese , Indian ,  Chinese ,  Thai,  Western ",TRUE,TRUE
+D17,Restaurant#17,"165 Tanjong Pagar Road
+Singapore ",88539,6222 4688,4," Thai,  Western ",FALSE,TRUE
+D18,Restaurant#18,"1 Tras Link
+Singapore ",78867,,3," Thai,  French ,  Korean ,  Vietnamese ,  Western , Indian ",TRUE,TRUE
+D19,Restaurant#19,"1 Tras Link
+Singapore ",78867,,0," Vietnamese ,  Korean ,  Chinese ,  Thai, Indian ,  French ",TRUE,TRUE
+D20,Restaurant#20,"2 Lim Teck Kim
+Singapore ",88933,6324 2559,1," Chinese ,  Western , Indian ,  French ,  Korean ",TRUE,TRUE
+D21,Restaurant#21,"100 Tras Street
+Singapore ",79027,6444 4406,1," Korean ,  French ",FALSE,FALSE
+D22,Restaurant#22,"70 Anson Road
+Singapore ",79905,,0," Thai,  Western , Indian ,  Chinese ,  Vietnamese ",TRUE,TRUE
+D23,Restaurant#23,"15 Enggor St
+Singapore ",79716,6534 9336,0," French ,  Vietnamese , Indian ,  Thai,  Korean ,  Chinese ,  Western ",FALSE,TRUE
+D24,Restaurant#24,"7 Keppel Road
+Singapore ",89053,,0," Vietnamese , Indian ,  Chinese ,  Thai,  Western ",TRUE,TRUE
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,

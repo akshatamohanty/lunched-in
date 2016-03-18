@@ -4,7 +4,12 @@ var restaurantSchema = {
 	code: { type: String, require: true},
 	name: { type: String, required: true}, 
 	address: { type: String },
+	zip: Number,
+	price: Number,
+	phone: { type: String },
 	cuisine: [ String ],
+	halal: { type: Boolean },
+	veg: { type: Boolean },
 	scheduled: Number,
 	total: Number
 };
