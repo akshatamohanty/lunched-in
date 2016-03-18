@@ -234,8 +234,8 @@ setTimeout(test, 5000);
 
   app.post('/login',
     passport.authenticate('local', { 
-                                   successRedirect: '/#matches',
-                                   failureRedirect: '/#mates'
+                                   successRedirect: '/',
+                                   failureRedirect: '/#/lunches'
                                  })
   );
 
@@ -316,7 +316,7 @@ setTimeout(test, 5000);
   });*/
 
    // getting today's lunch match for a user
-  app.get('/api/matches', function(req, res){
+  app.get('/api/lunches', function(req, res){
       
       if(req.isAuthenticated()){   //!! TODO: find if this is safe? I think there's a loophole - if req can be tampered around with
 
@@ -404,7 +404,7 @@ setTimeout(test, 5000);
       }
   })
 
-  app.post('/api/add_User', function(req, res){
+  app.post('/api/addUser', function(req, res){
 
       // only Admins can add new users
       if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
@@ -431,7 +431,7 @@ setTimeout(test, 5000);
 
   })
 
-  app.post('/api/delete_User', function(req, res){
+  app.post('/api/removeUser', function(req, res){
 
       // only Admins can delete users
       if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
@@ -480,7 +480,7 @@ setTimeout(test, 5000);
       }
   })
 
-  app.post('/api/add_Restaurant', function(req, res){
+  app.post('/api/addRestaurant', function(req, res){
       // only Admins can add new users
       if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
 
@@ -505,7 +505,7 @@ setTimeout(test, 5000);
       }
   })
 
-  app.post('/api/delete_Restaurant', function(req, res){
+  app.post('/api/removeRestaurant', function(req, res){
       // only Admins can delete users
       if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
 
@@ -528,7 +528,7 @@ setTimeout(test, 5000);
   })
 
   // name changed from user_pref to edit_user - change in angular app - public
-  app.post('/api/edit_User', function(req, res){
+  app.post('/api/editUser', function(req, res){
 
       if(req.isAuthenticated()){
         
@@ -624,7 +624,7 @@ setTimeout(test, 5000);
   });
 
   // deprecated - same as edit_User - delete after configuring angular app
-  app.post('/api/edit_mates', function(req, res){
+/*  app.post('/api/edit_mates', function(req, res){
       
       // authenticate the request - to ensure no one gets information without correct access rights
       if(req.isAuthenticated()){
@@ -650,7 +650,7 @@ setTimeout(test, 5000);
             res.json(req.session.passport.user[0]._id);
       }
 
-  });
+  });*/
 
   app.get('*', function(req, res){ 
         res.send('Sorry! We haven\'t written this API yet! Got a suggestion? Mail us at admin@trylunchedin.com!');

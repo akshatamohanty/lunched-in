@@ -1,27 +1,4 @@
-<style>
-table, th , td {
-  border: 1px solid grey;
-  border-collapse: collapse;
-  padding: 15px;
-}
-table tr:nth-child(odd) {
-  background-color: #f1f1f1;
-}
-table tr:nth-child(even) {
-  background-color: #ffffff;
-}
-table {
-    width: 50%;
-}
-th {
-    background-color: #4CAF50;
-    color: white;
-    height: 50px;
-}
-</style>
-
-<div id='match_userView' ng-show=!loggedInUser.adminStatus>
-	<md-divider></md-divider>
+<md-divider></md-divider>
 
 	<md-toolbar class="md-theme-light" md-scroll-shrink>
 	    <h2 class="md-toolbar-tools">
@@ -134,7 +111,7 @@ th {
 		</md-card>
 	    </div>
 
-	</div>
+	    </div>
 
 	<md-button> Cancel this Lunch </md-button>
 
@@ -177,27 +154,3 @@ th {
 	</md-content>
 
 	</div>
-</div>
-
-<div id='match_adminView' ng-show=loggedInUser.adminStatus>
-  <h3><center> Matches Panel </center></h1>
-  <md-button ng-click=match()> Match! </md-button>
-  <md-button ng-click=getMatches()> Get Matches! </md-button>
-  <div>
-    <table> 
-        <th>Date</th>
-        <th>Participants</th>
-        <th>Dropouts</th>
-        <th>Locations</th>
-        <tr ng-repeat="match in matches">
-          <td>{{ match.date }} </td>
-          <td><div ng-repeat="participant in match.participants">{{ participant.name }} </div></td>
-          <td>{{ march.dropouts }}</td>
-          <td>{{ restaurant.location }} </td>
-        </tr>
-    </table>
-  </div>
-
-</div>
-
-

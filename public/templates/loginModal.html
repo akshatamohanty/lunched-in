@@ -1,0 +1,49 @@
+<!-- <h1 id='logo'>LunchedIn.</h1> -->
+<div id='loginDialog'>
+
+  <md-tabs class='loginTabs' md-dynamic-height md-no-ink md-stretch-tabs="always">           
+    
+    <md-tab class='loginTab' label="Sign In" id="signInTab"> 
+      <form method="post" action="/login">
+        <md-input-container layout-padding>
+          <label>Email</label>
+          <input name="username">
+        </md-input-container>
+        <md-input-container layout-padding>
+          <label>Password</label>
+          <input type="password" name="password">
+        </md-input-container>
+        <md-button class='loginBtn' type="submit" id="signInBtn">Sign In</md-button>
+      </form>
+    </md-tab>
+
+    <md-tab class='loginTab' label="Sign Up" id="signUpTab">
+        <md-input-container layout-padding>
+          <label>Email</label>
+          <input ng-model="user.email">
+        </md-input-container>
+        <md-input-container layout-padding>
+          <label>Password</label>
+          <input ng-model="user.password">
+        </md-input-container>
+        <md-input-container layout-padding>
+          <label>Repeat Password</label>
+          <input ng-model="user.repeat">  
+        </md-input-container>
+        <span class="passwordMatchMessage" ng-if="user.password==user.repeat && user.repeat">Passwords match!<br></span>
+        <md-button class="loginBtn" id="signUpBtn">Sign Up</md-button>
+    </md-tab>
+
+    <md-tab ng-disabled=true> <!--dummy tab for spacing--></md-tab>
+
+
+    <md-tab class='loginTab' label="Reset" id="resetTab">
+        <md-input-container layout-padding>
+          <label>Email</label>
+          <input ng-model="user.password">
+        </md-input-container>
+        <md-button class='loginBtn' id="resetBtn">Send Password</md-button>
+    </md-tab>
+
+  </md-tabs>
+</div>
