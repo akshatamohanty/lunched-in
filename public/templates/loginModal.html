@@ -18,20 +18,22 @@
     </md-tab>
 
     <md-tab class='loginTab' label="Sign Up" id="signUpTab">
+      <form method="post" action="/signUp">
         <md-input-container layout-padding>
           <label>Email</label>
-          <input ng-model="user.email">
+          <input ng-model="user.email" name=email>
         </md-input-container>
         <md-input-container layout-padding>
           <label>Password</label>
-          <input ng-model="user.password">
+          <input ng-model="user.password" type="password">
         </md-input-container>
         <md-input-container layout-padding>
           <label>Repeat Password</label>
-          <input ng-model="user.repeat">  
+          <input ng-model="user.repeat" type="password">  
         </md-input-container>
         <span class="passwordMatchMessage" ng-if="user.password==user.repeat && user.repeat">Passwords match!<br></span>
         <md-button class="loginBtn" id="signUpBtn">Sign Up</md-button>
+      </form>
     </md-tab>
 
     <md-tab ng-disabled=true> <!--dummy tab for spacing--></md-tab>

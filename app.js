@@ -81,6 +81,8 @@ var cookieParser = require('cookie-parser'); // the session is stored in a cooki
 
 var async = require('async');
 
+var postmark = require("postmark");
+
 
 // configuration ==============================
 /* 
@@ -728,6 +730,60 @@ setTimeout(test, 5000);
 
               if(!user.length)
                 res.send("Sorry! This email is not registered with us.")
+
+          });  
+  });
+
+  app.post('/signUp', function(req, res){
+          
+          console.log(req.body);
+
+          User.find({
+            'email': req.body.email
+          }, function(err, user){ 
+
+              if(user){
+                res.send("Oops.. Looks like this email has already been registered with us.");
+
+              if(!user.length){
+                // send a mail with this password; 
+
+
+                    var client = new postmark.Client("32f51173-e5ee-4819-90aa-ad9c25c402a8");
+
+                    client.sendEmailWithTemplate({
+                      "From": "admin@trylunchedin.com",
+                      "To": req.body.email,
+                      "TemplateId": 497903,
+                      "TemplateModel": {
+                        "product_name": "TryLunchedIn",
+                        "username": req.body.email,
+                        "action_url": "admin@trylunchedin.com",
+                        "product_address_line1": "Singapore"
+                      }
+                    });
+
+                    client.send({
+                        "From": "admin@TryLunchedIn.com",
+                        "To": "trylunchedin@gmail.com",
+                        "Subject": "New Sign Up on TryLunchedIn",
+                        "TextBody": req.body.email+" just signed up on TryLunchedIn!",
+                        "Tag": "sign-up"
+                        }, function(error, success) {
+                        if(error) {
+                            console.error("Unable to send via postmark: " + error.message);
+                           return;
+                        }
+                        console.info("Sent to postmark for delivery")
+                    });
+
+                    console.info("Sent to postmark for delivery")
+                }
+
+                res.send("Thank you! Please check your inbox for a mail from us!")
+              }
+              
+              
 
           });  
   });
