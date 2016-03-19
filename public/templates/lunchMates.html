@@ -1,119 +1,14 @@
-<style>
-table, th , td {
-  border: 1px solid grey;
-  border-collapse: collapse;
-  padding: 15px;
-}
-table tr:nth-child(odd) {
-  background-color: #f1f1f1;
-}
-table tr:nth-child(even) {
-  background-color: #ffffff;
-}
-table {
-    width: 50%;
-}
-th {
-    background-color: #4CAF50;
-    color: white;
-    height: 50px;
-}
-</style>
+<div ng-switch="loggedInUser.adminStatus">
 
-
-<div id='mates_userView' ng-show=!loggedInUser.adminStatus>
-  <md-button ng-click="saveMates()"> Save </md-button>
-  <md-tabs md-selected="selectedIndex" md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink>
-      <md-tab ng-repeat="tab in tabs" label="{{tab.title}}"> 
-          <div class='md-padding' layout="row" layout-wrap flex>
-            <!-- <md-card ng-repeat="user in (selectedUsers.length ? selectedUsers : querySearch(tab.title)) "> -->
-            
-            <md-card ng-repeat="user in users" style="width: 25%; height: 45%"  ng-show="checkInitial(tab.title, user.name)" >
-                <div class='contactCards' classlayout='column'>
-                  <center>
-                  <div class='contactCards' id='username'><b><br>
-                      {{user.name}}
-                      </b>
-                      <br>
-                      <i class='contactCards' id='usertitle'>{{user.title}}<i>
-                      <div ng-show="containsObject(user, 'known')"> Known user </div>
-                      <div ng-show="containsObject(user, 'blocked')"> Blocked user </div>
-
-                  </div> 
-                  <br>
-                  <div class='contactCards' id='userpicture'>
-                      <ng-md-icon ng-attr-icon='perm_identity' size="40"></ng-md-icon>
-                  </div>
-                  <div class='contactCards' id='usertagline'>
-                    "{{user.tagline}}"
-                  </div>
-
-                  <div class='contactCards' id='btn-user-sel-placeholder'>
-                      <md-button ng-click="addToList(user, 'known')"> Add to Known </md-button>
-                      <md-button ng-click="addToList(user, 'blocked')"> Block </md-button>
-                  </div>
-
-                </div>
-                </center>
-            </md-card>
-
-        </div> 
-      </md-tab>
-  </md-tabs>
+      <div id='lunchMates_userView' ng-switch-when="false" >
+          <ng-include src="'templates/lunchMates_user.html'"> </ng-include> <!--path wrt parent-->
+      </div>
+      
+      <div id='lunchMates_adminView' ng-switch-when="true" >
+          <ng-include src="'templates/lunchMates_admin.html'"> </ng-include> 
+      </div>
+    
 </div>
 
-<div id='match_adminView' ng-show=loggedInUser.adminStatus>
 
-  <h3><center> User Panel </center></h1>
 
-  <div>
-    <table> 
-        <th>Add</th>
-        <th>Delete</th>
-        <th>Email</th>
-        <th>Name</th>
-        <th>Password</th>
-        <th>Title</th>
-        <th>Phone</th>
-        <th>Tagline</th>
-        <th>Nationality</th>
-        <th>Picture</th>
-        <th>Cuisine</th>
-        <th>Availability</th>
-        <th>Blocked</th>
-        <th>Known</th>
-        <tr>
-          <td> <md-button ng-click="addNewUser()">Add User </md-button> </td>
-          <td></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.email" aria-label="email">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.name" aria-label="name">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.password" aria-label="password">  </input>  </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.title" aria-label="title">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.phone" aria-label="phone">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.tagline" aria-label="tagline">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.nationality" aria-label="nationality">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.picture" aria-label="picture">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.cuisine" aria-label="cuisine">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.availability" aria-label="availability">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.blocked" aria-label="blocked">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.known" aria-label="known">  </input> </md-input-container></td>
-        </tr>
-        <tr ng-repeat="user in users">
-          <td></td>
-          <td><md-button ng-click="deleteUser( user.email )"> Delete User </md-button> </td>
-          <td>{{ user.email }} </td>
-          <td>{{ user.name }} </td>
-          <td>{{ user.password }}</td>
-          <td>{{ user.title }} </td>
-          <td>{{ user.phone }}</td>
-          <td>{{ user.tagline }} </td>
-          <td>{{ user.nationality }}</td>
-          <td>{{ user.picture }}</td>
-          <td>{{ user.cuisine }}</td>
-          <td>{{ user.available }}</td>
-          <td>{{ user.blocked }}</td>
-          <td>{{ user.known }}</td>
-        </tr>
-    </table>
-  </div>
-</div>

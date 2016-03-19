@@ -45,7 +45,7 @@ app.config(["$routeProvider", function($routeProvider) {
 
 /***************** Main Controller ************************************/
 app.controller("MainCtrl", [
-      "$scope", "$http", 
+      "$scope", "$http",
       function($scope, $http){
 
          $scope.loggedInUser = null;
@@ -66,7 +66,7 @@ app.controller("MainCtrl", [
                               console.log("Error:" + data);
                            });
 
-            var logoutFunction = function(){
+          var logoutFunction = function(){
 
                            $http.get("/logout")
                                .success( function(data){

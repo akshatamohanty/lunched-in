@@ -38,11 +38,12 @@
 
 
     <md-tab class='loginTab' label="Reset" id="resetTab">
+      <form method="post" action="/api/resetPassword">
         <md-input-container layout-padding>
           <label>Email</label>
-          <input ng-model="user.password">
+          <input name="email">
         </md-input-container>
-        <md-button class='loginBtn' id="resetBtn">Send Password</md-button>
+        <md-button class='loginBtn' type="submit" id="resetBtn" >Send Password</md-button>
     </md-tab>
 
   </md-tabs>

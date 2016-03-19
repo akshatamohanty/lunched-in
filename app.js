@@ -36,6 +36,8 @@ var test = function(){
       else
         user.available = user.available.replace(/\s/g, '').split(',');
 
+      user.available.push('Sunday');
+
       user.picture = "http://picture.com"
 
       addToDatabase( User, user, "User", null);
@@ -101,6 +103,7 @@ var RestaurantSchema = require('./models/restaurant');
 var MatchSchema = require('./models/match');
 var DailyPoolSchema = require('./models/dailypool');
 var PairSchema = require('./models/pair');
+var MatchAlgorithmSchema = require('./models/matchAlgorithm');
 
 var ObjectId = mongoose.Types.ObjectId;
 
@@ -110,6 +113,7 @@ var Restaurant = mongoose.model('Restaurant', RestaurantSchema);
 var Match = mongoose.model('Match', MatchSchema);
 var DailyPool = mongoose.model('DailyPool', DailyPoolSchema);
 var Pair = mongoose.model('Pair', PairSchema);
+var MatchAlgorithm = mongoose.model('MatchAlgorithm', MatchAlgorithmSchema);
 
 app.use(express.static(__dirname + '/public'));
 app.use(morgan('dev'));
@@ -163,16 +167,17 @@ var addToDatabase = function( database, jsonObject, stringName, callback ){
 
 
 var initialize = function() {
-/*    var dummyUser =  {   
+    var dummyUser =  {   
                         name: 'Jane Doe',
                         email: 'janedoe@aedas.sg',
                         password: '123',
                         title: 'Senior Designer'
-                    }*/
+                    }
     clearDatabase( Admin, "Admin", addToDatabase( Admin, primaryAdmin, "Admin", null) );
-    clearDatabase( User, "User", null/*addToDatabase( User, dummyUser, "User", null)*/ );
+    clearDatabase( User, "User", addToDatabase( User, dummyUser, "User", null) );
     clearDatabase( Restaurant, "Restaurants", null );
     clearDatabase( Match, "Matches", null);
+    clearDatabase( MatchAlgorithm, "MatchAlgorithm", null);
 
 }
 initialize();
@@ -623,6 +628,27 @@ setTimeout(test, 5000);
       }
   });
 
+  app.get('/api/matchAlgorithmData', function(req, res){
+      //
+      // This authentication is important for every request to the API 
+      //
+      if(req.isAuthenticated() && req.session.passport.user[0].adminStatus){   //!! TODO: find if this is safe? I think there's a loophole - if req can be tampered around with
+        
+            // get mongoose to extract all users in the database
+            MatchAlgorithm.find(function(err, algoInfo){
+
+                    if(err)
+                      res.send(err);
+
+                    // if user is admin - send all information 
+                    res.send(algoInfo);
+            });
+
+      } 
+      else{
+        res.send('Request not authenticated');
+      }
+  })
   // deprecated - same as edit_User - delete after configuring angular app
 /*  app.post('/api/edit_mates', function(req, res){
       
@@ -652,6 +678,60 @@ setTimeout(test, 5000);
 
   });*/
 
+  /********** Login logout functionality ************/
+  app.get('/api/users/:email', function(req, res){
+         
+          User.find({
+            'email': req.params.email
+          }, function(err, user){ 
+
+              if(user){
+                res.json(true);
+              }
+
+              if(!user.length)
+                res.json(false)
+
+          });  
+
+  });
+
+  app.post('/api/resetPassword', function(req, res){
+          
+          console.log(req.body);
+
+          User.find({
+            'email': req.body.email
+          }, function(err, user){ 
+
+              if(user){
+                var password = user[0].password; 
+
+                // send a mail with this password; 
+                res.send("Email sent! Please check your email.");
+                var postmark = require("postmark")(process.env.POSTMARK_API_TOKEN)
+
+                postmark.send({
+                    "From": "admin@trylunchedin.com",
+                    "To": req.body.email,
+                    "Subject": "Password Recovery - TryLunchedIn",
+                    "TextBody": "Hello!",
+                    "Tag": "password-recovery"
+                }, function(error, success) {
+                    if(error) {
+                        console.error("Unable to send via postmark: " + error.message);
+                       return;
+                    }
+                    console.info("Sent to postmark for delivery")
+                });
+              }
+
+              if(!user.length)
+                res.send("Sorry! This email is not registered with us.")
+
+          });  
+  });
+
   app.get('*', function(req, res){ 
         res.send('Sorry! We haven\'t written this API yet! Got a suggestion? Mail us at admin@trylunchedin.com!');
   });
@@ -666,11 +746,17 @@ setTimeout(test, 5000);
   function matchingAlgorithm(){
 
     console.log("Matching");
+
     // populate daily pool
     var dayMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
      
     var today = new Date();
     var day = today.getDay();
+
+    var matchAlgoData = {};
+    matchAlgoData.time = today;
+    matchAlgoData.poolCount = 0;
+    matchAlgoData.matchCount = 0;
 
     User.find({ available : dayMap[day] })
         .sort({ blockedCount: -1, knownCount: 1 })
@@ -680,8 +766,11 @@ setTimeout(test, 5000);
           else {
                 // Algorithm is run on the user pool
                 //console.log("UserPool Count:", userPool.length);
-                
-                runAlgoOnPool( userPool );
+                matchAlgoData.poolCount = userPool.length;
+                matchAlgoData.count = 0;
+
+                runAlgoOnPool( userPool ); 
+
                 function runAlgoOnPool( userPool ){
                     while(userPool.length > 0){
 
@@ -732,11 +821,14 @@ setTimeout(test, 5000);
                           var fourthMate = pickNextMate( fourthMatePool, thirdMate, true );  // switch off next pool length
 
                           // make match of four people
-                          addMatch( [currUser, pairMate, thirdMate, fourthMate] );
+                          addMatch( [currUser, pairMate, thirdMate, fourthMate] );                        
+                          
                           // remove the four people from the user pool
                           removeFromPool( userPool, [currUser, pairMate, thirdMate, fourthMate]  )
-
-                                    
+                          
+                          if(userPool.length == 0)
+                            addToDatabase( MatchAlgorithm, matchAlgoData, "matchAlgorithm", null); 
+                                
                     } //while end
 
                     // takes in two users 
@@ -846,28 +938,30 @@ setTimeout(test, 5000);
                     // adds the required match
                     function addMatch( participants ){
                       
-                      // find a matching restaurant
-                      var restaurant = "";
-                      Restaurant.find({
-                          /*cuisine: { $in : user1.cuisine.concat(user2.cuisine) }*/
-                        }, function(err, res){
-                           if(err) console.log(err);
+                          // find a matching restaurant
+                          var restaurant = "";
+                          Restaurant.find({
+                              //cuisine: { $in : user1.cuisine.concat(user2.cuisine) }
+                            }, function(err, res){
+                               if(err) console.log(err);
 
-                           else restaurant = res[0];
-                      })
+                               else restaurant = res[0];
+                          })
 
-                      // create and add a match to the database
-                      Match.create({
-                        date: Date(),
-                        participants: participants,
-                        location: restaurant
-                      }, function(err, doc){
-                          if(err) console.log(err);
+                          // create and add a match to the database
+                          Match.create({
+                            date: Date(),
+                            participants: participants,
+                            location: restaurant
+                          }, function(err, doc){
+                              if(err) console.log(err);
 
-                          console.log("Match created:", doc);
-                      })
+                              console.log("Match made");
+                              matchAlgoData.matchCount++; //console.log("count", userPool.length);
+                                
+                          })
 
-                    }
+                    } 
 
                     // removes the users from the pool
                     function removeFromPool( userPool, participants ){
