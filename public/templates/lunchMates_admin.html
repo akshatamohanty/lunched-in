@@ -1,55 +1,12 @@
-<div id='match_adminView' ng-show=loggedInUser.adminStatus>
+<div class='adminViewContainer' ng-show=loggedInUser.adminStatus>
 
-  <h3><center> User Panel </center></h1>
+ 
 
-  <div>
-    <table> 
-        <th>Add</th>
-        <th>Delete</th>
-        <th>Email</th>
-        <th>Name</th>
-        <th>Password</th>
-        <th>Title</th>
-        <th>Phone</th>
-        <th>Tagline</th>
-        <th>Nationality</th>
-        <th>Picture</th>
-        <th>Cuisine</th>
-        <th>Availability</th>
-        <th>Blocked</th>
-        <th>Known</th>
-        <tr>
-          <td> <md-button ng-click="addNewUser()">Add User </md-button> </td>
-          <td></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.email" aria-label="email">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.name" aria-label="name">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.password" aria-label="password">  </input>  </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.title" aria-label="title">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.phone" aria-label="phone">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.tagline" aria-label="tagline">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.nationality" aria-label="nationality">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.picture" aria-label="picture">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.cuisine" aria-label="cuisine">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.availability" aria-label="availability">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.blocked" aria-label="blocked">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.known" aria-label="known">  </input> </md-input-container></td>
-        </tr>
-        <tr ng-repeat="user in users">
-          <td></td>
-          <td><md-button ng-click="deleteUser( user.email )"> Delete User </md-button> </td>
-          <td>{{ user.email }} </td>
-          <td>{{ user.name }} </td>
-          <td>{{ user.password }}</td>
-          <td>{{ user.title }} </td>
-          <td>{{ user.phone }}</td>
-          <td>{{ user.tagline }} </td>
-          <td>{{ user.nationality }}</td>
-          <td>{{ user.picture }}</td>
-          <td>{{ user.cuisine }}</td>
-          <td>{{ user.available }}</td>
-          <td>{{ user.blocked }}</td>
-          <td>{{ user.known }}</td>
-        </tr>
-    </table>
+  <div class='adminInnerContainer'>
+    <h3><center> User Panel </center></h3>
+    <md-button ng-click='refreshUserList()'>Refresh</md-button>
+    <md-card class='admin-user-card' ng-repeat="user in users">
+      {{ user }}
+    </md-card>
   </div>
 </div>

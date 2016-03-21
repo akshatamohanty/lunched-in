@@ -1,11 +1,13 @@
 <h1> Matches Panel </h1>
 <md-button ng-click=match()> Match! </md-button>
 <md-button ng-click=getMatches()> Get Matches! </md-button>
-<div>
-    <md-card ng-repeat="match in matches">
-      On {{ match.date }} 
-      <span ng-repeat="participant in match.participants">{{ participant.name }} ( {{ participant.title }}) <span>
-      to {{ restaurant.location }} 
-      Dropouts: {{ march.dropouts }}
-    </md-card>
+<div class='adminViewContainer'>
+	<div class='adminInnerContainer'>
+	    <md-card ng-repeat="match in matches">
+	      On {{ match.date }} 
+	      <span ng-repeat="participant in match.participants">{{ participant.name }} ( {{ participant.title }}) <span>
+	      to {{ restaurant.location }} 
+	      Dropouts: {{ match.dropouts }}
+	    </md-card>
+	</div>
 </div>

@@ -19,47 +19,29 @@ th {
     height: 50px;
 }
 </style>
-<div id='pref_for_admin' ng-show=loggedInUser.adminStatus>
-  Cuisine List <br>
-  {{ cuisines }} <br>
-  Adding Cuisine: {{ newCuisine }}
-  <md-input-container>
-      <input type="text" ng-model="newCuisine" aria-label="cuisineName"></input> 
-  </md-input-container>
-  <md-button ng-click="addCuisine()"> Add Cuisine </md-button>
+<div class='adminViewContainer' id='pref_for_admin' ng-show=loggedInUser.adminStatus>
+  <div class='adminInnerContainer'>
+    Cuisine List <br>
+    {{ cuisines }} <br>
+    Adding Cuisine: {{ newCuisine }}
+    <md-input-container>
+        <input type="text" ng-model="newCuisine" aria-label="cuisineName"></input> 
+    </md-input-container>
+    <md-button ng-click="addCuisine()"> Add Cuisine </md-button>
+  </div>
 
-  <br><br>
-  
-  Restaurant Table
-  <h3><center> User Panel </center></h1>
+  <br>
+  <br>
 
-  <div>
-    <table> 
-        <th>Add</th>
-        <th>Delete</th>
-        <th>Code</th>
-        <th>Name</th>
-        <th>Cuisine</th>
-        <th>Scheduled</th>
-        <th>Total</th>
-        <tr>
-          <td> <md-button ng-click="addNewRestaurant()"> Add Restaurant </md-button> </td>
-          <td></td>
-          <td> <md-input-container><input type="text" ng-model="newRestaurant.code" aria-label="code">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newRestaurant.name" aria-label="name">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newRestaurant.cuisine" aria-label="cuisine">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newRestaurant.scheduled" aria-label="availability">  </input> </md-input-container></td>
-          <td> <md-input-container><input type="text" ng-model="newUser.total" aria-label="blocked">  </input> </md-input-container></td>
-        </tr>
-        <tr ng-repeat="restaurant in restaurants">
-          <td></td>
-          <td><md-button ng-click="deleteRestaurant( restaurant.code )"> Delete Restaurant </md-button> </td>
-          <td>{{ restaurant.code }} </td>
-          <td>{{ restaurant.name }} </td>
-          <td>{{ restaurant.cuisine }}</td>
-          <td>{{ restaurant.scheduled }} </td>
-          <td>{{ restaurant.total }} </td>
-        </tr>
-    </table>
+  <div class='adminInnerContainer'>
+  <h3><center> Restaurants </center></h1>
+      <md-card ng-repeat="restaurant in restaurants">
+        {{ restaurant.code }} 
+        {{ restaurant.name }} 
+        {{ restaurant.cuisine }}
+        {{ restaurant.scheduled }}
+        {{ restaurant.total }} 
+      </md-card>
+      <md-button ng-click='refreshRestaurantList()'>Refresh</md-button>
   </div>
 </div>
