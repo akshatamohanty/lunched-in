@@ -1,15 +1,14 @@
 <div ng-switch="loggedInUser.adminStatus">
 
-      <div id='lunchMates_userView' ng-switch-when="false" >
-          <!-- <ng-include src="'templates/lunchMates_user.html'"> </ng-include> --> <!--path wrt parent-->
+      <div id='match_userView' ng-switch-when="false" >
+          <!-- <ng-include src="'templates/lunches_user.html'"> </ng-include> --> <!--path wrt parent-->
           Working on it!
       </div>
       
-      <div id='lunchMates_adminView' ng-switch-when="true" >
+      <div id='match_adminView' ng-switch-when="true" ng-controller='lunchMatesCtrlAdmin'>
           <ng-include src="'templates/lunchMates_admin.html'"> </ng-include> 
       </div>
     
 </div>
-
 
 

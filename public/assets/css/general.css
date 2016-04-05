@@ -1,16 +1,20 @@
 html {
     font-family: 'Roboto', sans-serif;
+    width:100%; 
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: grey;
 }
 
 body{
-    position: absolute;
+    height: 100%;
     background-image: url('..//images//background//loginPage1.jpg');
-    background-repeat: repeat-y;
     background-size: cover;
     background-position: top-left;
-    width:100%; 
-    height:100%;
+    background-repeat: repeat-y;
 
+    overflow: overlay; 
 }
 
 /************ CSS for Login Modal *************************/
@@ -49,7 +53,7 @@ h1#logo{
 
 #resetTab{
     text-transform: uppercase;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Roboto', sans-serif;
 }
 
 .loginBtn {
@@ -77,30 +81,68 @@ h1#logo{
   left: 15%;
   width: 70%;
   height: 100%;
-  background-color: white;
-  z-index: 9999;
+  background-color: #0c9d7c;
+  font-family: Verdana, sans-serif;
 }
 
 
 /********** CSS for Dashboard ********************/
-
 .dashboard-header{
-  background-color: black;
-  font-color: white;
-  font-family: monospace;
-  height: 10%;
+  position: absolute;
+  top: 10%;
+  left: 5%;
+  width: 90%;
+  height: 15%;
+  background-color: white;
+  color: black;
+  font-size: 1em;
+  text-align: center;
+}
+
+.pageTitle{
+  height: 30%;
+  top: 25%;
+  background-color: #0c9d7c;
+  border: 4px solid #0c8d7c;
+  color: white;
+  font-size: 3em;
+  text-align: left;
+  padding: 3%;
 }
 
 .adminViewContainer{
+  position: absolute;
+  top: 55%;
   padding: 20px;
-  background-color: #D3D4D5;
+  background-color: white;
   height: 100%;
 }
 
-.adminInnerContainer{
-  background-color: white;
-  border-radius: 20px;
-  padding: 20px;
-  height: 100%;
+.userbox{
+  height: 50px !important;
+  border: 2px solid #0c8d7c;
+  background-color: #0c8d7c;
+  padding: 3%;
+  margin: 2%;
+  color: white;
+  text-transform: uppercase;
 }
+
+.userbox:hover{
+  background-color: #eee;
+  z-index: 3;
+}
+
+.userDetails{
+  background-color: #eee;
+  text-align: left;
+}
+
+.userDetails span{
+  border: 2px solid #0c8d7c;
+  padding: 3%;
+  margin: 1%;
+}
+
+
 
