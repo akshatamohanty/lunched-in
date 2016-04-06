@@ -1,13 +1,20 @@
-<h1> Matches Panel </h1>
-<md-button ng-click=match()> Match! </md-button>
-<md-button ng-click=getMatches()> Get Matches! </md-button>
-<div class='adminViewContainer'>
-	<div class='adminInnerContainer'>
-	    <md-card ng-repeat="match in matches">
-	      On {{ match.date }} 
-	      <span ng-repeat="participant in match.participants">{{ participant.name }} ( {{ participant.title }}) <span>
-	      to {{ restaurant.location }} 
-	      Dropouts: {{ match.dropouts }}
-	    </md-card>
-	</div>
+<div class='dashboard-header pageTitle'> Lunches     ({{ matches.length }})
+    <md-button ng-click='runMatchAlgorithm(); refreshMatchList()'>Run</md-button>  
+</div>
+<div class='adminViewContainer dashboard-header'> 
+  <div layout="row"> 
+    <div flex='66' class="details" layout="column">
+      <span>{{ selectedMatch.date }} </span>
+      <span>Location: {{ selectedMatch.location }}</span>
+      <span>Participants: <ul><li ng-repeat=" user in selectedMatch.participants ">{{ user.name }}</li></ul></span>
+      <span>Dropouts: <ul><li ng-repeat=" user in selectedMatch.dropouts ">{{ user.name }}</li></ul></span>
+    </div>
+    <div flex='33'>
+        <div layout="column">
+        <div flex ng-repeat="match in matches" class='userList'>
+          <div class='userbox' ng-click="$parent.selectedMatch = match">{{ match.date }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

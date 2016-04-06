@@ -36,8 +36,8 @@ app.config(["$routeProvider", function($routeProvider) {
    }).
 
    otherwise({
-      templateUrl: "templates/lunchMates.html", 
-      controller: "lunchMatesCtrl"
+      templateUrl: "templates/lunches.html", 
+      controller: "lunches"
    });
 	
 }]);
@@ -83,9 +83,9 @@ app.controller("lunchesCtrl", [
          function( $scope, $http ){
 
             $scope.matches = []; 
+            $scope.refreshMatchList = refreshMatchList; 
 
-            $scope.getMatches = getMatches; 
-            var getMatches = function(){
+            var refreshMatchList = function(){
                $http.get("/api/lunches")
                   .success( function(data){
                      $scope.matches = data; 
@@ -94,18 +94,14 @@ app.controller("lunchesCtrl", [
                   .error( function( data ){
                      console.log("Error: ", data);
                   });
-            }
+            };
+            refreshMatchList();
+         
+}]);
 
-            $scope.match = function(){
-               $http.get('/api/runMatchAlgorithm')
-                   .success( function(data){
-                     console.log("Algorithm ran successfully!")
-                     getMatches();
-                   })
-                   .error( function(err){
-                     console.log("Error: ", data);
-                   })
-            }
+app.controller("lunchesCtrlUser", [
+         "$scope", "$http", 
+         function( $scope, $http ){
 
             function processMatches(){
                // checking for lunch today
@@ -132,10 +128,29 @@ app.controller("lunchesCtrl", [
 
                console.log("today", $scope.today);
             }
+}]);
 
-         }
+app.controller("lunchesCtrlAdmin", [
+         "$scope", "$http", 
+         function( $scope, $http ){
 
-]);
+            $scope.selectedMatch = 'No Match Selected';
+            $scope.runMatchAlgorithm = runMatchAlgorithm;            
+
+            var runMatchAlgorithm = function(){
+               $http.get('/api/runMatchAlgorithm')
+                   .success( function(data){
+                     console.log("Algorithm ran successfully!")
+                   })
+                   .error( function(err){
+                     console.log("Error: ", data);
+                   })
+            };
+            runMatchAlgorithm();
+
+
+}]);
+
 
 
 /****************** Settings Controller *******************/
@@ -143,144 +158,99 @@ app.controller("settingsCtrl", [
          "$scope", "$http", "$routeParams",
          function( $scope, $http, $routeParams ){
 
-            $scope.userDetails = $scope.loggedInUser; 
-            $scope.days = [
-                        'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'   
-                        ]
-
-            /********** Admin Component - Cuisine Related ********************/
-            // get the cuisines from the server
-            $scope.cuisines = []
-            $scope.newCuisine = "";
-
-            function refreshCuisineList(){
-               console.log("Refreshing Cuisine List");
-               $http.get("/api/cuisines")
-                  .success( function(data){
-
-                     $scope.cuisines = data;
-
-                  })
-                  .error(function(data){
-                     console.log("Error:" + data);
-                  });
-            }
-            // initialization
-            refreshCuisineList();
             
+}]);
 
-            $scope.addCuisine = function( cuisineName, cuisinePicture ){ console.log("Adding Cuisine", $scope.newCuisine);
-               $http.post('/api/addCuisine', { 'cuisineName': $scope.newCuisine })
-                               .success(function(data){
-                                 console.log("New Cuisine Added");
-                                 $scope.cuisines = data;
-                                 $scope.newCuisine = "";
-                               })
-                               .error(function(data){
-                                 console.log('Error:', data);
-                               });
-            }
+app.controller("settingsCtrlUser", [
+  "$scope", "$http", 
+  function( $scope, $http ){
 
 
-            /*************** admin Component : Restaurant related **********************/
-            $scope.restaurants;
-            $scope.newRestaurant = {
-               'code': "0001",
-               'name' : 'Restaurant1',
-               'address' : 'Address',
-               'cuisine': [],
-               'scheduled': 0,
-               'total': 0
-            };
+}]);
 
-            // get all users data
-            function refreshRestaurantList(){
-               $http.get("/api/restaurants")
-                  .success( function(data){
+app.controller("settingsCtrlAdmin", [
+  "$scope", "$http", 
+  function( $scope, $http ){
 
-                     $scope.restaurants = data;
-                     console.log("Refreshed User List", data);
+    $scope.restaurants = [];
+    $scope.cuisines = [];
+    $scope.refreshRestaurantList = refreshRestaurantList;
+    $scope.refreshCuisineList = refreshCuisineList;
+    $scope.selectedRestaurant = 'No restautant selected';
 
-                  })
-                  .error(function(data){
-                     console.log("Error:" + data);
-                  });
-            }
+    refreshCuisineList();
+    refreshRestaurantList();
 
-            $scope.addNewRestaurant = function(){
-               $http.post('/api/addRestaurant', $scope.newRestaurant)
-                   .success( function(data){
-                     console.log("Restaurant Added. ", data);
+    // get all restautant data
+    function refreshRestaurantList(){
+       $http.get("/api/restaurants")
+          .success( function(data){
 
-                   })
-                   .error( function(data){
-                     console.log("Restaurant not added", data);
-                   })
+             $scope.restaurants = data;
+             console.log("Refreshed User List", data);
 
-               refreshRestaurantList();
-             }
+          })
+          .error(function(data){
+             console.log("Error:" + data);
+          });
+    }
 
-             $scope.deleteRestaurant = function ( code ){
+    function refreshCuisineList(){
+       $http.get("/api/cuisines")
+          .success( function(data){
 
-               $http.post('/api/removeRestaurant', {'code' : code } )
-                   .success( function(data){
-                     console.log("Restaurant Deleted. ", data);
+             $scope.cuisines = data;
 
-                   })
-                   .error( function(data){
-                     console.log("Restaurant not deleted", data);
-                   })
+          })
+          .error(function(data){
+             console.log("Error:" + data);
+          });
+    }
 
-               refreshRestaurantList();
-             }
+    $scope.addCuisine = function( cuisineName, cuisinePicture ){ console.log("Adding Cuisine", $scope.newCuisine);
+       $http.post('/api/addCuisine', { 'cuisineName': $scope.newCuisine })
+                       .success(function(data){
+                         console.log("New Cuisine Added");
+                         $scope.cuisines = data;
+                         $scope.newCuisine = "";
+                       })
+                       .error(function(data){
+                         console.log('Error:', data);
+                       });
+    }
 
+    $scope.addNewRestaurant = function(){
+       $http.post('/api/addRestaurant', $scope.newRestaurant)
+           .success( function(data){
+             console.log("Restaurant Added. ", data);
 
+           })
+           .error( function(data){
+             console.log("Restaurant not added", data);
+           })
 
-                        // user preference options
-/*          $http.get("/api/user_pref")
-                  .success( function(data){
+       refreshRestaurantList();
+     }
 
-                     if(data.statusCode == 302){
-                        $window.location.href = '/login'
-                     }
+     $scope.deleteRestaurant = function ( code ){
 
-                     $scope.userDetails = data;
-                     //console.log("preference", data);
+       $http.post('/api/removeRestaurant', {'code' : code } )
+           .success( function(data){
+             console.log("Restaurant Deleted. ", data);
 
-                  })
-                  .error(function(data){
-                     console.log("Error:" + data);
-                  });*/
-      
-               
-               /*************** user component *********************************/
-               $scope.toggle = function (item, list) {
-                  if (list == undefined) { return };
-               var idx = list.indexOf(item);
-               if (idx > -1) list.splice(idx, 1);
-               else list.push(item);
-               };
+           })
+           .error( function(data){
+             console.log("Restaurant not deleted", data);
+           })
 
-               $scope.exists = function (item, list) {
-                  //console.log("exists", item, list.indexOf(item) > -1);
-                  if (list == undefined) { return };
-               return list.indexOf(item) > -1;
-               };
+       refreshRestaurantList();
+     }
 
 
-            $scope.editUserPreference = function (){
-               $http.post('/api/edit_pref', $scope.userDetails)
-                               .success(function(data){
-                                 console.log($scope.userDetails._id);
-                                 console.log("user updated", data);
-                               })
-                               .error(function(data){
-                                 console.log('Error:', data);
-                               });
-            }
+}]);
 
-         }
-]);
+
+
 
 
 /**************** User Display Controller *****************/

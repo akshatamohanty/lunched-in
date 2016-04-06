@@ -1,47 +1,25 @@
-<style>
-table, th , td {
-  border: 1px solid grey;
-  border-collapse: collapse;
-  padding: 15px;
-}
-table tr:nth-child(odd) {
-  background-color: #f1f1f1;
-}
-table tr:nth-child(even) {
-  background-color: #ffffff;
-}
-table {
-    width: 50%;
-}
-th {
-    background-color: #4CAF50;
-    color: white;
-    height: 50px;
-}
-</style>
-<div class='adminViewContainer' id='pref_for_admin' ng-show=loggedInUser.adminStatus>
-  <div class='adminInnerContainer'>
-    Cuisine List <br>
-    {{ cuisines }} <br>
-    Adding Cuisine: {{ newCuisine }}
-    <md-input-container>
-        <input type="text" ng-model="newCuisine" aria-label="cuisineName"></input> 
-    </md-input-container>
-    <md-button ng-click="addCuisine()"> Add Cuisine </md-button>
-  </div>
-
-  <br>
-  <br>
-
-  <div class='adminInnerContainer'>
-  <h3><center> Restaurants </center></h1>
-      <md-card ng-repeat="restaurant in restaurants">
-        {{ restaurant.code }} 
-        {{ restaurant.name }} 
-        {{ restaurant.cuisine }}
-        {{ restaurant.scheduled }}
-        {{ restaurant.total }} 
-      </md-card>
-      <md-button ng-click='refreshRestaurantList()'>Refresh</md-button>
+<div class='dashboard-header pageTitle'> Restaurants </div>
+<div class='adminViewContainer dashboard-header'> 
+  <div layout="row"> 
+    <div flex='66' class="details" layout="column">
+      <span>{{ selectedRestaurant.name }} </span>
+      <span>Code: {{ selectedRestaurant.code }} </span>
+      <span>Address: {{ selectedRestaurant.address }}</span>
+      <span>Zip: {{ selectedRestaurant.zip }}</span>
+      <span>Price: {{ selectedRestaurant.price }}</span>
+      <span>Phone: {{ selectedRestaurant.phone }}</span>
+      <span>Halal: {{ selectedRestaurant.halal }}</span>
+      <span>Veg: {{ selectedRestaurant.veg }}</span>
+      <span>Cuisine: <ul><li ng-repeat=" cuisine in selectedRestaurant.cuisine">{{ cuisine }}</li></ul></span>
+      <span>Scheduled: {{ selectedRestaurant.scheduled }}</span>
+      <span>Total: {{ selectedRestaurant.total }}</span>
+    </div>
+    <div flex='33'>
+        <div layout="column">
+        <div flex ng-repeat="restaurant in restaurants" class='userList'>
+          <div class='userbox' ng-click="$parent.selectedRestaurant = restaurant">{{ restaurant.name }}</div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

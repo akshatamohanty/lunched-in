@@ -1,5 +1,5 @@
-<html lang="en" >
-
+<!DOCTYPE html>
+<html>
 <title> LunchedIn </title>
 <head>
 
@@ -32,9 +32,7 @@
 
 
 <body ng-app="lunchedIn" ng-controller="MainCtrl" >
-    
-    <div id='over'></div>  
-    
+       
     <!-- Shifted from ng-show / ng-hide approach to reduce number of watchers for better performance and digest cycle -->
     <!-- use ng-include directly without a div or you get a multiple directives error -->
     <div ng-switch="loggedInUser != null">
@@ -49,12 +47,12 @@
       </div>
     
     </div>
-
+</body>
 
     <!--Google Maps API-->
     <script src="http://maps.googleapis.com/maps/api/js"></script>
 
     <!--Angular App File -->
     <script src="angularApp.js"></script>
-</body>
+
 </html>

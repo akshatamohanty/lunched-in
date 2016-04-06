@@ -1,11 +1,11 @@
 <div ng-switch="loggedInUser.adminStatus">
 
-      <div id='settings_userView' ng-switch-when="false" >
+      <div id='settings_userView' ng-switch-when="false" ng-controller='settingsCtrlUser'>
           <!-- <ng-include src="'templates/settings_user.html'"> </ng-include>  --><!--path wrt parent-->
           Working on it! 
       </div>
       
-      <div id='settings_adminView' ng-switch-when="true" >
+      <div id='settings_adminView' ng-switch-when="true" ng-controller='settingsCtrlAdmin'>
           <ng-include src="'templates/settings_admin.html'"> </ng-include> 
       </div>
     
