@@ -1,26 +1,72 @@
-<div class='dashboard-header pageTitle'> Lunchmates </div>
-<div class='adminViewContainer dashboard-header'> 
-	<div layout="row">
-		<div flex='66' class="details" layout="column">
-		 	<span>{{ selectedUser.name }} </span>
-		 	<span>Password: {{ selectedUser.password }} </span>
-		 	<span>Title: {{ selectedUser.title }} </span>
-		 	<span>Picture: {{ selectedUser.picture }}</span>
-		 	<span>Email: {{ selectedUser.email }}</span>
-		 	<span>Phone: {{ selectedUser.phone }}</span>
-		 	<span>Tagline: {{ selectedUser.tagline }}</span>
-		 	<span>Nationality: {{ selectedUser.nationality }}</span>
-		 	<span>Cuisine: <ul><li ng-repeat="cuisine in selectedUser.cuisine">{{ cuisine }}</li></ul></span>
-		 	<span>Available: <ul><li ng-repeat="day in selectedUser.available">{{ day }}</li></ul></span>
-		 	<span>Blocked: <ul><li ng-repeat="user in selectedUser.blocked">{{ user }}</li></ul></span>
-		 	<span>Known: <ul><li ng-repeat="user in selectedUser.known">{{ user }}</li></ul></span>
-		</div>
-		<div flex='33'>
-	  		<div layout="column">
-				<div flex ng-repeat="user in users" class='userList'>
-					<div class='userbox' ng-click="$parent.selectedUser = user">{{ user.name }}</div>
-				</div>
-		 	</div>
+<div class='dashboard-header pageTitle'> 
+	<div class='row'>
+		<div class='col-xs-8'>Lunchmates</div>
+		<div class='col-xs-4'> 
+	<div class="dropdown">
+	  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">{{selectedUser.name}}
+	  <span class="caret"></span></button>
+	  <ul class="dropdown-menu">
+	    <li ng-repeat="user in users"><a ng-click="$parent.selectedUser = user">{{ user.name }}</a></li>
+	  </ul>
+	</div>
 		</div>
 	</div>
+</div>
+<div class='adminViewContainer dashboard-header'> 
+
+<div class="table-responsive">          
+  <table class="table text-left .table-striped .table-bordered">
+    <thead>
+      <tr>
+        <th>{{ selectedUser.name }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Password</td>
+        <td>{{ selectedUser.password }}</td>
+      </tr>
+       <tr>
+        <td>Title</td>
+        <td>{{ selectedUser.title }}</td>
+      </tr>
+       <tr>
+        <td>Picture</td>
+        <td>{{ selectedUser.picture }}</td>
+      </tr>
+      <tr>
+        <td>Email</td>
+        <td>{{ selectedUser.email }}</td>
+      </tr>
+      <tr>
+        <td>Phone</td>
+        <td>{{ selectedUser.phone }}</td>
+      </tr>
+       <tr>
+        <td>Tagline</td>
+        <td>{{ selectedUser.tagline }}</td>
+      </tr>
+       <tr>
+        <td>Nationality</td>
+        <td>{{ selectedUser.picture }}</td>
+      </tr>
+      <tr>
+        <td>Cuisine</td>
+        <td><ul><li ng-repeat="cuisine in selectedUser.cuisine">{{ cuisine }}</li></ul></td>
+      </tr>
+      <tr>
+        <td>Available</td>
+        <td><ul><li ng-repeat="day in selectedUser.available">{{ day }}</li></ul></td>
+      </tr>
+      <tr>
+        <td>Blocked</td>
+        <td><ul><li ng-repeat="user in selectedUser.blocked">{{ user }}</li></ul></td>
+      </tr>
+      <tr>
+        <td>Known</td>
+        <td><ul><li ng-repeat="user in selectedUser.known">{{ user }}</li></ul></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 </div>

@@ -78,7 +78,7 @@ h1#logo{
   left: 15%;
   width: 70%;
   height: 100%;
-  background-color: #0c9d7c;
+  background-color: #ddd;
   font-family: Verdana, sans-serif;
 }
 
@@ -86,7 +86,7 @@ h1#logo{
 /********** CSS for Dashboard ********************/
 .dashboard-header{
   position: absolute;
-  top: 10%;
+  top: 5%;
   left: 5%;
   width: 90%;
   height: 15%;
@@ -97,11 +97,11 @@ h1#logo{
 }
 
 .pageTitle{
-  height: 20%;
-  top: 25%;
-  background-color: #0c9d7c;
-  border: 4px solid #0c8d7c;
-  color: white;
+  height: 25%;
+  top: 15%;
+  background-color: #222;
+  border: 1px solid #ccc;
+  color: #ddd;
   font-size: 3em;
   text-align: left;
   padding: 3%;
@@ -109,7 +109,7 @@ h1#logo{
 
 .adminViewContainer{
   position: absolute;
-  top: 45%;
+  top: 35%;
   padding: 20px;
   background-color: white;
   height: 100%;
