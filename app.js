@@ -8,6 +8,7 @@
  */
 
 // GLOBAL VARIABLES
+var algoRuns = 0;
 var primaryAdmin =  {   
                         name: 'Administrator',
                         username: 'admin@trylunchedin.com',
@@ -37,6 +38,7 @@ var test = function(){
         user.available = user.available.replace(/\s/g, '').split(',');
 
       user.available.push('Sunday');
+      user.available.push('Saturday');
 
       user.picture = "http://picture.com"
 
@@ -61,6 +63,7 @@ var test = function(){
 
 
   // loads the restaurants from the database
+  matchingAlgorithm();
 }
 
 
@@ -241,8 +244,8 @@ setTimeout(test, 5000);
 
   app.post('/login',
     passport.authenticate('local', { 
-                                   successRedirect: '/',
-                                   failureRedirect: '/#/lunches'
+                                   successRedirect: '/#/lunches',
+                                   failureRedirect: '/'
                                  })
   );
 
@@ -403,6 +406,7 @@ setTimeout(test, 5000);
       
       // only Admins can run the algorithm
       if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+            algoRuns++;
             matchingAlgorithm();
             res.send(true);
       }
@@ -630,7 +634,7 @@ setTimeout(test, 5000);
       }
   });
 
-  app.get('/api/matchAlgorithmData', function(req, res){
+/*  app.get('/api/matchAlgorithmData', function(req, res){
       //
       // This authentication is important for every request to the API 
       //
@@ -650,7 +654,7 @@ setTimeout(test, 5000);
       else{
         res.send('Request not authenticated');
       }
-  })
+  })*/
   // deprecated - same as edit_User - delete after configuring angular app
 /*  app.post('/api/edit_mates', function(req, res){
       
@@ -822,8 +826,8 @@ setTimeout(test, 5000);
           else {
                 // Algorithm is run on the user pool
                 //console.log("UserPool Count:", userPool.length);
-                matchAlgoData.poolCount = userPool.length;
-                matchAlgoData.count = 0;
+                var poolCount = userPool.length;
+                //matchAlgoData.count = 0;
 
                 runAlgoOnPool( userPool ); 
 
@@ -882,8 +886,8 @@ setTimeout(test, 5000);
                           // remove the four people from the user pool
                           removeFromPool( userPool, [currUser, pairMate, thirdMate, fourthMate]  )
                           
-                          if(userPool.length == 0)
-                            addToDatabase( MatchAlgorithm, matchAlgoData, "matchAlgorithm", null); 
+/*                          if(userPool.length == 0)
+                            addToDatabase( MatchAlgorithm, matchAlgoData, "matchAlgorithm", null); */
                                 
                     } //while end
 
@@ -912,13 +916,13 @@ setTimeout(test, 5000);
                         
                         var returnValue = false;
 
-/*                        Restaurant.find({
-                          //cuisine: { $in : user1.cuisine.concat(user2.cuisine) }
+                        Restaurant.find({
+                          cuisine: { $in : user1.cuisine.concat(user2.cuisine) }
                         }, function(err, restaurant){
                            if(err) console.log(err);
                            
                            returnValue = true;
-                        })*/
+                        })
                         //console.log("cuisine compatible", true)
                         return true;
                     }
@@ -993,30 +997,40 @@ setTimeout(test, 5000);
 
                     // adds the required match
                     function addMatch( participants ){
+
+                          var allCuisine =  participants.reduce(function(previousValue, currentValue, currentIndex, array) { 
+                            return previousValue.concat(currentValue.cuisine);
+                          }, participants[0].cuisine);
+
+                          // remove duplicates
+                          allCuisine = allCuisine.filter(function(elem, pos) {
+                              return allCuisine.indexOf(elem) == pos;
+                          });
+                          //console.log(allCuisine);
                       
                           // find a matching restaurant
                           var restaurant = "";
                           Restaurant.find({
-                              //cuisine: { $in : user1.cuisine.concat(user2.cuisine) }
+                              cuisine: { $in : allCuisine }
                             }, function(err, res){
                                if(err) console.log(err);
 
-                               else restaurant = res[0];
-                          })
+                               else {
+                                        // create and add a match to the database
+                                        Match.create({
+                                          batch: algoRuns,
+                                          batchSize: poolCount,
+                                          date: Date(),
+                                          participants: participants,
+                                          location: res[0]
+                                        }, function(err, doc){
+                                            if(err) console.log(err);
 
-                          // create and add a match to the database
-                          Match.create({
-                            date: Date(),
-                            participants: participants,
-                            location: restaurant
-                          }, function(err, doc){
-                              if(err) console.log(err);
-
-                              console.log("Match made");
-                              matchAlgoData.matchCount++; //console.log("count", userPool.length);
-                                
-                          })
-
+                                            console.log("Match made at", res[0].name);
+                                              
+                                        })
+                                      }
+                              })
                     } 
 
                     // removes the users from the pool

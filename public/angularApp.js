@@ -89,7 +89,7 @@ app.controller("lunchesCtrl", [
                $http.get("/api/lunches")
                   .success( function(data){
                      $scope.matches = data; 
-                     console.log("Matches:", data)
+                     //console.log("Matches:", data)
                   })
                   .error( function( data ){
                      console.log("Error: ", data);
@@ -134,19 +134,33 @@ app.controller("lunchesCtrlAdmin", [
          "$scope", "$http", 
          function( $scope, $http ){
 
-            $scope.selectedMatch = 'No Match Selected';
-            $scope.runMatchAlgorithm = runMatchAlgorithm;            
-
+            var batchIds = [];
             var runMatchAlgorithm = function(){
                $http.get('/api/runMatchAlgorithm')
                    .success( function(data){
                      console.log("Algorithm ran successfully!")
+                     processMatches();
                    })
                    .error( function(err){
                      console.log("Error: ", data);
                    })
             };
             runMatchAlgorithm();
+
+            var processMatches = function(){
+                var matches = $scope.$parent.matches; 
+                for(var m=0; m < matches.length; m++){
+                  if(batchIds.indexOf(matches[m].batch) == -1)
+                    batchIds.push(matches[m].batch);
+                }
+                console.log("processed");
+            }; 
+
+            $scope.selectedBatch = 'No Match Selected';
+            $scope.refresh = $scope.$parent.refreshMatchList;
+            $scope.match = runMatchAlgorithm;
+            $scope.processMatches = processMatches;  
+            $scope.batchIds = batchIds;    
 
 
 }]);

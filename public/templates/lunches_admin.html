@@ -1,4 +1,4 @@
-<div class='dashboard-header pageTitle'> Lunches     ({{ matches.length }})
+<!-- <div class='dashboard-header pageTitle'> Lunches     ({{ matches.length }})
     <md-button ng-click='runMatchAlgorithm(); refreshMatchList()'>Run</md-button>  
 </div>
 <div class='adminViewContainer dashboard-header'> 
@@ -17,4 +17,49 @@
       </div>
     </div>
   </div>
+</div> -->
+<div class='dashboard-header pageTitle'> 
+  <div class='row'>
+    <div class='col-xs-6'>Lunches</div>
+    <div class='col-xs-4'> 
+      <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">{{selectedBatch}}
+        <span class="caret"></span></button>
+        <ul class="dropdown-menu">
+          <li ng-repeat="batch in batchIds"><a ng-click="selectedBatch = batch">{{ batch }}</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class='col-xs-2'>
+      <button class="btn btn-primary dropdown-toggle" type="button" onclick="match()">Match</button>
+    </div>
+  </div>  
+</div>
+<div class='adminViewContainer dashboard-header'> 
+
+<div ng-repeat="match in matches"> 
+  <div class="table-responsive" >          
+    <table class="table text-left .table-striped .table-bordered">
+      <thead>
+        <tr>
+          <th>Match Details</th>
+        </tr>
+      </thead>
+      <tbody>
+         <tr>
+            <td>Participants</td>
+            <td><ul>
+                  <li ng-repeat="user in match.participants">{{ user.name }}</li>
+                </ul>
+            </td>
+         </tr>
+         <tr>
+          <td>Location</td>
+          <td>{{ match.location[0].name }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
 </div>
