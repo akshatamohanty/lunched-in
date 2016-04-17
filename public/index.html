@@ -21,7 +21,7 @@
 
     <!--App StyleSheets and Fonts-->
     <link href='https://fonts.googleapis.com/css?family=Roboto:300,100,400' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="assets/css/general.css">
+
 
 
 
@@ -35,7 +35,7 @@
     <div ng-switch="loggedInUser != null">
       
       <div id='loginModule' ng-switch-when="false" >
-          <ng-include src="'templates/loginModal.html'"> </ng-include> 
+          <ng-include src="'templates/landing.html'"> </ng-include> 
       </div>
       
       <div id='content' ng-switch-when="true" >
@@ -45,9 +45,6 @@
     
     </div>
 </body>
-
-    <!--Google Maps API-->
-    <script src="http://maps.googleapis.com/maps/api/js"></script>
 
     <!--Angular App File -->
     <script src="angularApp.js"></script>
@@ -59,5 +56,6 @@
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="assets/css/general.css">
 
 </html>
