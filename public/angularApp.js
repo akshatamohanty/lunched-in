@@ -17,7 +17,7 @@ var app = angular
 /*
  *  Routing
  */
-app.config(["$routeProvider", function($routeProvider) {
+app.config(["$routeProvider", "$locationProvider", function($routeProvider, $locationProvider) {
    $routeProvider.
    
    when("/lunchMates", {
@@ -36,12 +36,12 @@ app.config(["$routeProvider", function($routeProvider) {
    }).
 
    otherwise({
-      templateUrl: "templates/lunches.html", 
-      controller: "lunches"
+      templateUrl: "templates/landing.html", 
    });
-	
-}]);
 
+	 $locationProvider.html5Mode(true);
+   
+}]);
 
 /***************** Main Controller ************************************/
 app.controller("MainCtrl", [

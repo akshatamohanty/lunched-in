@@ -22,19 +22,21 @@
     <!--App StyleSheets and Fonts-->
     <link href='https://fonts.googleapis.com/css?family=Roboto:300,100,400' rel='stylesheet' type='text/css'>
 
+    <meta charset="utf-8">
 
+    <base href="/">
 
 
 </head>
 
 
-<body ng-app="lunchedIn" ng-controller="MainCtrl" >
+<body ng-app="lunchedIn" ng-controller="MainCtrl" data-spy="scroll" data-target=".navbar" data-offset="0">
        
     <!-- Shifted from ng-show / ng-hide approach to reduce number of watchers for better performance and digest cycle -->
     <!-- use ng-include directly without a div or you get a multiple directives error -->
     <div ng-switch="loggedInUser != null">
       
-      <div id='loginModule' ng-switch-when="false" >
+      <div id='loginModule' ng-switch-when="false">
           <ng-include src="'templates/landing.html'"> </ng-include> 
       </div>
       
@@ -45,7 +47,29 @@
     
     </div>
 </body>
+<script>
+$(document).ready(function(){
+  // Add smooth scrolling to all links in navbar + footer link
+  $(".navbar a, footer a[href='#myPage']").on('click', function(event) {
 
+  // Prevent default anchor click behavior
+  event.preventDefault();
+
+  // Store hash
+  var hash = this.hash;
+
+  // Using jQuery's animate() method to add smooth page scroll
+  // The optional number (900) specifies the number of milliseconds it takes to scroll to the specified area
+  $('html, body').animate({
+    scrollTop: $(hash).offset().top
+  }, 900, function(){
+
+    // Add hash (#) to URL when done scrolling (default click behavior)
+    window.location.hash = hash;
+    });
+  });
+})
+</script>
     <!--Angular App File -->
     <script src="angularApp.js"></script>
 

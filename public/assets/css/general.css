@@ -6,8 +6,29 @@ body {
 
 }
 
-.navbar{
-  margin-bottom: 0px !important; 
+.navbar {
+    margin-bottom: 0;
+    background-color: #2f6596;
+    z-index: 9999;
+    border: 0;
+    font-size: 12px !important;
+    line-height: 1.42857143 !important;
+    letter-spacing: 4px;
+    border-radius: 0;
+}
+
+.navbar li a, .navbar .navbar-brand {
+    color: #fff !important;
+}
+
+.navbar-nav li a:hover, .navbar-nav li.active a {
+    color: #2f6596 !important;
+    background-color: #fff !important;
+}
+
+.navbar-default .navbar-toggle {
+    border-color: transparent;
+    color: #fff !important;
 }
 
 .jumbotron{
@@ -21,13 +42,22 @@ body {
   height: 100vh;
 }
 
+.page-header{
+  color: #2f6596;
+}
+
+.btn-info{
+  background-color: #2f6596;
+  border: 1px solid #2f6596;
+}
+
 .full-page-padding{
   padding-left: 10% !important;
   padding-right: 10% !important;
 }
 
 .white-text{
-  color: #222;
+  color: #2f6596;
   text-align: right;
 }
 
@@ -36,7 +66,7 @@ body {
 }
 
 .right-border{
-  border-right: 4px solid #fff;
+  border-right: 4px solid #2f6596;
 }
 
 .bg-dark{
@@ -46,6 +76,52 @@ body {
 
 #loginIn{
   width: 60%;
+}
+
+.panel {
+    border: 1px solid #2f6596; 
+    border-radius:0;
+    transition: box-shadow 0.5s;
+}
+
+.panel:hover {
+    box-shadow: 5px 0px 40px rgba(0,0,0, .2);
+}
+
+.panel-footer .btn:hover {
+    border: 1px solid #2f6596;
+    background-color: #fff !important;
+    color: #2f6596;
+}
+
+.panel-heading {
+    color: #fff !important;
+    background-color: #2f6596 !important;
+    padding: 25px;
+    border-bottom: 1px solid transparent;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+.panel-footer {
+    background-color: #fff !important;
+}
+
+.panel-footer h3 {
+    font-size: 32px;
+}
+
+.panel-footer h4 {
+    color: #aaa;
+    font-size: 14px;
+}
+
+.panel-footer .btn {
+    margin: 15px 0;
+    background-color: #2f6596;
+    color: #fff;
 }
 
 /*.carousel-control.right, .carousel-control.left {
