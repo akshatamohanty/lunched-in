@@ -16,7 +16,7 @@ var primaryAdmin =  {
                         adminStatus: true
                     }
 
-var cuisineList = [];
+var cuisineList = ['Chinese', 'Continental', 'Korean', 'Thai', 'Indian','Western', 'Vietnamese', 'Japanese'];
 
 var test = function(){
   // loads the dummyUsers from the database
@@ -39,6 +39,8 @@ var test = function(){
 
       user.available.push('Sunday');
       user.available.push('Saturday');
+      user.veg = true;
+      user.halal = false;
 
       user.picture = "http://picture.com"
 

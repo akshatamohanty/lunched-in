@@ -10,6 +10,9 @@ var userSchema = {
 	tagline: { type: String }, 
 	nationality: { type: String },
 	cuisine: [String],
+	veg: { type: Boolean },
+	halal: { type: Boolean },
+	lunchCount: { type: Number },
 	available: [String],
 	blocked: [ {
     		type: mongoose.Schema.Types.ObjectId, ref: 'User'

@@ -75,7 +75,7 @@ app.controller("MainCtrl", [
 
                             if( data ){
                                $scope.loggedInUser = data; 
-                               console.log("User is logged in.");
+                               console.log("User is logged in.", data);
                             }
                             else
                                console.log("User is not logged in.");
@@ -87,8 +87,7 @@ app.controller("MainCtrl", [
         $http.get("/api/cuisines")
           .success( function(data){
 
-             $scope.cuisines = data;
-
+             $scope.cuisines = data; 
           })
           .error(function(data){
              console.log("Error:" + data);
@@ -109,6 +108,38 @@ app.controller("MainCtrl", [
 app.controller("user", [
       "$scope", "$http",
       function($scope, $http){
+
+        $scope.loggedInUser = null;
+        $scope.saveUser = saveUser;
+        $scope.n=0;
+        $scope.nMod = function(mod){
+
+          if(mod)
+            $scope.n-2>-1)?$scope.n-=2:$scope.n;
+          else
+            $scope.n+2<cuisines.length)?$scope.n-=2:$scope.n;
+
+        }
+        $scope.decN = (n+2<cuisines.length)?n=n+2:n=n
+
+        var saveUser = function(){
+          console.log("Saving :", $scope.loggedInUser);
+        };
+
+        $http.get("/api/getLoggedInUser")
+               .success( function(data){
+
+                  if( data ){
+                     $scope.loggedInUser = data; 
+                  
+                  }
+                  else
+                     console.log("User is not logged in.");
+
+               })
+               .error(function(data){
+                  console.log("Error:" + data);
+               });
 
           $scope.users = [];
 /*          $http.get("/api/users")
