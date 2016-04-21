@@ -63,7 +63,7 @@ var test = function(){
 
 
   // loads the restaurants from the database
-  matchingAlgorithm();
+  //matchingAlgorithm();
 }
 
 
@@ -210,7 +210,7 @@ setTimeout(test, 5000);
   //
   passport.use(new LocalStrategy(function(username, password, done) {
       process.nextTick(function() {
-
+        console.log("passport");
         User.find({ 
                         'email' : username, //remember! virtuals can't be queried unless exposed!
                         'password' : password 
@@ -222,7 +222,7 @@ setTimeout(test, 5000);
                               return done(null, user); 
                             }
                               
-
+                            console.log("user not found");
                             // Find in Admin database if not found in users
                             Admin.find({ 
                                             'username' : username, 
@@ -236,6 +236,7 @@ setTimeout(test, 5000);
                                                 }
                                                 
                                                 // fail! 
+                                                console.log("user not found");
                                                 done(null, false); 
                                           });
                        }); 
@@ -244,7 +245,7 @@ setTimeout(test, 5000);
 
   app.post('/login',
     passport.authenticate('local', { 
-                                   successRedirect: '/#/lunches',
+                                   successRedirect: '/',
                                    failureRedirect: '/'
                                  })
   );

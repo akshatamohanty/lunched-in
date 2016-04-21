@@ -3,7 +3,7 @@ html {
 }
 
 body { 
-
+  
 }
 
 .navbar {
@@ -31,7 +31,7 @@ body {
     color: #fff !important;
 }
 
-.jumbotron{
+#home{
   background-image: url('..//images//background//loginPage3.jpg');
   background-size: cover;
   background-position: top-left;
@@ -78,7 +78,7 @@ body {
   width: 60%;
 }
 
-.panel {
+ .panel {
     border: 1px solid #2f6596; 
     border-radius:0;
     transition: box-shadow 0.5s;
@@ -88,13 +88,13 @@ body {
     box-shadow: 5px 0px 40px rgba(0,0,0, .2);
 }
 
-.panel-footer .btn:hover {
+ .panel-footer .btn:hover {
     border: 1px solid #2f6596;
     background-color: #fff !important;
     color: #2f6596;
 }
 
-.panel-heading {
+ .panel-heading {
     color: #fff !important;
     background-color: #2f6596 !important;
     padding: 25px;
@@ -109,7 +109,7 @@ body {
     background-color: #fff !important;
 }
 
-.panel-footer h3 {
+ .panel-footer h3 {
     font-size: 32px;
 }
 
@@ -118,18 +118,18 @@ body {
     font-size: 14px;
 }
 
-.panel-footer .btn {
+ .panel-footer .btn {
     margin: 15px 0;
     background-color: #2f6596;
     color: #fff;
 }
 
-/*.carousel-control.right, .carousel-control.left {
+ .carousel-control.right, .carousel-control.left {
     background-image: none;
     color: #f4511e;
 }
 
-.carousel-indicators li {
+ .carousel-indicators li {
     border-color: #f4511e;
 }
 
@@ -137,7 +137,7 @@ body {
     background-color: #f4511e;
 }
 
-.item h4 {
+ .item h4 {
     font-size: 19px;
     line-height: 1.375em;
     font-weight: 400;
@@ -145,9 +145,70 @@ body {
     margin: 70px 0;
 }
 
-.item span {
+ .item span {
     font-style: normal;
+}
+
+
+/*body{
+  color: #666;
+}
+
+.navbar {
+    margin-bottom: 0;
+    z-index: 9999;
+    border: 0;
+    font-size: 12px !important;
+    line-height: 1.42857143 !important;
+    letter-spacing: 4px;
+    border-radius: 0;
 }*/
 
+.user-dashboard{
+  background-color: #e5e5e5;
+}
 
+.dashboard-main{
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  margin: 0;
+  padding: 2%;
+}
 
+.carousel-caption{
+  color: #222;
+}
+
+.card {
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  transition: all 0.2s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+}
+
+.user-card{
+/*  margin: 0;*/
+}
+
+.user-card .selected{
+  background-color: green;
+}
+
+.user-card .panel-heading{
+  padding:0;
+}
+
+.user-card .panel-body{
+  padding: 1%;
+}
+
+.user-card-frame{
+  padding: 0;
+}
+
+.pagination-sm li{
+  border-radius: 0px !important;
+}

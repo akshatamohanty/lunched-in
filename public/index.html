@@ -36,19 +36,18 @@
     <!-- use ng-include directly without a div or you get a multiple directives error -->
     <div ng-switch="loggedInUser != null">
       
-      <div id='loginModule' ng-switch-when="false">
+      <div ng-switch-when="false">
           <ng-include src="'templates/landing.html'"> </ng-include> 
       </div>
       
-      <div id='content' ng-switch-when="true" >
-          <ng-include src="'templates/content.html'"> </ng-include> <!-- make sure you add ng-include src attribute -->
+      <div ng-switch-when="true">
           <ng-view>  </ng-view> <!--only works in index.html-->
       </div>
     
     </div>
 </body>
 <script>
-$(document).ready(function(){
+/*$(document).ready(function(){
   // Add smooth scrolling to all links in navbar + footer link
   $(".navbar a, footer a[href='#myPage']").on('click', function(event) {
 
@@ -68,7 +67,7 @@ $(document).ready(function(){
     window.location.hash = hash;
     });
   });
-})
+})*/
 </script>
     <!--Angular App File -->
     <script src="angularApp.js"></script>
