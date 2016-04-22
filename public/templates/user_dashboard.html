@@ -133,34 +133,34 @@
 
         <!--beginning of mates--> 
         <h3>Lunch Mates</h3>
-        <md-tabs md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink>
-              <md-tab ng-repeat="letter in letters" label="{{letter}}"> 
-<!--                       <div style='border: 3px solid green' ng-show='{{exists(user._id, active_user.known)}}'></div>
-                      <div style='border: 3px solid grey' ng-show='{{exists(user._id, active_user.blocked)}}'></div>
+<!--            <md-tabs md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink>
+                <md-tab ng-repeat="letter in letters" label="{{letter}}">  -->
 
-                      <div ng-show='user.name[0] == letter' ng-click='exists(user._id, active_user.blocked) ? toggle(user._id, active_user.blocked) : exists(user._id, active_user.known) ? toggle(user._id, active_user.known) == toggle(user._id, active_user.blocked) : toggle(user._id, active_user.known)'> -->
-                      <div class='row'>
-                        <div class='col-sm-4' ng-repeat="user in users">    
-                          <div class="card">
-                            <div class="card-block">
-                              <h4 class="card-title">{{user.name}} </h4>
-                              <h6 class="card-subtitle text-muted">{{user.title}}</h6>
-                            </div>
-                            <img data-src="http://placehold.it/300x150" alt="Card image">
-                            <div class="card-block">
-                              <p class="card-text"><i class="fa fa-quote-left"></i>{{user.tagline}}</p>
-                              <hr style='padding:0; margin:0'>
-                              <p><span class="glyphicon glyphicon-phone"></span> {{ active_user.phone }} </p>
-                              <a href="#" class="card-link">Card link</a>
-                              <a href="#" class="card-link">Another link</a>
+
+                        <div class="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 200 }'>
+                          <div class="grid-item grid-item--width2" ng-repeat="user in users">
+                            <div class='card user-card panel panel-default text-center'>
+                              <div class='panel-heading user-card-head'>
+                                  <h4>{{ user.name }}</h4>
+                                  <em>{{ user.title }}</em><br><br>
+                                  </div>           
+                                  <div class='panel-body'>
+                                    <img src='http://placehold.it/300x150' class='img-responsive'>
+                                  
+
+                                  <p><i class="fa fa-quote-left"></i> {{ user.tagline }} </p> 
+                                  <hr style='padding:0; margin:0'>
+                                    <p><span class="glyphicon glyphicon-phone"></span> {{ user.phone }} </p>
+                                  </div>
+                              </div>
                             </div>
                           </div>
+<!--                           <div class="grid-item ">...</div>
+                          <div class="grid-item">...</div> -->
                         </div>
-                      </div>
-
-
-              </md-tab>
-          </md-tabs> 
+<!-- 
+                </md-tab>
+            </md-tabs>   -->
 
             
         

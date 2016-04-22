@@ -62,7 +62,7 @@ app.controller("MainCtrl", [
         $scope.users = [];
         $http.get("/api/users")
             .success( function(data){
-               $scope.users = data;
+               $scope.users = data; console.log("All users loaded", data);
             })
             .error(function(data){
                console.log("Error:" + data);
