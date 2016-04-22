@@ -297,6 +297,7 @@ setTimeout(test, 5000);
                           console.log("Compressing Data");
                           var compressedUserData = users.map( function(user){
                                return {
+                                      _id: user._id,
                                       name: user.name, 
                                       title: user.title, 
                                       picture: user.picture, 
@@ -573,35 +574,44 @@ setTimeout(test, 5000);
                               }
                     )
 
-                    res.json("Success");   
+                  res.json("Success");   
           }
           else{
+                  console.log("request", req.body);
                   User.findOneAndUpdate(
                               { 
                                  "_id": new ObjectId(req.session.passport.user[0]._id)
                               }, 
                               {
                                   password: req.body.password, 
-                                  picture: req.body.picture,  
+                                  phone: req.body.phone,  
                                   tagline: req.body.tagline, 
+                                  nationality: req.body.nationality, 
                                   cuisine: req.body.cuisine,
-                                  available: req.body.available
+                                  veg: req.body.veg,
+                                  halal: req.body.halal,
+                                  available: req.body.available, 
+                                  blocked: req.body.blocked, 
+                                  known: req.body.known
                               }, 
                               { multi: false }, 
                               function(){
-                                console.log("Updated loggedIn user details");
+                                  // update the current user
+                                  req.session.passport.user[0].password =  req.body.password;
+                                  req.session.passport.user[0].phone = req.body.phone;
+                                  req.session.passport.user[0].tagline = req.body.tagline; 
+                                  req.session.passport.user[0].nationality = req.body.nationality;
+                                  req.session.passport.user[0].cuisine = req.body.cuisine;
+                                  req.session.passport.user[0].veg = req.body.veg;
+                                  req.session.passport.user[0].halal = req.body.halal;
+                                  req.session.passport.user[0].available = req.body.available;
+                                  req.session.passport.user[0].blocked = req.body.blocked;
+                                  req.session.passport.user[0].known = req.body.known;
+
+                                  res.json(req.session.passport.user[0]._id);  
+                                  console.log("User update from User-Dashboard");  
                               }
                     )
-
-
-                    // update the logged in user
-                    req.session.passport.user[0].password =  req.body.password;
-                    req.session.passport.user[0].picture = req.body.picture;
-                    req.session.passport.user[0].tagline = req.body.tagline; 
-                    req.session.passport.user[0].cuisine = req.body.cuisine;
-                    req.session.passport.user[0].available = req.body.available;
-
-                    res.json(req.session.passport.user[0]._id);            
           }
       }
   });

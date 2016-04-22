@@ -1,263 +1,172 @@
-<nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span> 
-        </button>
-        <a class="navbar-brand" href="#">TryLunchedIN</a>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span> 
+          </button>
+          <a class="navbar-brand" href="#">TryLunchedIN</a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+          <ul class="nav navbar-nav navbar-right">
+            <li class='active'><a href="#card">My Card</a></li>
+            <li><a href="#pref">My Preferences</a></li>
+            <li><a href="#mates">My Mates</a></li>
+            <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span></a></li>
+          </ul>
+        </div>
       </div>
-      <div class="collapse navbar-collapse" id="myNavbar">
-        <ul class="nav navbar-nav navbar-right">
-          <li class='active'><a href="#card">My Card</a></li>
-          <li><a href="#pref">My Preferences</a></li>
-          <li><a href="#mates">My Mates</a></li>
-          <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span></a></li>
-        </ul>
-      </div>
-    </div>
   </nav>
 
-<div class='container-fluid user-dashboard'>
+  <div class='container-fluid user-dashboard'>
 
-  <div class='row'>
-    <br><br>
-    <!---borders-->
-    <div class='xs-hidden col-sm-3'></div>
-    
-
-    <!---mainsection-->
-    <div class='col-sm-6 dashboard-main'>
-
+    <div class='row'>
+      <br><br>
+      <!---borders-->
+      <div class='xs-hidden col-sm-3'></div>
       
-      <div class='jumbotron'>
-        <h3>Hello {{ loggedInUser.name  }}!</h3>
-        Badges Display 
-        <button class='btn btn-primary'>Save</button>
-      </div>
 
-      <hr id='card'>
+      <!---mainsection-->
+      <div class='col-sm-6 dashboard-main'>
 
-      <!--beginning of card-->
-      <h3 class='page-header'>Your Card</h3>
-
-      <div class='row'>
         
-        <!-- user card display! -->
-        <div class='col-sm-5 user-card-frame'>
-          <user-card info='loggedInUser'></user-card>
+        <div class='jumbotron'>
+          <h3>Hello {{ active_user.name  }}!</h3>
+          Badges Display 
+          <button class='btn btn-primary' ng-click="updateUser()">Save</button>
         </div>
 
-        <div class='col-sm-7'>
-            <div class='row'>
-              <div class='col-sm-6'>
-                <md-input-container>
-                  <label>Name</label>
-                  <input ng-model="loggedInUser.name" disabled>
-                </md-input-container>
-                <md-input-container>
-                  <label>Email</label>
-                  <input ng-model="loggedInUser.email" disabled>
-                </md-input-container>
-                <md-input-container>
-                  <label>Phone</label>
-                  <input ng-model="loggedInUser.phone">
-                </md-input-container>
-              </div>
-              <div class='col-sm-6'>
-                <md-input-container>
-                  <label>Title</label>
-                  <input ng-model="loggedInUser.title" disabled>
-                </md-input-container>
-                <md-input-container>
-                  <label>Password</label>
-                  <input ng-model="loggedInUser.password">
-                </md-input-container>
-                <md-input-container>
-                  <label>Nationality</label>
-                  <input ng-model="loggedInUser.nationality">
-                </md-input-container>
-              </div>
-            </div>
-            <div class='row' style='margin:1%;'>  
-              <md-input-container>
-                <label>You, in 50 characters!</label>
-                <textarea ng-model="loggedInUser.tagline" md-maxlength="50" rows="1"></textarea>
-              </md-input-container>
-            </div>
-        </div>
+        <hr id='card'>
 
-      </div>
-      <!--end of card-->
-      <hr id='pref'>
-      
-      <!--beginning of preferences-->    
-      <h3 class='page-header'>Your Preferences</h3>
-      <div class='row'>
-        <md-checkbox ng-model='loggedInUser.veg'> Are you Vegeterian?</md-checkbox>
-        <md-checkbox ng-model='loggedInUser.halal'> Do you prefer restaurants that serve Halal meat?</md-checkbox>
-      </div>
-
-      <br>
-
-      <h4>Which cuisines do you like?</h4><br>
-      <div id="myCarousel" class="carousel slide" data-ride="carousel">
-          <!-- Wrapper for slides -->
-          <div class="carousel-inner" role="listbox">
-            <div class="item active">
-              <div class='row'>
-                
-                <div class='col-sm-4'>
-                    <div class='card user-card'>{{cuisines[n]}}
-                      <img class='img-responsive img-thumbnail' src="http://placehold.it/600x250">
-                      <div class="carousel-caption">
-                        <h3>{{cuisines[n]}}</h3>
-                        <p>Piping hot from China!</p>
-                      </div>
-                    </div>
-                </div>
-                 
-                <div class='col-sm-4'>
-                  <div class='card  user-card'>
-                    <img class='img-responsive img-thumbnail' src="http://placehold.it/600x250">
-                    <div class="carousel-caption">
-                      <h3>{{cuisines[n+1]}}</h3>
-                      <p>Yummy Butter Chicken!</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class='col-sm-4'>
-                  <div class='card  user-card'>
-                    <img class='img-responsive img-thumbnail' src="http://placehold.it/600x250">
-                    <div class="carousel-caption">
-                      <h3>{{cuisines[n+2]}}</h3>
-                      <p>Of Tacoes and Burritoes!</p>
-                    </div>
-                  </div>
-                </div>
-                
-              </div>  
-            </div>
-          </div>
-
-          <!-- Left and right controls -->
-          <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev" onclick='decN()'>
-            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-            <span class="sr-only">Previous</span>
-          </a>
-          <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next" onclick='incN()'>
-            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-            <span class="sr-only">Next</span>
-          </a>
-      </div>
-
-      <br>
-
-      <h4>When are you free to lunch?</h4>
-      <div class='row'>
-        <div class='col-sm-4'>
-            <md-checkbox>Messy Monday? </md-checkbox>
-            <md-checkbox>Tiring Tuesday? </md-checkbox>
-            <md-checkbox>Wobbly Wednesday? </md-checkbox>
-            <md-checkbox>Thankful Thursday? </md-checkbox>
-            <md-checkbox>Freaking Friday? </md-checkbox>
-        </div>
- 
-        <div class='col-sm-8'>
-          <h4>Away on vacation?</h4>
-          <p>Some text</p>
-          <br>
-          <div class=text-center>
-            <div class='row'>
-              <div class='col-sm-6'>
-                  <div class="form-group">
-                      <div class='input-group date' id='datetimepicker6'>
-                          <input type='text' class="form-control" />
-                          <span class="input-group-addon">
-                              <span class="glyphicon glyphicon-calendar"></span>
-                          </span>
-                      </div>
-                  </div>
-              </div> 
-              <div class='col-sm-6'>
-                  <div class="form-group">
-                      <div class='input-group date' id='datetimepicker7'>
-                          <input type='text' class="form-control" />
-                          <span class="input-group-addon">
-                              <span class="glyphicon glyphicon-calendar"></span>
-                          </span>
-                      </div>
-                  </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-
-
-
-      
-      <!--end of preferences-->
-      <hr  id='mates'>
-      
-
-      <!--beginning of mates--> 
-      <h3>Lunch Mates</h3>
-      <md-tabs md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink>
-            <md-tab ng-repeat="letter in letters" label="{{letter}}"> 
-                <div class='md-padding' layout="row" layout-wrap flex>
-                  <!-- <md-card ng-repeat="user in (selectedUsers.length ? selectedUsers : querySearch(tab.title)) "> -->
-                  
-                  <md-card ng-repeat="user in users">
-<!--                     <div class='row'>
-                      <div class='col-sm-4'>ng-show="checkInitial(tab.title, user.name)" 
-                        <div class='card user-card panel panel-default text-center'>
-                        <div class='panel-heading user-card-head'>
-                          <img src='http://placehold.it/600x250' class='img-responsive'></div>
-                        <div class='panel-body'>
-
-                          <h3>Donald Duck</h3>
-                          <em>Cartoon Character</em><br><br>
-
-                          <p><i class="fa fa-quote-left"></i>  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, adipisci.</p> 
-                          <hr style='padding:0; margin:0'>
-                          <h6><span class="glyphicon glyphicon-phone"></span> +00 1515151515</h6>
-
-                        </div>
-                      </div>
-                      </div>
-                      <div class='col-sm-4'>
-                        <div class='card user-card panel panel-default text-center'>
-                        <div class='panel-heading user-card-head'>
-                          <img src='http://placehold.it/600x250' class='img-responsive'></div>
-                        <div class='panel-body'>
-
-                          <h3>Donald Duck</h3>
-                          <em>Cartoon Character</em><br><br>
-
-                          <p><i class="fa fa-quote-left"></i>  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos, adipisci.</p> 
-                          <hr style='padding:0; margin:0'>
-                          <h6><span class="glyphicon glyphicon-phone"></span> +00 1515151515</h6>
-
-                        </div>
-                      </div>
-                      </div>
-                    </div> -->
-                  </md-card>
-
-              </div> 
-            </md-tab>
-        </md-tabs> 
-
+        <!--beginning of card-->
+        <h3 class='page-header'>Your Card</h3>
+        <div class='row'>
           
+          <!-- user card display! -->
+          <div class='col-sm-5 user-card-frame'>
+            <div class='card user-card panel panel-default text-center'>
+                <div class='panel-heading user-card-head'>
+                  <h4>{{ active_user.name }}</h4>
+                  <em>{{ active_user.title }}</em><br><br>
+                  </div>           
+                  <div class='panel-body'>
+                    <img src='http://placehold.it/300x150' class='img-responsive'>
+                  
+
+                  <p><i class="fa fa-quote-left"></i> {{ active_user.tagline }} </p> 
+                  <hr style='padding:0; margin:0'>
+                  <p><span class="glyphicon glyphicon-phone"></span> {{ active_user.phone }} </p>
+                </div>
+            </div>
+          </div>
+
+          <div class='col-sm-7'>
+              <div class='row'>
+                <div class='col-sm-6'>
+                  <md-input-container>
+                    <label>Name</label>
+                    <input ng-model="active_user.name" disabled>
+                  </md-input-container>
+                  <md-input-container>
+                    <label>Email</label>
+                    <input ng-model="active_user.email" disabled>
+                  </md-input-container>
+                  <md-input-container>
+                    <label>Phone</label>
+                    <input ng-model="active_user.phone">
+                  </md-input-container>
+                </div>
+                <div class='col-sm-6'>
+                  <md-input-container>
+                    <label>Title</label>
+                    <input ng-model="active_user.title" disabled>
+                  </md-input-container>
+                  <md-input-container>
+                    <label>Password</label>
+                    <input ng-model="active_user.password">
+                  </md-input-container>
+                  <md-input-container>
+                    <label>Nationality</label>
+                    <input ng-model="active_user.nationality">
+                  </md-input-container>
+                </div>
+              </div>
+              <div class='row' style='margin:1%;'>  
+                <md-input-container>
+                  <label>You, in 50 characters!</label>
+                  <textarea ng-model="active_user.tagline" md-maxlength="50" rows="1"></textarea>
+                </md-input-container>
+              </div>
+          </div>
+
+        </div>
+        <!--end of card-->
+        <hr id='pref'>
+        
+        <!--beginning of preferences-->    
+        <h3 class='page-header'>Your Preferences</h3>
+        <div class='row'>
+          <md-checkbox ng-model='active_user.veg'> Are you Vegeterian?</md-checkbox>
+          <md-checkbox ng-model='active_user.halal'> Do you prefer restaurants that serve Halal meat?</md-checkbox>
+        </div>
+
+        <br>
+
+        <h4>Which cuisines do you like?</h4><br>
+        <div class='row'>
+          <div class='col-sm-4' ng-repeat='cuisine in cuisines'>
+            <md-checkbox ng-checked="exists(cuisine, active_user.cuisine)" ng-click="toggle(cuisine, active_user.cuisine)">
+                {{ cuisine }}
+            </md-checkbox>
+          </div>
+        </div>
+
+        <br>
+
+        <h4>When are you free to lunch?</h4>
+        <md-checkbox ng-repeat='day in days' ng-checked="exists(day, active_user.available)" ng-click="toggle(day, active_user.available)">{{day}}</md-checkbox>
+        
+        <!--end of preferences-->
+        <hr  id='mates'>
+        
+
+        <!--beginning of mates--> 
+        <h3>Lunch Mates</h3>
+        <md-tabs md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink>
+              <md-tab ng-repeat="letter in letters" label="{{letter}}"> 
+<!--                       <div style='border: 3px solid green' ng-show='{{exists(user._id, active_user.known)}}'></div>
+                      <div style='border: 3px solid grey' ng-show='{{exists(user._id, active_user.blocked)}}'></div>
+
+                      <div ng-show='user.name[0] == letter' ng-click='exists(user._id, active_user.blocked) ? toggle(user._id, active_user.blocked) : exists(user._id, active_user.known) ? toggle(user._id, active_user.known) == toggle(user._id, active_user.blocked) : toggle(user._id, active_user.known)'> -->
+                      <div class='row'>
+                        <div class='col-sm-4' ng-repeat="user in users">    
+                          <div class="card">
+                            <div class="card-block">
+                              <h4 class="card-title">{{user.name}} </h4>
+                              <h6 class="card-subtitle text-muted">{{user.title}}</h6>
+                            </div>
+                            <img data-src="http://placehold.it/300x150" alt="Card image">
+                            <div class="card-block">
+                              <p class="card-text"><i class="fa fa-quote-left"></i>{{user.tagline}}</p>
+                              <hr style='padding:0; margin:0'>
+                              <p><span class="glyphicon glyphicon-phone"></span> {{ active_user.phone }} </p>
+                              <a href="#" class="card-link">Card link</a>
+                              <a href="#" class="card-link">Another link</a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+
+              </md-tab>
+          </md-tabs> 
+
+            
+        
+      </div>
       
-    </div>
-    
-    <!--border-->
-    <div class='xs-hidden col-sm-3'></div>
-  </div><!-- row end-->
-</div><!--container end-->
+      <!--border-->
+      <div class='xs-hidden col-sm-3'></div>
+    </div><!-- row end-->
+  </div><!--container end-->

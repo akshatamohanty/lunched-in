@@ -8,7 +8,7 @@
  *  App Defintion and Configuration
  */
 var app = angular
-      .module("lunchedIn", ["ngMaterial", "ngRoute", "ngMdIcons", "ngResource"])
+      .module("lunchedIn", ["ngMaterial", "ngRoute", "ngResource"])
       .config(function($mdThemingProvider) {
 		  $mdThemingProvider.theme('default')
 		    .primaryPalette('red')
@@ -43,19 +43,6 @@ app.config(["$routeProvider", "$locationProvider", function($routeProvider, $loc
    
 }]);
 
-app.controller('Controller', ['$scope', function($scope) {
-  $scope.naomi = { name: 'Naomi', address: '1600 Amphitheatre' };
-  $scope.igor = { name: 'Igor', address: '123 Somewhere' };
-}])
-.directive('user-card', function() {
-  return {
-    restrict: 'E',
-    scope: {
-      userInfo: '=info'
-    },
-    templateUrl: 'user-card.html'
-  };
-});
 
 /***************** Main Controller ************************************/
 app.controller("MainCtrl", [
@@ -69,6 +56,17 @@ app.controller("MainCtrl", [
 
         $scope.letters = ["A", "B", "C", "D", "E", "F",
          "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+
+        $scope.days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+
+        $scope.users = [];
+        $http.get("/api/users")
+            .success( function(data){
+               $scope.users = data;
+            })
+            .error(function(data){
+               console.log("Error:" + data);
+            });
          
         $http.get("/api/getLoggedInUser")
                          .success( function(data){
@@ -109,51 +107,59 @@ app.controller("user", [
       "$scope", "$http",
       function($scope, $http){
 
-        $scope.loggedInUser = null;
-        $scope.saveUser = saveUser;
-        $scope.n=0;
-        $scope.nMod = function(mod){
+        $scope.active_user = null;
 
-          if(mod)
-            $scope.n-2>-1)?$scope.n-=2:$scope.n;
-          else
-            $scope.n+2<cuisines.length)?$scope.n-=2:$scope.n;
-
-        }
-        $scope.decN = (n+2<cuisines.length)?n=n+2:n=n
-
-        var saveUser = function(){
-          console.log("Saving :", $scope.loggedInUser);
-        };
 
         $http.get("/api/getLoggedInUser")
-               .success( function(data){
+                         .success( function(data){
 
-                  if( data ){
-                     $scope.loggedInUser = data; 
-                  
-                  }
-                  else
-                     console.log("User is not logged in.");
+                            if( data ){
+                                $scope.active_user = data; 
+                                // fix null values
+                                if($scope.active_user.cuisines == null)
+                                  $scope.active_user.cuisines = [];
+                                if($scope.active_user.available == null)
+                                  $scope.active_user.available = [];
+                                if($scope.active_user.blocked == null)
+                                  $scope.active_user.blocked = [];
+                                if($scope.active_user.known == null)
+                                  $scope.active_user.known = [];                            
+                            }
+                            else
+                               console.log("User is not logged in.");
 
-               })
-               .error(function(data){
-                  console.log("Error:" + data);
-               });
+                         })
+                         .error(function(data){
+                            console.log("Error:" + data);
+                         });
 
-          $scope.users = [];
-/*          $http.get("/api/users")
-              .success( function(data){
+        $scope.toggle = function (item, list) {
+          if(list){
+            var idx = list.indexOf(item);
+            if (idx > -1) {
+              list.splice(idx, 1);
+            }
+            else {
+              list.push(item);
+            }
+          }
+        };
 
-                 $scope.users = data;
-                 console.log("Refreshed User List", data);
+        $scope.exists = function (item, list) {
+          if(list)
+            return list.indexOf(item) > -1;
+          else
+            return false;
+        };
 
-              })
-              .error(function(data){
-                 console.log("Error:" + data);
-              });*/
-      }
-]);
+        $scope.updateUser = function(){
+
+            $.post('/api/editUser', $scope.active_user, function(data,status,xhr){
+              console.log(status);
+            })
+        };
+
+}]);
 
 app.controller("admin", [
       "$scope", "$http",
