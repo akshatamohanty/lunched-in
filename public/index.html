@@ -31,7 +31,13 @@
       </div>
       
       <div ng-switch-when="true">
-          <ng-view>  </ng-view> <!--only works in index.html-->
+        <div ng-switch="loggedInUser.adminStatus == true">
+          <div ng-switch-when="false" ng-controller="user">
+            <ng-include src="'templates/user_dashboard.html'"> </ng-include> 
+          </div>
+          <div ng-switch-when="true" ng-controller="admin">
+            <ng-include src="'templates/admin_dashboard.html'"> </ng-include> 
+          </div>
       </div>
     
     </div>

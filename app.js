@@ -552,7 +552,7 @@ setTimeout(test, 5000);
 
                   User.findOneAndUpdate(
                               { 
-                                 'email': req.body.email
+                                 "_id": new ObjectId(req.body._id)
                               }, 
                               {
                                     name: req.body.name, 

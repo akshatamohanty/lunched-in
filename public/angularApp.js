@@ -20,16 +20,6 @@ var app = angular
 app.config(["$routeProvider", "$locationProvider", function($routeProvider, $locationProvider) {
    $routeProvider.
     
-    when("/", {
-      templateUrl: "templates/user_dashboard.html", 
-      controller: "user"
-   }).
-
-    when("/admin", {
-      templateUrl: "templates/admin_dashboard.html", 
-      controller: "admin"
-   }).
-
     when("/logout", {
       templateUrl: "templates/logout.html", 
    }).
@@ -165,8 +155,88 @@ app.controller("admin", [
       "$scope", "$http",
       function($scope, $http){
 
-         $scope.loggedInUser = null;
-         $scope.logout = logoutFunction; 
+        $scope.selectedUser = null;
+        $scope.selectedRestaurant = null;
+
+        $scope.matches = [];
+        $scope.restaurants = []
+
+        $http.get("/api/matches")
+                         .success( function(data){
+
+                            if( data ){
+                                $scope.matches = data; 
+                                             
+                            }
+                            else
+                               console.log("Error getting matches");
+
+                         })
+                         .error(function(data){
+                            console.log("Error:" + data);
+                         });
+        $http.get("/api/lunches")
+                 .success( function(data){
+
+                    if( data ){
+                        $scope.matches = data; 
+                                     
+                    }
+                    else
+                       console.log("Error getting matches");
+
+                 })
+                 .error(function(data){
+                    console.log("Error:" + data);
+                 });
+
+        $http.get("/api/restaurants")
+                 .success( function(data){
+
+                    if( data ){
+                        $scope.restaurants = data; 
+                                     
+                    }
+                    else
+                       console.log("Error getting matches");
+
+                 })
+                 .error(function(data){
+                    console.log("Error:" + data);
+                 });
+
+        $scope.toggle = function (item, list) {
+          if(list){
+            var idx = list.indexOf(item);
+            if (idx > -1) {
+              list.splice(idx, 1);
+            }
+            else {
+              list.push(item);
+            }
+          }
+        };
+
+        $scope.exists = function (item, list) {
+          if(list)
+            return list.indexOf(item) > -1;
+          else
+            return false;
+        };
+
+        $scope.updateUser = function(){
+
+            $.post('/api/editUser', $scope.selectedUser, function(data,status,xhr){
+              console.log(status);
+            })
+        };
+
+        $scope.updateRestaurant = function(){
+
+            $.post('/api/editUser', $scope.selectedRestaurant, function(data,status,xhr){
+              console.log(status);
+            })
+        };
 
       }
 ]);
