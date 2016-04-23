@@ -94,7 +94,7 @@ body {
     color: #2f6596;
 }
 
- .panel-heading {
+.panel-heading {
     color: #fff !important;
     background-color: #2f6596 !important;
     padding: 25px;
@@ -177,30 +177,57 @@ body {
   background: #fff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   margin: 0;
-  padding: 2%;
+  padding-right: 2%;
+  padding-left: 2%;
 }
 
-.carousel-caption{
+/*.carousel-caption{
   color: #222;
-}
+}*/
 
 .card {
   background: #fff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   transition: all 0.2s ease-in-out;
-  padding:0;
+  border: none;
+  height: 300px;
 }
 
 .card:hover {
   box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
 
+.card-heading{
+  padding: 1%;
+  padding-left: 5%;
+}
+
+.card-body{
+  padding: 0;
+}
+
+.card-body p{
+  margin: 3%;
+  position: relative;
+}
+
+.dashboard-header{
+  margin: 0 !important;
+  padding: 1%;
+  border-radius: 0;
+}
+
+.bottom-align{
+  position: absolute;
+  bottom: 1%;
+}
+/*
 .user-card{
-  margin: 0;
+  
 }
 
 .user-card .selected{
-  background-color: green;
+
 }
 
 .user-card .panel-heading{
@@ -212,9 +239,18 @@ body {
 }
 
 .user-card-frame{
-  padding: 0;
+  height: 600px !important;
 }
 
 .pagination-sm li{
   border-radius: 0px !important;
+}
+
+.contact-cards{
+  height: 600px !important;
+}
+*/
+
+input{
+  font-size: 12px;
 }

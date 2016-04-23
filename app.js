@@ -65,7 +65,7 @@ var test = function(){
 
 
   // loads the restaurants from the database
-  //matchingAlgorithm();
+  matchingAlgorithm();
 }
 
 
@@ -318,17 +318,6 @@ setTimeout(test, 5000);
       }
   });
 
-  // deprecated - same as logged in user - delete this
-/*  app.get('/api/user_pref', function(req, res){
-
-      if(req.isAuthenticated())
-        res.json(req.session.passport.user[0]);
-      else{
-        res.statusCode = 302;
-      }
-
-  });*/
-
    // getting today's lunch match for a user
   app.get('/api/lunches', function(req, res){
       
@@ -410,9 +399,7 @@ setTimeout(test, 5000);
       
       // only Admins can run the algorithm
       if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
-            algoRuns++;
             matchingAlgorithm();
-            res.send(true);
       }
       else{
         res.send('Request not authenticated');
@@ -647,58 +634,35 @@ setTimeout(test, 5000);
       }
   });
 
-/*  app.get('/api/matchAlgorithmData', function(req, res){
-      //
-      // This authentication is important for every request to the API 
-      //
-      if(req.isAuthenticated() && req.session.passport.user[0].adminStatus){   //!! TODO: find if this is safe? I think there's a loophole - if req can be tampered around with
-        
-            // get mongoose to extract all users in the database
-            MatchAlgorithm.find(function(err, algoInfo){
+  app.post('/api/dropOut', function(req, res){
 
-                    if(err)
-                      res.send(err);
+/*        Match.find{ 
+                     '_id': req.body._id
+                  }, function(res, err){
+                    
+                  })
 
-                    // if user is admin - send all information 
-                    res.send(algoInfo);
-            });
+        Match.findOneAndUpdate(
+                  , 
+                  {                 
+                      name: req.body.name, 
+                      address: req.body.address,
+                      cuisine: req.body.cuisine,
+                      scheduled: req.body.scheduled,
+                      total: req.body.total
+                  }, 
+                  { multi: false }, 
+                  function(){
+                    console.log("Updated restaurant details");
+                  }
+        )*/
 
-      } 
-      else{
-        res.send('Request not authenticated');
-      }
-  })*/
-  // deprecated - same as edit_User - delete after configuring angular app
-/*  app.post('/api/edit_mates', function(req, res){
-      
-      // authenticate the request - to ensure no one gets information without correct access rights
-      if(req.isAuthenticated()){
-        
-          User.findOneAndUpdate(
-                      { 
-                         "_id": new ObjectId(req.session.passport.user[0]._id)
-                      }, 
-                      {
-                          known: req.body.known, 
-                          blocked: req.body.blocked,  
-                      }, 
-                      { multi: false }, 
-                      function(){
-                        console.log("Updated mate selection for the user"); 
-                      }
-            )
+        res.json("Successfully dropped");   
 
-            // update the logged in user
-            req.session.passport.user[0].known = req.body.known;
-            req.session.passport.user[0].blocked = req.body.blocked;
-
-            res.json(req.session.passport.user[0]._id);
-      }
-
-  });*/
+  });
 
   /********** Login logout functionality ************/
-  app.get('/api/users/:email', function(req, res){
+/*  app.get('/api/users/:email', function(req, res){
          
           User.find({
             'email': req.params.email
@@ -713,7 +677,7 @@ setTimeout(test, 5000);
 
           });  
 
-  });
+  });*/
 
   app.post('/api/resetPassword', function(req, res){
           
@@ -821,15 +785,16 @@ setTimeout(test, 5000);
     console.log("Matching");
 
     // populate daily pool
-    var dayMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    var dayMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    var holidays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+     
      
     var today = new Date();
     var day = today.getDay();
 
-    var matchAlgoData = {};
-    matchAlgoData.time = today;
-    matchAlgoData.poolCount = 0;
-    matchAlgoData.matchCount = 0;
+    var poolCount = 0;
+    var currMatches = [];
+    var matchedCount = [];
 
     User.find({ available : dayMap[day] })
         .sort({ blockedCount: -1, knownCount: 1 })
@@ -839,42 +804,53 @@ setTimeout(test, 5000);
           else {
                 // Algorithm is run on the user pool
                 //console.log("UserPool Count:", userPool.length);
-                var poolCount = userPool.length;
+                poolCount = userPool.length;
                 //matchAlgoData.count = 0;
 
                 runAlgoOnPool( userPool ); 
 
-                function runAlgoOnPool( userPool ){
+                    function runAlgoOnPool( userPool ){
                     while(userPool.length > 0){
 
                           //always at index 0 - because the first user is always removed; remove the first user
-                          var currUser = userPool.splice(0, 1)[0]; 
+                          //console.log("UserPool Length at", userPool.length);
+                          var currUser = userPool.splice(0, 1)[0]; // removes from the userPool also
+                          
+                          //console.log("Starting with", currUser.name);
 
                           // create a pool for second mate - which should be a close person to the current user
                           var pairMatePool = regroup( userPool, currUser, false ); 
                           var pairMatePool = pairMatePool[0].concat(pairMatePool[1]).concat(pairMatePool [2]); // ordered by priority
-
+                          //console.log("Found pairmate pool of length", pairMatePool.length);
                           // if pairMatePool.length == 0 - no pair available - can't do anything - user has already been removed from the pool
-                          if(pairMatePool.length == 0)
-                            continue;
+                          if(pairMatePool.length == 0){
+                              console.log("Match not found for", currUser.name);
+                              continue;                            
+                          }
+
 
                           // picks the first mate in the given pool with compatible cuisine - or just picks the first person
                           var pairMate = pickNextMate( pairMatePool, currUser, false );
                           
                           // this will happen when no user can be selected such that a third user can be selected -
                           // in this case, better to discard the first user and continue
-                          if(pairMate == undefined)
-                            continue;
+                          if(pairMate == undefined){
+                              console.log("Match not found for", currUser.name);
+                              continue;
+                          }
+                            
 
                           // this regrouping will give users compatible with both the selected users
                           // pairMatePool has to be reordered according to new user
                           // ordering of the pool is done to keep compatible people first
                           var thirdMatePool = regroup( pairMatePool, pairMate, false );
                           var thirdMatePool = thirdMatePool[2].concat(thirdMatePool[1]).concat(thirdMatePool[0]);
+                          //console.log("Pool of third mate for", currUser.name, "and", pairMate.name, "of length", thirdMatePool.length);
 
                           // pick a third person compatible with the second person - and matching his cuisine
                           // if no user with matching cuisine is found, pick first person who gives next pool length > 0
                           var thirdMate = pickNextMate( thirdMatePool, pairMate, false );
+                          //console.log("Found mate for", currUser.name, "and", pairMate.name, "in", thirdMate.name || 'none');
 
                           // this happens when no third user can give the next pool greater than 0 
                           // in this case, switch off pool length condition - pick a person with compatible cuisine
@@ -884,6 +860,7 @@ setTimeout(test, 5000);
                             addMatch( [currUser, pairMate, thirdMate] );
                             // remove the three people from the userpool
                             removeFromPool( userPool, [currUser, pairMate, thirdMate]  )
+
                             continue;
                           }
 
@@ -897,7 +874,8 @@ setTimeout(test, 5000);
                           addMatch( [currUser, pairMate, thirdMate, fourthMate] );                        
                           
                           // remove the four people from the user pool
-                          removeFromPool( userPool, [currUser, pairMate, thirdMate, fourthMate]  )
+                          //console.log("pool length before removal", userPool.length);
+                          removeFromPool( userPool, [pairMate, thirdMate, fourthMate]  )
                           
 /*                          if(userPool.length == 0)
                             addToDatabase( MatchAlgorithm, matchAlgoData, "matchAlgorithm", null); */
@@ -927,17 +905,22 @@ setTimeout(test, 5000);
                     // later -> or equivalent cuisine - can find restaurant serving atleast one of each
                     function userCuisineCompatible( user1, user2 ){
                         
-                        var returnValue = false;
-
                         Restaurant.find({
-                          cuisine: { $in : user1.cuisine.concat(user2.cuisine) }
+                          $and: [ { cuisine: { $in: user1.cuisine } }, 
+                                  { cuisine: { $in: user2.cuisine } },
+                                  { veg: user1.veg || user2.veg },
+                                  { halal: user1.halal || user2.halal },
+                                ]  
                         }, function(err, restaurant){
-                           if(err) console.log(err);
+                           if(err){
+                             console.log(err);
+                             return false;
+                           } 
                            
-                           returnValue = true;
+                           return true;
                         })
-                        //console.log("cuisine compatible", true)
-                        return true;
+                        //console.log("cuisine compatible", returnValue)
+                        //return returnValue;
                     }
 
 
@@ -997,8 +980,9 @@ setTimeout(test, 5000);
                       if(pairMate == undefined){
                         var i=0;
                         while(i < matePool.length){
-                          if(poolLengthOFF || regroup( matePool, matePool[i], true )){
-                            pairMate = matePool.splice(i, 1); // removes pairmate at the same time  
+                          if(poolLengthOFF || regroup( matePool, matePool[i], true )){ 
+                            pairMate = matePool.splice(i, 1)[0]; // removes pairmate at the same time  
+                            //console.log("No one cuisine compatible, pairmate selected", pairMate.name || "none");
                             break;
                           }
                           i++;               
@@ -1010,36 +994,45 @@ setTimeout(test, 5000);
 
                     // adds the required match
                     function addMatch( participants ){
-
-                          var allCuisine =  participants.reduce(function(previousValue, currentValue, currentIndex, array) { 
-                            return previousValue.concat(currentValue.cuisine);
-                          }, participants[0].cuisine);
-
-                          // remove duplicates
-                          allCuisine = allCuisine.filter(function(elem, pos) {
-                              return allCuisine.indexOf(elem) == pos;
-                          });
-                          //console.log(allCuisine);
-                      
+                    
                           // find a matching restaurant
-                          var restaurant = "";
+                          //factor in veg and halal
                           Restaurant.find({
-                              cuisine: { $in : allCuisine }
+                               $and: [ { cuisine: { $in: participants[0].cuisine } }, 
+                                        { cuisine: { $in: participants[1].cuisine } },
+                                        { cuisine: { $in: participants[2].cuisine } },
+                                        { cuisine: { $in: (participants[3].cuisine || []) } },
+                                        { veg: (participants[0].veg || participants[1].veg || participants[2].veg || (participants[3].veg || 0) )},
+                                        { halal: (participants[0].halal || participants[1].halal || participants[2].halal || (participants[3].halal || 0) ) },
+                                      ]  
                             }, function(err, res){
                                if(err) console.log(err);
 
                                else {
+                                        // increase lunchcount of users
+
+                                        // add users to known 
+
                                         // create and add a match to the database
-                                        Match.create({
-                                          batch: algoRuns,
-                                          batchSize: poolCount,
-                                          date: Date(),
-                                          participants: participants,
-                                          location: res[0]
-                                        }, function(err, doc){
+                                        if (res[0] == undefined)
+                                          res[0] = {'name' : 'Foodcourt'};
+                                        var newMatch =                                           
+                                          {
+                                            'batch': algoRuns,
+                                            'batchSize': poolCount,
+                                            'date': Date(),
+                                            'participants': participants,
+                                            'location': res[0]
+                                          };
+                                          currMatches.push(newMatch);
+
+
+                                        Match.create(
+                                          newMatch
+                                        , function(err, doc){
                                             if(err) console.log(err);
 
-                                            console.log("Match made at", res[0].name);
+                                            console.log("Match");
                                               
                                         })
                                       }
@@ -1049,7 +1042,7 @@ setTimeout(test, 5000);
                     // removes the users from the pool
                     function removeFromPool( userPool, participants ){
                       for(var i=0; i<participants.length; i++){
-                        var index = userPool.indexOf(participants[i]);
+                        var index = userPool.indexOf(participants[i]); 
                         userPool.splice(index, 1);
                       }
                     }    

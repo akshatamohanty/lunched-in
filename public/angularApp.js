@@ -98,6 +98,7 @@ app.controller("user", [
       function($scope, $http){
 
         $scope.active_user = null;
+        $scope.selectedLetter = 'A';
 
 
         $http.get("/api/getLoggedInUser")
