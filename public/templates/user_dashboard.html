@@ -108,11 +108,19 @@
         <br>
 
         <h4>Which cuisines do you like?</h4><br>
+        <md-chips ng-model="active_user.cuisine" readonly="true"></md-chips>
         <div class='row'>
           <div class='col-sm-4' ng-repeat='cuisine in cuisines'>
-            <md-checkbox ng-checked="exists(cuisine, active_user.cuisine)" ng-click="toggle(cuisine, active_user.cuisine)">
-                {{ cuisine }}
-            </md-checkbox>
+                  <div class='cuisine-card card panel panel-default'>
+                      <div class='panel-heading card-heading'>
+                        <button class='btn btn-info btn-sm' style='margin-bottom:0'  ng-model='active_user' ng-click='toggle(cuisine, active_user.cuisine)'
+                        > {{ exists(cuisine, active_user.cuisine)? "Remove" : "Add" }} {{cuisine}} </button>
+                      </div>           
+                      <div class='panel-body card-body'>                        
+                        <img src='http://placehold.it/300x75' class='img-responsive'>
+                      </div>
+
+                  </div>
           </div>
         </div>
 
@@ -126,14 +134,14 @@
         
 
         <!--beginning of mates--> 
-        <h3>Lunch Mates</h3>
+        <h3>Let's select your lunchmates -</h3>
             <md-tabs md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink>
-                <md-tab ng-repeat="letter in letters" label="{{letter}}" ng-model='selectedLetter'> 
+                <md-tab ng-repeat="letter in letters" label="{{letter}}"> 
                 </md-tab>
             </md-tabs> 
-            <br> 
+            <br> {{selectedLetter}}
             <div class='row'>
-                <div class='col-sm-4' ng-repeat="user in users" ng-show='user.name[0]==selectedLetter'>
+                <div class='col-sm-4' ng-repeat="user in users" ng-model='user' ng-show='user.name[0]==selectedLetter'>
                   <div class='card panel panel-default'>
                       <div class='panel-heading card-heading'>
                         <h4 style='margin-bottom:0'>{{ user.name }}

@@ -221,6 +221,13 @@ body {
   position: absolute;
   bottom: 1%;
 }
+
+.cuisine-card{
+  height: 75px;
+
+}
+
+
 /*
 .user-card{
   
