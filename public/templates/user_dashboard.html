@@ -136,8 +136,7 @@
         <!--beginning of mates--> 
         <h3>Let's select your lunchmates -</h3>
             <md-tabs md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink>
-                <md-tab ng-repeat="letter in letters" label="{{letter}}"> 
-                </md-tab>
+                <md-tab ng-repeat="letter in letters" label="{{letter}}"></md-tab>                         
             </md-tabs> 
             <br> {{selectedLetter}}
             <div class='row'>
@@ -158,12 +157,14 @@
                         <p class='text-center'><i class="fa fa-quote-left"></i> {{ user.tagline }} 
                         
                         </p>
-
                       </div>
-                        <p class='text-center bottom-align'>
-                          <hr style='padding:0; margin:0'>
+                      <div class='panel-footer'>
+                        <p class='text-center' style='padding:0'>
                           <span class="glyphicon glyphicon-phone"></span> {{ user.phone }} 
                         </p>
+                      </div>
+
+
                   </div>
 
                 </div>
