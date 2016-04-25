@@ -65,7 +65,7 @@ var test = function(){
 
 
   // loads the restaurants from the database
-  matchingAlgorithm();
+  //matchingAlgorithm();
 }
 
 
@@ -857,6 +857,9 @@ setTimeout(test, 5000);
                           if(thirdMate == undefined){
                             thirdMate = pickNextMate( thirdMatePool, pairMate, true );
                             // create match of three people
+                            if(thirdMate == undefined)
+                              console.log("No third mate found");
+
                             addMatch( [currUser, pairMate, thirdMate] );
                             // remove the three people from the userpool
                             removeFromPool( userPool, [currUser, pairMate, thirdMate]  )
@@ -997,6 +1000,7 @@ setTimeout(test, 5000);
                     
                           // find a matching restaurant
                           //factor in veg and halal
+                          console.log(participants[participants.length-1].cuisine);
                           Restaurant.find({
                                $and: [ { cuisine: { $in: participants[0].cuisine } }, 
                                         { cuisine: { $in: participants[1].cuisine } },

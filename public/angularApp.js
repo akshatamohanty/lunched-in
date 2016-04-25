@@ -101,7 +101,6 @@ app.controller("user", [
         $scope.selectedLetter = 'A';
         $scope.changeLetter = function(letter){
           $scope.selectedLetter = letter;
-          alert("letter changed");
         }
 
 

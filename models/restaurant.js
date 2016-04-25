@@ -10,7 +10,6 @@ var restaurantSchema = {
 	cuisine: [ String ],
 	halal: { type: Boolean },
 	veg: { type: Boolean },
-	scheduled: Number,
 	total: Number
 };
 

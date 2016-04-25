@@ -8,7 +8,7 @@ body {
 
 .navbar {
     margin-bottom: 0;
-    background-color: #2f6596;
+    background-color: #12A6E9;
     z-index: 9999;
     border: 0;
     font-size: 12px !important;
@@ -17,25 +17,46 @@ body {
     border-radius: 0;
 }
 
-.navbar li a, .navbar .navbar-brand {
-    color: #fff !important;
+.hero-text{
+  font-family: Helvetika, sans-serif;
+  font-size: 58px;
+  color: #fff;
+  font-weight: bold;
+  vertical-align: text-center;
 }
 
-.navbar-nav li a:hover, .navbar-nav li.active a {
-    color: #2f6596 !important;
-    background-color: #fff !important;
+.subtext{
+  font-family: Helvetika, sans-serif;
+  font-size: 18px;
+  color: #939da3;
+  line-height: 27px;
+  vertical-align: text-center;
 }
 
-.navbar-default .navbar-toggle {
-    border-color: transparent;
-    color: #fff !important;
+.description-text{
+  font-family: Helvetika, sans-serif;
+  font-size: 18px;
+  color: #555;
+  line-height: 26px; 
+  vertical-align: text-center;
+}
+
+.color-grey{
+  color: #777776;
+}
+
+.padded{
+  padding: 15%;
+  padding-top: 10%;
 }
 
 #home{
-  background-image: url('..//images//background//loginPage3.jpg');
+/*  background-image: url('..//images//background//loginPage3.jpg');
   background-size: cover;
   background-position: top-left;
-  padding-top: 30% !important;
+  padding-top: 30% !important;*/
+  background-color: #12A6E9;
+  padding: 10%;
 }
 
 .full-page{
@@ -67,11 +88,6 @@ body {
 
 .right-border{
   border-right: 4px solid #2f6596;
-}
-
-.bg-dark{
-   background-color: #222;
-   color:#eee;
 }
 
 #loginIn{
@@ -224,7 +240,6 @@ body {
 
 .cuisine-card{
   height: 75px;
-
 }
 
 

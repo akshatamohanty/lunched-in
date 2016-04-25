@@ -13,6 +13,7 @@ var userSchema = {
 	veg: { type: Boolean },
 	halal: { type: Boolean },
 	lunchCount: { type: Number },
+	dropCount: { type: Number },
 	available: [String],
 	blocked: [ {
     		type: mongoose.Schema.Types.ObjectId, ref: 'User'
