@@ -7,68 +7,6 @@
  * set the app to list on a port so we can view it on the browser
  */
 
-// GLOBAL VARIABLES
-var algoRuns = 0;
-var primaryAdmin =  {   
-                        name: 'Administrator',
-                        username: 'admin@trylunchedin.com',
-                        password: '123',
-                        adminStatus: true
-                    }
-
-var cuisineList = ['Chinese', 'Continental', 'Korean', 'Thai', 'Indian','Western', 'Vietnamese', 'Japanese'];
-
-var test = function(){
-  // loads the dummyUsers from the database
-  var dummyUsers = require('./dummyUsers');
-  console.log(dummyUsers.length, "users loaded.");
-  
-  // pre-process the user data - change to array etc
-  for(var i=0; i<dummyUsers.length; i++){
-      var user = dummyUsers[i]; 
-
-      if(user.cuisine == 0)
-        user.cuisine = [];
-      else 
-        user.cuisine = user.cuisine.replace(/\s/g, '').split(',');
-
-      if(user.available == 0)
-        user.available = [];
-      else
-        user.available = user.available.replace(/\s/g, '').split(',');
-
-      user.available.push('Sunday');
-      user.available.push('Saturday');
-      user.veg = true;
-      user.halal = false;
-
-      user.picture = "http://picture.com"
-
-      addToDatabase( User, user, "User", null);
-  }
-
-    // loads the dummyUsers from the database
-  var dummyRestaurants = require('./dummyRestaurants');
-  console.log(dummyRestaurants.length, "restaurants loaded.");
-  
-  // pre-process the user data - change to array etc
-  for(var i=0; i<dummyRestaurants.length; i++){
-      var restaurant = dummyRestaurants[i]; 
-
-      if(restaurant.cuisine == 0)
-        restaurant.cuisine = [];
-      else 
-        restaurant.cuisine = restaurant.cuisine.replace(/\s/g, '').split(',');
-
-      addToDatabase( Restaurant, restaurant, "Restaurant", null);
-  }
-
-
-  // loads the restaurants from the database
-  //matchingAlgorithm();
-}
-
-
 // set up =====================================
 var express = require('express');
 var app = express();
@@ -87,6 +25,7 @@ var cookieParser = require('cookie-parser'); // the session is stored in a cooki
 var async = require('async');
 
 var postmark = require("postmark");
+var querystring = require("querystring");
 
 
 // configuration ==============================
@@ -108,9 +47,6 @@ var AdminSchema = require('./models/admin');
 var UserSchema = require('./models/user');
 var RestaurantSchema = require('./models/restaurant');
 var MatchSchema = require('./models/match');
-var DailyPoolSchema = require('./models/dailypool');
-var PairSchema = require('./models/pair');
-var MatchAlgorithmSchema = require('./models/matchAlgorithm');
 
 var ObjectId = mongoose.Types.ObjectId;
 
@@ -118,9 +54,6 @@ var Admin = mongoose.model('Admin', AdminSchema);
 var User = mongoose.model('User', UserSchema);
 var Restaurant = mongoose.model('Restaurant', RestaurantSchema);
 var Match = mongoose.model('Match', MatchSchema);
-var DailyPool = mongoose.model('DailyPool', DailyPoolSchema);
-var Pair = mongoose.model('Pair', PairSchema);
-var MatchAlgorithm = mongoose.model('MatchAlgorithm', MatchAlgorithmSchema);
 
 app.use(express.static(__dirname + '/public'));
 app.use(morgan('dev'));
@@ -172,23 +105,153 @@ var addToDatabase = function( database, jsonObject, stringName, callback ){
 }
 
 
-
-var initialize = function() {
-    var dummyUser =  {   
-                        name: 'Jane Doe',
-                        email: 'janedoe@aedas.sg',
+// GLOBAL VARIABLES
+var primaryAdmin =  {   
+                        name: 'Administrator',
+                        username: 'admin@trylunchedin.com',
                         password: '123',
-                        title: 'Senior Designer'
-                    }
+                        adminStatus: true
+                    };
+
+var run = 0; // keeps count of how many times the algorithm has run
+var activePool = []; // TODO: Global variable - very risky - change later
+
+var cuisineList = ['Chinese', 'Continental', 'Korean', 'Thai', 'Indian','Western', 'Vietnamese', 'Japanese'];
+
+/* Adds the preliminary user details and restaurants */
+var init = function(){
+  // loads the dummyUsers from the database
+  var dummyUsers = require('./finalUsers');
+  console.log(dummyUsers.length, "users loaded.");
+  
+  // pre-process the user data - change to array etc
+  for(var i=0; i<dummyUsers.length; i++){
+      var user = dummyUsers[i]; 
+      console.log(user.name);
+
+      user.tagline="";
+      user.nationality="";
+      user.cuisine = []; // not enough - fix null values on client side
+      user.available = [];
+      user.veg = false;
+      user.halal = false;
+      user.lunchCount = 0;
+      user.dropCount = 0;
+      user.available = [];
+      user.blocked = [];
+      user.known = [];
+
+      addToDatabase( User, user, "User", null);
+  }
+
+    // loads the dummyUsers from the database
+  var dummyRestaurants = require('./dummyRestaurants');
+  console.log(dummyRestaurants.length, "restaurants loaded.");
+  
+  // pre-process the user data - change to array etc
+  for(var i=0; i<dummyRestaurants.length; i++){
+      var restaurant = dummyRestaurants[i]; 
+
+      if(restaurant.cuisine == 0)
+        restaurant.cuisine = [];
+      else 
+        restaurant.cuisine = restaurant.cuisine.replace(/\s/g, '').split(',');
+
+      addToDatabase( Restaurant, restaurant, "Restaurant", null);
+  }
+
+
+  // loads the restaurants from the database
+  //matchingAlgorithm();
+}
+
+/* Clears all databases */
+var initializeDatabases = function() {
     clearDatabase( Admin, "Admin", addToDatabase( Admin, primaryAdmin, "Admin", null) );
-    clearDatabase( User, "User", addToDatabase( User, dummyUser, "User", null) );
+    clearDatabase( User, "User", null );
     clearDatabase( Restaurant, "Restaurants", null );
     clearDatabase( Match, "Matches", null);
-    clearDatabase( MatchAlgorithm, "MatchAlgorithm", null);
-
 }
-initialize();
-setTimeout(test, 5000);
+//initializeDatabases();
+//setTimeout(init, 5000); // initialize after 5 seconds so databases have been properly configured
+
+
+/*
+ *  Function will be called by match algorithm and related APIs
+ *  Will - 1) Will analyse each match from previous run and perform addToKnown operation
+ *       - 2) Will add to activePool
+ *       - 3) Will run secondCall function after an allotted period of time
+ *         4) secondCall will perform matching, mail users
+ *  
+ *
+ */
+var firstCall = function(){
+
+  Match.find({ 
+        run : run-1;
+      }, function(err, users){
+
+          if(err) console.log("Error fetching previous matches", err);
+
+          // add to known for each match
+  });
+
+  var today = new Date();
+  var day = today.getDay();
+
+  // populate daily pool
+  var dayMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  var holidays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+
+  activePool = [];
+
+  User.find({ 
+        available : dayMap[day]
+      }, function(err, users){
+
+          if(err) console.log("Error fetching pool", err);
+
+          console.log("Pool length on", dayMap[day] + users.length);
+          
+
+          // mail users      - change to user length after testing
+          for(var i=0; i<users.length; i++){
+
+            var user=users[i];
+            var client = new postmark.Client("32f51173-e5ee-4819-90aa-ad9c25c402a8");
+
+            client.sendEmailWithTemplate({
+              "From": "admin@trylunchedin.com",
+              "To": "trylunchedin@gmail.com",
+              "TemplateId": 588701,
+              "TemplateModel": {
+                "name": user.name,
+                "action_url": "http://localhost:3000/api/addToPool?id=" + user.email,
+                "sender_name": "Eva",
+                "product_address_line1": "product_address_line1_Value",
+                "product_address_line2": "product_address_line2_Value"
+              }
+            });
+
+            console.info("Sent to postmark for delivery")           
+          }
+  });
+
+  // call secondCall after some predetermined time
+
+}; //firstCall();
+
+var secondCall = function(){
+
+  // deal with pool
+
+  // match and mail
+
+  // store matches
+
+  run++;
+
+};
 
 // routes ================
 
@@ -253,7 +316,8 @@ setTimeout(test, 5000);
   );
 
   app.get('/logout', function(req, res){
-    req.logout();
+    req.session.passport.user = undefined;
+    //req.logout();
     res.send('/');
   });
 
@@ -370,7 +434,7 @@ setTimeout(test, 5000);
       else{
         res.send('Request not authenticated');
       }
-  })
+  });
 
   // Admin Only APIs
   app.post('/api/addCuisine', function(req, res){
@@ -393,7 +457,7 @@ setTimeout(test, 5000);
         res.send('Request not authenticated');
       }
 
-  })
+  });
 
   app.get('/api/runMatchAlgorithm', function(req, res){
       
@@ -405,6 +469,21 @@ setTimeout(test, 5000);
         res.send('Request not authenticated');
       }
   })
+
+  app.get('/api/firstcall', function(req, res){
+      firstCall();
+      // only Admins can run the algorithm
+/*      if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+            firstCall();
+      }
+      else{
+        res.send('Request not authenticated');
+      }*/
+  })
+
+  app.get('/api/today', function(req, res){
+    res.send(activePool);
+  });
 
   app.post('/api/addUser', function(req, res){
 
@@ -471,7 +550,7 @@ setTimeout(test, 5000);
 
                     // if user is admin - send all information 
                     if( req.session.passport.user[0].adminStatus ){
-                          console.log("Admin Request Approved: Sending complete data", restaurants);
+                          //console.log("Admin Request Approved: Sending complete data", restaurants);
                           res.json(restaurants);
                     }
             });
@@ -539,7 +618,7 @@ setTimeout(test, 5000);
 
                   User.findOneAndUpdate(
                               { 
-                                 "_id": new ObjectId(req.body._id)
+                                    email: req.body.email  // don't change to id - doesn't work!
                               }, 
                               {
                                     name: req.body.name, 
@@ -556,12 +635,14 @@ setTimeout(test, 5000);
                                     known: req.body.known
                               }, 
                               { multi: false }, 
-                              function(){
-                                console.log("Updated user details");
+                              function(err, user){
+                                if(err) console.log(err);
+                                else{
+                                  console.log("Updated user details", user);
+                                  res.json("Success");  
+                                }
                               }
                     )
-
-                  res.json("Success");   
           }
           else{
                   console.log("request", req.body);
@@ -634,50 +715,49 @@ setTimeout(test, 5000);
       }
   });
 
-  app.post('/api/dropOut', function(req, res){
 
-/*        Match.find{ 
-                     '_id': req.body._id
-                  }, function(res, err){
-                    
-                  })
+  // email apis
+  app.get('/api/addToPool', function(req, res){
 
-        Match.findOneAndUpdate(
-                  , 
-                  {                 
-                      name: req.body.name, 
-                      address: req.body.address,
-                      cuisine: req.body.cuisine,
-                      scheduled: req.body.scheduled,
-                      total: req.body.total
-                  }, 
-                  { multi: false }, 
-                  function(){
-                    console.log("Updated restaurant details");
-                  }
-        )*/
+      var qs = querystring.parse(req.url.split("?")[1]),
+      id = qs.id; console.log(id);
+      User.find({
+              email : id
+            }, function(err, user){
 
-        res.json("Successfully dropped");   
-
+                if(err) console.log("Error while adding user to pool", err);
+                else{
+                  console.log(user);
+                  if(user.length){
+                    //check for duplicates
+                    activePool.push(user[0]);
+                    for(var i=0; i<activePool.length; i++){
+                      var user_i = activePool[i];
+                      if(user_i.email == id)
+                        res.send("You are already signed up for today!");
+                    }
+                  } 
+                  res.end("Added successfully.", activePool);
+                }
+            })      
   });
 
-  /********** Login logout functionality ************/
-/*  app.get('/api/users/:email', function(req, res){
-         
-          User.find({
-            'email': req.params.email
-          }, function(err, user){ 
+  app.post('/api/dropOut', function(req, res){
+      
+      var qs = querystring.parse(req.url.split("?")[1]),
+      objectID = qs.id;
+      matchID = qs.id;
 
-              if(user){
-                res.json(true);
-              }
+    var qs = querystring.parse(req.url.split("?")[1]),
+    id = qs.id; console.log(id);
+    Match.find({
+            _id : ObjectId(id)
+          }, function(err, user){
 
-              if(!user.length)
-                res.json(false)
+              
+          })    
 
-          });  
-
-  });*/
+  });
 
   app.post('/api/resetPassword', function(req, res){
           

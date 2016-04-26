@@ -3,11 +3,10 @@ var User = require('./user');
 var Restaurant = require('./restaurant');
 
 var matchSchema = {
-	batch: { type: Number, required: true },
-	batchSize: { type: Number, required: true},
+	run: { type: Number, required: true}, 
 	date: { type: Date, required: true}, 
-	participants: [ User.userSchema ],
-	dropouts: [ User.userSchema ],
+	participants: [ { type: mongoose.Schema.Types.ObjectId, ref: 'User'  }], 
+	dropouts: [ { type: mongoose.Schema.Types.ObjectId, ref: 'User'  }],
 	location: Restaurant.restaurantSchema
 };
 

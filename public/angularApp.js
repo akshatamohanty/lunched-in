@@ -50,9 +50,21 @@ app.controller("MainCtrl", [
         $scope.days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
         $scope.users = [];
+        $scope.usersAlpha = [];
+        
         $http.get("/api/users")
             .success( function(data){
-               $scope.users = data; console.log("All users loaded", data);
+               console.log("All users loaded", data);
+               $scope.users = data;
+               for(var i=0; i<$scope.letters.length; i++)
+                  $scope.usersAlpha[ $scope.letters[i] ] = [];
+
+               for(var i=0; i<data.length; i++){
+                  $scope.usersAlpha[ data[i].name[0] ].push( data[i] );
+               }
+
+               console.log($scope.usersAlpha);
+              
             })
             .error(function(data){
                console.log("Error:" + data);
@@ -109,15 +121,7 @@ app.controller("user", [
 
                             if( data ){
                                 $scope.active_user = data; 
-                                // fix null values
-                                if($scope.active_user.cuisines == null)
-                                  $scope.active_user.cuisines = [];
-                                if($scope.active_user.available == null)
-                                  $scope.active_user.available = [];
-                                if($scope.active_user.blocked == null)
-                                  $scope.active_user.blocked = [];
-                                if($scope.active_user.known == null)
-                                  $scope.active_user.known = [];                            
+                                                
                             }
                             else
                                console.log("User is not logged in.");
@@ -228,9 +232,17 @@ app.controller("admin", [
             return false;
         };
 
-        $scope.updateUser = function(){
-
-            $.post('/api/editUser', $scope.selectedUser, function(data,status,xhr){
+        $scope.updateUserByAdmin = function(selectedUser){
+                  if (selectedUser.blocked == null)
+                      selectedUser.blocked = [];
+                  if (selectedUser.known == null)
+                      selectedUser.known = [];
+                  if (selectedUser.cuisine == null)
+                      selectedUser.cuisine = [];
+                  if (selectedUser.available == null)
+                      selectedUser.available = [];
+            $.post('/api/editUser', selectedUser, function(data,status,xhr){
+              
               console.log(status);
             })
         };
