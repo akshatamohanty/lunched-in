@@ -135,8 +135,8 @@
                         <div class='card panel panel-default'>
                             <div class='panel-heading card-heading'>
                               <h4 style='margin-bottom:0'>{{ user.name }}
-                                <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, selectedUser.known)'
-                                ng-disabled='exists(user._id, selectedUser.blocked)'>F</button>
+                                <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, selectedUser.known || 0)'
+                                ng-disabled='exists(user._id, selectedUser.blocked || 1)'>F</button>
                                 <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, selectedUser.blocked)'
                                 ng-disabled='exists(user._id, selectedUser.known)'>B</button>
                               </h4>

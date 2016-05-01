@@ -76,6 +76,92 @@ app.use(passport.session());
 
 
 // set up database ==== only for testing === 
+var lunchedin = {};
+lunchedin.sendMail = function( templateID, templateModel, user_email ){
+
+    var client = new postmark.Client("32f51173-e5ee-4819-90aa-ad9c25c402a8");
+
+    client.sendEmailWithTemplate({
+            "From": "admin@trylunchedin.com",
+            "To": user_email,
+            "TemplateId": templateID,
+            "TemplateModel": templateModel 
+    });
+};
+
+lunchedin.firstMail = function( user ){
+
+    var templateID = 588701;
+    var templateModel = {
+              "name": user.name,
+              "action_url": "http://localhost:3000/api/addToPool?id=" + user.email,
+              "sender_name": "Eva",
+              "product_address_line1": "product_address_line1_Value",
+              "product_address_line2": "product_address_line2_Value"
+            }
+
+    console.log("First Mail sent to ", user.name);
+    //lunchedin.sendMail( templateID, templateModel, user.email)
+
+};
+
+lunchedin.confirmationMail = function( user ){
+
+    var templateID = 588701;
+    var templateModel = {
+              "name": user.name,
+              "action_url": "http://localhost:3000/api/addToPool?id=" + user.email,
+              "sender_name": "Eva",
+              "product_address_line1": "product_address_line1_Value",
+              "product_address_line2": "product_address_line2_Value"
+            }
+    
+    console.log("Confirmation Mail sent to ", user.name);
+    //lunchedin.sendMail( templateID, templateModel, user.email)
+
+};
+
+lunchedin.matchedMail = function( user ){
+
+    var templateID = 588701;
+    var templateModel = {
+              "name": user.name,
+              "action_url": "http://localhost:3000/api/addToPool?id=" + user.email,
+              "sender_name": "Eva",
+              "product_address_line1": "product_address_line1_Value",
+              "product_address_line2": "product_address_line2_Value"
+            }
+
+    console.log("Matched Mail sent to ", user.name);
+    //lunchedin.sendMail( templateID, templateModel, user.email)
+
+};
+
+lunchedin.addToKnown = function( runCount ){
+    // for each participant of a match, check if all others are added - if not - add it
+    Match.find({ run: runCount }, function(err, matches){
+
+      console.log(matches.length, "matches found");
+
+      for(var i=0; i < matches.length; matches++){
+
+          var participants = matches.participants; 
+
+          for(var p=0; p < participants.length - 1; p++){
+
+              for( var q=p+1; q < participants.length; q++){
+
+
+
+              }
+
+          }
+          
+      }
+
+    });
+};
+
 var clearDatabase = function( database, stringName, callback ){
 
   database.remove({}, function(err, doc){
@@ -87,7 +173,7 @@ var clearDatabase = function( database, stringName, callback ){
           callback;   
     });
 
-}
+};
 
 var addToDatabase = function( database, jsonObject, stringName, callback ){
     
@@ -102,10 +188,11 @@ var addToDatabase = function( database, jsonObject, stringName, callback ){
                       if(callback)
                         callback;   
                   });
-}
+};
 
 
 // GLOBAL VARIABLES
+var run = 0;
 var primaryAdmin =  {   
                         name: 'Administrator',
                         username: 'admin@trylunchedin.com',
@@ -113,35 +200,38 @@ var primaryAdmin =  {
                         adminStatus: true
                     };
 
-var run = 0; // keeps count of how many times the algorithm has run
-var activePool = []; // TODO: Global variable - very risky - change later
 
 var cuisineList = ['Chinese', 'Continental', 'Korean', 'Thai', 'Indian','Western', 'Vietnamese', 'Japanese'];
 
 /* Adds the preliminary user details and restaurants */
 var init = function(){
   // loads the dummyUsers from the database
-  var dummyUsers = require('./finalUsers');
+  var dummyUsers = require('./dummyUsers');
   console.log(dummyUsers.length, "users loaded.");
   
   // pre-process the user data - change to array etc
   for(var i=0; i<dummyUsers.length; i++){
+      
       var user = dummyUsers[i]; 
-      console.log(user.name);
+      
 
-      user.tagline="";
-      user.nationality="";
-      user.cuisine = []; // not enough - fix null values on client side
-      user.available = [];
+      //user.tagline="";
+      //user.nationality="";
+      //user.cuisine = []; // not enough - fix null values on client side
+      //user.available = [];
       user.veg = false;
       user.halal = false;
       user.lunchCount = 0;
       user.dropCount = 0;
-      user.available = [];
+      user.available = ['Monday', 'Saturday'];
       user.blocked = [];
       user.known = [];
 
       addToDatabase( User, user, "User", null);
+
+      //lunchedin.firstMail( user );
+      console.log("Sent first mail to ", user.name);
+
   }
 
     // loads the dummyUsers from the database
@@ -172,8 +262,8 @@ var initializeDatabases = function() {
     clearDatabase( Restaurant, "Restaurants", null );
     clearDatabase( Match, "Matches", null);
 }
-//initializeDatabases();
-//setTimeout(init, 5000); // initialize after 5 seconds so databases have been properly configured
+initializeDatabases(); // clear the database
+setTimeout(init, 5000); // initialize after 5 seconds so databases have been properly configured
 
 
 /*
@@ -187,14 +277,8 @@ var initializeDatabases = function() {
  */
 var firstCall = function(){
 
-  Match.find({ 
-        run : run-1;
-      }, function(err, users){
-
-          if(err) console.log("Error fetching previous matches", err);
-
-          // add to known for each match
-  });
+  //lunchedin.addToKnown();
+  console.log("Running first call...");
 
   var today = new Date();
   var day = today.getDay();
@@ -203,53 +287,60 @@ var firstCall = function(){
   var dayMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   var holidays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
-  activePool = [];
-
+  /*
+   *  Sends confirmation mail to users who have marked - 'Ask Me Everyday'
+   */
   User.find({ 
-        available : dayMap[day]
-      }, function(err, users){
+        available : ['All'] 
+  }, function(err, users){
 
-          if(err) console.log("Error fetching pool", err);
+          if(err) 
+            console.log("Error fetching pool", err);
+          else{
 
-          console.log("Pool length on", dayMap[day] + users.length);
-          
-
-          // mail users      - change to user length after testing
-          for(var i=0; i<users.length; i++){
-
-            var user=users[i];
-            var client = new postmark.Client("32f51173-e5ee-4819-90aa-ad9c25c402a8");
-
-            client.sendEmailWithTemplate({
-              "From": "admin@trylunchedin.com",
-              "To": "trylunchedin@gmail.com",
-              "TemplateId": 588701,
-              "TemplateModel": {
-                "name": user.name,
-                "action_url": "http://localhost:3000/api/addToPool?id=" + user.email,
-                "sender_name": "Eva",
-                "product_address_line1": "product_address_line1_Value",
-                "product_address_line2": "product_address_line2_Value"
-              }
-            });
-
-            console.info("Sent to postmark for delivery")           
+              for(var i=0; i<users.length; i++)
+                lunchedin.confirmationMail( users[i]);                
           }
   });
 
-  // call secondCall after some predetermined time
+  /*
+   * Add all users that have already marked preference 
+   */
+  User.update({ available: dayMap[day] }, {inPool:true} , {multi: true}, function(err, users){
+        if(err) console.log(err, "error");
+        
+        console.log(users.n, "users added to pool");
 
-}; //firstCall();
+        User.find({inPool:true}, function(err, users){
+          console.log(users.length, "made active");
+        })
+
+  }); 
+
+  // call secondCall after some predetermined time
+  setTimeout(secondCall, 5000);
+
+};
+setTimeout(firstCall, 7000);
 
 var secondCall = function(){
 
   // deal with pool
+  User.find({ inPool : true })
+        .sort({ blockedCount: -1, knownCount: 1 })
+        .exec( function(err, userPool) {
 
+            console.log(userPool.length, " being matched");
+
+            matchingAlgorithm(userPool);
+            
+        });
   // match and mail
 
   // store matches
 
-  run++;
+  //
+  //console.log("Incrementing run", run++);
 
 };
 
@@ -748,14 +839,14 @@ var secondCall = function(){
       objectID = qs.id;
       matchID = qs.id;
 
-    var qs = querystring.parse(req.url.split("?")[1]),
-    id = qs.id; console.log(id);
-    Match.find({
-            _id : ObjectId(id)
-          }, function(err, user){
+      var qs = querystring.parse(req.url.split("?")[1]),
+      id = qs.id; console.log(id);
+      Match.find({
+              _id : ObjectId(id)
+            }, function(err, user){
 
-              
-          })    
+                
+            })    
 
   });
 
@@ -860,284 +951,260 @@ var secondCall = function(){
   console.log("App listening on port 8080");    
 
 
-  function matchingAlgorithm(){
+  function matchingAlgorithm( userPool ){
 
-    console.log("Matching");
 
-    // populate daily pool
-    var dayMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    var holidays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-     
-     
-    var today = new Date();
-    var day = today.getDay();
-
-    var poolCount = 0;
-    var currMatches = [];
-    var matchedCount = [];
-
-    User.find({ available : dayMap[day] })
-        .sort({ blockedCount: -1, knownCount: 1 })
-        .exec( function(err, userPool) {
-          if (err) console.log("UserPoolRetrieval Failed! Error:", err);
+          var discardedUsers = [];
           
-          else {
-                // Algorithm is run on the user pool
-                //console.log("UserPool Count:", userPool.length);
-                poolCount = userPool.length;
-                //matchAlgoData.count = 0;
+          while(userPool.length > 0){
 
-                runAlgoOnPool( userPool ); 
+                if(userPool.length == 5){
+                  console.log("Pool length is 5");
+                }
 
-                    function runAlgoOnPool( userPool ){
-                    while(userPool.length > 0){
-
-                          //always at index 0 - because the first user is always removed; remove the first user
-                          //console.log("UserPool Length at", userPool.length);
-                          var currUser = userPool.splice(0, 1)[0]; // removes from the userPool also
-                          
-                          //console.log("Starting with", currUser.name);
-
-                          // create a pool for second mate - which should be a close person to the current user
-                          var pairMatePool = regroup( userPool, currUser, false ); 
-                          var pairMatePool = pairMatePool[0].concat(pairMatePool[1]).concat(pairMatePool [2]); // ordered by priority
-                          //console.log("Found pairmate pool of length", pairMatePool.length);
-                          // if pairMatePool.length == 0 - no pair available - can't do anything - user has already been removed from the pool
-                          if(pairMatePool.length == 0){
-                              console.log("Match not found for", currUser.name);
-                              continue;                            
-                          }
+                if(userPool.length < 3){
+                  console.log("Pool length is less than 3");
+                }
 
 
-                          // picks the first mate in the given pool with compatible cuisine - or just picks the first person
-                          var pairMate = pickNextMate( pairMatePool, currUser, false );
-                          
-                          // this will happen when no user can be selected such that a third user can be selected -
-                          // in this case, better to discard the first user and continue
-                          if(pairMate == undefined){
-                              console.log("Match not found for", currUser.name);
-                              continue;
-                          }
-                            
+                //always at index 0 - because the first user is always removed; remove the first user
+                //console.log("UserPool Length at", userPool.length);
+                var currUser = userPool.splice(0, 1)[0]; // removes from the userPool also
+                
+                console.log("Starting with", currUser.name);
 
-                          // this regrouping will give users compatible with both the selected users
-                          // pairMatePool has to be reordered according to new user
-                          // ordering of the pool is done to keep compatible people first
-                          var thirdMatePool = regroup( pairMatePool, pairMate, false );
-                          var thirdMatePool = thirdMatePool[2].concat(thirdMatePool[1]).concat(thirdMatePool[0]);
-                          //console.log("Pool of third mate for", currUser.name, "and", pairMate.name, "of length", thirdMatePool.length);
+                // create a pool for second mate - which should be a close person to the current user
+                var pairMatePool = regroup( userPool, currUser, false ); 
+                var pairMatePool = pairMatePool[0].concat(pairMatePool[1]).concat(pairMatePool [2]); // ordered by priority
+                //console.log("Found pairmate pool of length", pairMatePool.length);
+                // if pairMatePool.length == 0 - no pair available - can't do anything - user has already been removed from the pool
+                if(pairMatePool.length == 0){
+                    console.log("Match not found for", currUser.name);
+                    discardedUsers.push(currUser);
+                    continue;                            
+                }
 
-                          // pick a third person compatible with the second person - and matching his cuisine
-                          // if no user with matching cuisine is found, pick first person who gives next pool length > 0
-                          var thirdMate = pickNextMate( thirdMatePool, pairMate, false );
-                          //console.log("Found mate for", currUser.name, "and", pairMate.name, "in", thirdMate.name || 'none');
 
-                          // this happens when no third user can give the next pool greater than 0 
-                          // in this case, switch off pool length condition - pick a person with compatible cuisine
-                          if(thirdMate == undefined){
-                            thirdMate = pickNextMate( thirdMatePool, pairMate, true );
-                            // create match of three people
-                            if(thirdMate == undefined)
-                              console.log("No third mate found");
+                // picks the first mate in the given pool with compatible cuisine - or just picks the first person
+                var pairMate = pickNextMate( pairMatePool, currUser, false );
+                
+                // this will happen when no user can be selected such that a third user can be selected -
+                // in this case, better to discard the first user and continue
+                if(pairMate == undefined){
+                    console.log("Match not found for", currUser.name);
+                    continue;
+                }
+                  
 
-                            addMatch( [currUser, pairMate, thirdMate] );
-                            // remove the three people from the userpool
-                            removeFromPool( userPool, [currUser, pairMate, thirdMate]  )
+                // this regrouping will give users compatible with both the selected users
+                // pairMatePool has to be reordered according to new user
+                // ordering of the pool is done to keep compatible people first
+                var thirdMatePool = regroup( pairMatePool, pairMate, false );
+                var thirdMatePool = thirdMatePool[2].concat(thirdMatePool[1]).concat(thirdMatePool[0]);
+                //console.log("Pool of third mate for", currUser.name, "and", pairMate.name, "of length", thirdMatePool.length);
 
-                            continue;
-                          }
+                // pick a third person compatible with the second person - and matching his cuisine
+                // if no user with matching cuisine is found, pick first person who gives next pool length > 0
+                var thirdMate = pickNextMate( thirdMatePool, pairMate, false );
+                console.log("Found mate for", currUser.name, "and", pairMate.name, "in", thirdMate.name || 'none');
 
-                          // third mate pool is acceptable to both first and second user - fourth mate pool removes
-                          // blocked users for third mate also - ordered with best friend for third mate first
-                          var fourthMatePool = regroup( thirdMatePool, thirdMate, false );
-                          var fourthMatePool = fourthMatePool[0].concat(fourthMatePool[1]).concat(fourthMatePool[2]);
-                          var fourthMate = pickNextMate( fourthMatePool, thirdMate, true );  // switch off next pool length
+                // this happens when no third user can give the next pool greater than 0 
+                // in this case, switch off pool length condition - pick a person with compatible cuisine
+                if(thirdMate == undefined){
+                  thirdMate = pickNextMate( thirdMatePool, pairMate, true );
+                  // create match of three people
+                  if(thirdMate == undefined)
+                    console.log("No third mate found");
 
-                          // make match of four people
-                          addMatch( [currUser, pairMate, thirdMate, fourthMate] );                        
-                          
-                          // remove the four people from the user pool
-                          //console.log("pool length before removal", userPool.length);
-                          removeFromPool( userPool, [pairMate, thirdMate, fourthMate]  )
-                          
-/*                          if(userPool.length == 0)
-                            addToDatabase( MatchAlgorithm, matchAlgoData, "matchAlgorithm", null); */
-                                
-                    } //while end
+                  addMatch( [currUser, pairMate, thirdMate] );
+                  // remove the three people from the userpool
+                  removeFromPool( userPool, [currUser, pairMate, thirdMate]  )
 
-                    // takes in two users 
-                    // returns true if either of the users have blocked each other
-                    // returns false if none of the users have blocked each other
-                    function userMutualBlock( user1, user2 ){
+                  continue;
+                }
+
+                // third mate pool is acceptable to both first and second user - fourth mate pool removes
+                // blocked users for third mate also - ordered with best friend for third mate first
+                var fourthMatePool = regroup( thirdMatePool, thirdMate, false );
+                var fourthMatePool = fourthMatePool[0].concat(fourthMatePool[1]).concat(fourthMatePool[2]);
+                var fourthMate = pickNextMate( fourthMatePool, thirdMate, true );  // switch off next pool length
+
+                // make match of four people
+                addMatch( [currUser, pairMate, thirdMate, fourthMate] );                        
+                
+                // remove the four people from the user pool
+                //console.log("pool length before removal", userPool.length);
+                removeFromPool( userPool, [pairMate, thirdMate, fourthMate]  )
+                
                       
-                      // check if user1.id is present in user2 block list
-                      if( user2.blocked.indexOf(user1._id) > -1 ||  user1.blocked.indexOf(user2._id) > -1 )
-                        return true;
-                      
-                      return false; 
-                    }
+          } //while end
 
-                    // returns the connection between two users
-                    // in 0, 1, 2 form
-                    function userMutualFriends( user1, user2){
-                      // check if user1.id is present in user2 block list
-                      return (user2.known.indexOf(user1._id)>-1) + (user1.known.indexOf(user2._id)>-1) +0; 
-                    }
-
-                    // returns true if the users have atleast one common cuisine
-                    // later -> or equivalent cuisine - can find restaurant serving atleast one of each
-                    function userCuisineCompatible( user1, user2 ){
-                        
-                        Restaurant.find({
-                          $and: [ { cuisine: { $in: user1.cuisine } }, 
-                                  { cuisine: { $in: user2.cuisine } },
-                                  { veg: user1.veg || user2.veg },
-                                  { halal: user1.halal || user2.halal },
-                                ]  
-                        }, function(err, restaurant){
-                           if(err){
-                             console.log(err);
-                             return false;
-                           } 
-                           
-                           return true;
-                        })
-                        //console.log("cuisine compatible", returnValue)
-                        //return returnValue;
-                    }
-
-
-                    // takes in a user pool and a current user - divides the group into three layers 
-                    // length - returns only length of the compatible pool
-                    // returns a divided pool of all unblocked users for the given current user
-                    function regroup( userPool, currUser, length ){
-                        
-                        var oneWayPool = [];
-                        var twoWayPool = [];
-                        var compatible = [];
-
-                        for(var i=0; i<userPool.length; i++){
-                            // if either of the people have blocked, skip the user
-                            if( userMutualBlock( currUser, userPool[i] ))
-                              continue;
-
-                            // categorize according to compatibility
-                            switch( userMutualFriends( currUser, userPool[i] ) ) {
-                                case 0:
-                                    compatible.push( userPool[i] )
-                                    break;
-                                case 1:
-                                    oneWayPool.push( userPool[i] )
-                                    break;
-                                case 2:
-                                    twoWayPool.push( userPool[i] )
-                            } // switch end
-                        } // for-compatibility end
-
-                        if(!length)
-                          return [twoWayPool, oneWayPool, compatible]
-                        else
-                          return twoWayPool.length + oneWayPool.length + compatible.length;                         
-                    }
-
-
-                    // takes a pool and a current user and finds person from the pool with which the given user is cuisine compatible
-                    // and compatible pool for both these users has length more than 1
-                    // incase of no cuisine compatibility - the first user or user with next compatible pool length > 1 is selected
-                    // and returned
-                    // the matePool is ordered accordin to priority - two way first or compatible first etc
-                    function pickNextMate(  matePool, currUser, poolLengthOFF  ){
-                      // pick the first that has compatible cuisine
-                      var pairMate; 
-                      for(var i=0; i<matePool.length; i++){
-
-                          // if the from the mate pool is cuisine compatible and the next pool with both these has length > 0
-                          if( userCuisineCompatible( currUser, matePool[i] ) 
-                                && ( poolLengthOFF || regroup( matePool, matePool[i], true ) ) ){ 
-                            pairMate = matePool.splice(i, 1)[0]; // removes pairmate at the same time                     
-                            break;
-                          }
-                      }
-                     
-                      // if no one is cuisine compatible, just pick best friend
-                      if(pairMate == undefined){
-                        var i=0;
-                        while(i < matePool.length){
-                          if(poolLengthOFF || regroup( matePool, matePool[i], true )){ 
-                            pairMate = matePool.splice(i, 1)[0]; // removes pairmate at the same time  
-                            //console.log("No one cuisine compatible, pairmate selected", pairMate.name || "none");
-                            break;
-                          }
-                          i++;               
-                        }
-                      }
-
-                      return pairMate;
-                    }
-
-                    // adds the required match
-                    function addMatch( participants ){
-                    
-                          // find a matching restaurant
-                          //factor in veg and halal
-                          console.log(participants[participants.length-1].cuisine);
-                          Restaurant.find({
-                               $and: [ { cuisine: { $in: participants[0].cuisine } }, 
-                                        { cuisine: { $in: participants[1].cuisine } },
-                                        { cuisine: { $in: participants[2].cuisine } },
-                                        { cuisine: { $in: (participants[3].cuisine || []) } },
-                                        { veg: (participants[0].veg || participants[1].veg || participants[2].veg || (participants[3].veg || 0) )},
-                                        { halal: (participants[0].halal || participants[1].halal || participants[2].halal || (participants[3].halal || 0) ) },
-                                      ]  
-                            }, function(err, res){
-                               if(err) console.log(err);
-
-                               else {
-                                        // increase lunchcount of users
-
-                                        // add users to known 
-
-                                        // create and add a match to the database
-                                        if (res[0] == undefined)
-                                          res[0] = {'name' : 'Foodcourt'};
-                                        var newMatch =                                           
-                                          {
-                                            'batch': algoRuns,
-                                            'batchSize': poolCount,
-                                            'date': Date(),
-                                            'participants': participants,
-                                            'location': res[0]
-                                          };
-                                          currMatches.push(newMatch);
-
-
-                                        Match.create(
-                                          newMatch
-                                        , function(err, doc){
-                                            if(err) console.log(err);
-
-                                            console.log("Match");
-                                              
-                                        })
-                                      }
-                              })
-                    } 
-
-                    // removes the users from the pool
-                    function removeFromPool( userPool, participants ){
-                      for(var i=0; i<participants.length; i++){
-                        var index = userPool.indexOf(participants[i]); 
-                        userPool.splice(index, 1);
-                      }
-                    }    
-                } // end of runAlgoOnPool
+          // takes in two users 
+          // returns true if either of the users have blocked each other
+          // returns false if none of the users have blocked each other
+          function userMutualBlock( user1, user2 ){
+            
+            // check if user1.id is present in user2 block list
+            if( user2.blocked.indexOf(user1._id) > -1 ||  user1.blocked.indexOf(user2._id) > -1 )
+              return true;
+            
+            return false; 
           }
-    });
 
+          // returns the connection between two users
+          // in 0, 1, 2 form
+          function userMutualFriends( user1, user2){
+            // check if user1.id is present in user2 block list
+            return (user2.known.indexOf(user1._id)>-1) + (user1.known.indexOf(user2._id)>-1) +0; 
+          }
+
+          // returns true if the users have atleast one common cuisine
+          // later -> or equivalent cuisine - can find restaurant serving atleast one of each
+          function userCuisineCompatible( user1, user2 ){
+              
+              Restaurant.find({
+                $and: [ { cuisine: { $in: user1.cuisine } }, 
+                        { cuisine: { $in: user2.cuisine } },
+                        { veg: user1.veg || user2.veg },
+                        { halal: user1.halal || user2.halal },
+                      ]  
+              }, function(err, restaurant){
+                 if(err){
+                   console.log(err);
+                   return false;
+                 } 
+                 
+                 return true;
+              })
+              //console.log("cuisine compatible", returnValue)
+              //return returnValue;
+          }
+
+
+          // takes in a user pool and a current user - divides the group into three layers 
+          // length - returns only length of the compatible pool
+          // returns a divided pool of all unblocked users for the given current user
+          function regroup( userPool, currUser, length ){
+              
+              var oneWayPool = [];
+              var twoWayPool = [];
+              var compatible = [];
+
+              for(var i=0; i<userPool.length; i++){
+                  // if either of the people have blocked, skip the user
+                  if( userMutualBlock( currUser, userPool[i] ))
+                    continue;
+
+                  // categorize according to compatibility
+                  switch( userMutualFriends( currUser, userPool[i] ) ) {
+                      case 0:
+                          compatible.push( userPool[i] )
+                          break;
+                      case 1:
+                          oneWayPool.push( userPool[i] )
+                          break;
+                      case 2:
+                          twoWayPool.push( userPool[i] )
+                  } // switch end
+              } // for-compatibility end
+
+              if(!length)
+                return [twoWayPool, oneWayPool, compatible]
+              else
+                return twoWayPool.length + oneWayPool.length + compatible.length;                         
+          }
+
+
+          // takes a pool and a current user and finds person from the pool with which the given user is cuisine compatible
+          // and compatible pool for both these users has length more than 1
+          // incase of no cuisine compatibility - the first user or user with next compatible pool length > 1 is selected
+          // and returned
+          // the matePool is ordered accordin to priority - two way first or compatible first etc
+          function pickNextMate(  matePool, currUser, poolLengthOFF  ){
+            // pick the first that has compatible cuisine
+            var pairMate; 
+            for(var i=0; i<matePool.length; i++){
+
+                // if the from the mate pool is cuisine compatible and the next pool with both these has length > 0
+                if( userCuisineCompatible( currUser, matePool[i] ) 
+                      && ( poolLengthOFF || regroup( matePool, matePool[i], true ) ) ){ 
+                  pairMate = matePool.splice(i, 1)[0]; // removes pairmate at the same time                     
+                  break;
+                }
+            }
+           
+            // if no one is cuisine compatible, just pick best friend
+            if(pairMate == undefined){
+              var i=0;
+              while(i < matePool.length){
+                if(poolLengthOFF || regroup( matePool, matePool[i], true )){ 
+                  pairMate = matePool.splice(i, 1)[0]; // removes pairmate at the same time  
+                  //console.log("No one cuisine compatible, pairmate selected", pairMate.name || "none");
+                  break;
+                }
+                i++;               
+              }
+            }
+
+            return pairMate;
+          }
+
+          // adds the required match
+          function addMatch( participants ){
+
+                /*
+                 * Dynamically constructing the criteria for the query
+                 */
+                var criteria = []; 
+                vegValue = false; 
+                halalValue = false;
+                for( var p = 0; p < participants.length; p++ ){
+
+                    var participant = participants[p];
+
+                    if(participant == undefined)
+                      continue;
+                    
+                    if(participant.veg)
+                      vegValue = true;
+                    
+                    if(participant.halal)
+                      halalValue = true;
+
+                    criteria.push( { cuisine: { $in: participant.cuisine } } );
+                }
+
+                criteria.push( { veg: vegValue } )
+                criteria.push( { halal: halalValue } )
+
+
+                // Find a restaurant and add the match
+                Restaurant.find({
+                     $and: criteria
+                  }, function(err, res){
+                     if(err) console.log(err);
+                     else {
+                              var newMatch =                                           
+                                {
+                                  'run': run,
+                                  'date': Date(),
+                                  'participants': participants,
+                                  'location': res[0]
+                                };
+                                console.log("Match made at", res[0].name);
+                            }
+                })
+          } 
+
+          // removes the users from the pool
+          function removeFromPool( userPool, participants ){
+            for(var i=0; i<participants.length; i++){
+              var index = userPool.indexOf(participants[i]); 
+              userPool.splice(index, 1);
+            }
+          }    
 
   } // matchingAlgo end
 
 
-  //calling the matching algorithm every 5 seconds
-  //setInterval(matchingAlgorithm, 43200000);
 

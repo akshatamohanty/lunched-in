@@ -132,6 +132,7 @@ app.controller("user", [
                          });
 
         $scope.toggle = function (item, list) {
+
           if(list){
             var idx = list.indexOf(item);
             if (idx > -1) {
@@ -144,16 +145,25 @@ app.controller("user", [
         };
 
         $scope.exists = function (item, list) {
+          //console.log("exists");
           if(list)
             return list.indexOf(item) > -1;
           else
             return false;
         };
 
-        $scope.updateUser = function(){
+        $scope.updateUser = function(active_user){
 
-            $.post('/api/editUser', $scope.active_user, function(data,status,xhr){
-              console.log(status);
+            $.post('/api/editUser', active_user, function(data,status,xhr){
+              if (active_user.blocked == null)
+                      active_user.blocked = [];
+                  if (active_user.known == null)
+                      active_user.known = [];
+                  if (active_user.cuisine == null)
+                      active_user.cuisine = [];
+                  if (active_user.available == null)
+                      active_user.available = [];
+              console.log(active_user, status);
             })
         };
 

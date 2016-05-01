@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 
 var userSchema = {
+	inPool: { type: Boolean }, 
 	name: { type: String, required: true}, 
 	password: { type: String, required: true }, 
 	title: { type: String, required: true}, 

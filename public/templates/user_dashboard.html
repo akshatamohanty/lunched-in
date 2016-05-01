@@ -32,7 +32,7 @@
     
         <!--beginning of card-->
         <h3 class='page-header'>{{ active_user.name  }}, your Card -</h3>
-        <button class='btn btn-primary pull-right' ng-click="updateUser()">Save</button>
+        <button class='btn btn-primary pull-right' ng-click="updateUser(active_user)">Save</button>
         <div class='row'>
           
           <!-- user card display! -->
@@ -142,10 +142,10 @@
                         <div class='card panel panel-default'>
                             <div class='panel-heading card-heading'>
                               <h4 style='margin-bottom:0'>{{ user.name }}
-                                <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, selectedUser.known)'
-                                ng-disabled='exists(user._id, selectedUser.blocked)'>F</button>
-                                <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, selectedUser.blocked)'
-                                ng-disabled='exists(user._id, selectedUser.known)'>B</button>
+                                <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, active_user.known)'
+                                ng-disabled='exists(user._id, active_user.blocked)'>F</button>
+                                <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, active_user.blocked)'
+                                ng-disabled='exists(user._id, active_user.known)'>B</button>
                               </h4>
                               <em>{{ user.title }}</em>
                             </div>           

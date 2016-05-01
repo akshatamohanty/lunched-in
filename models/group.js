@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 
 var groupSchema = {
-	length: { type: Number, required: true}, 
+	run: { type: Number, required: true}, 
 	participants: { type:[ User.userSchema ], required: true },
 };
 
