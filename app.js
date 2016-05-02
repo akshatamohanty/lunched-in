@@ -77,6 +77,30 @@ app.use(passport.session());
 
 // set up database ==== only for testing === 
 var lunchedin = {};
+
+lunchedin.addToPool = function( runCount, userID ){
+
+  Match.find({ run: runCount }, function(err, matches){
+
+      if(matches.length>0){
+        console.log("Matches found for run ", run);
+        return false; 
+      }
+      else{
+        
+        console.log("Matches not found for run ", run);
+        User.find({ _id: ObjectId(userID)}, function(err, users){
+
+            users[0].inPool = true; 
+            users[0].save();
+            console.log(users[0].name, " added to pool");
+
+        })
+        return true; 
+      }
+  });
+};
+
 lunchedin.sendMail = function( templateID, templateModel, user_email ){
 
     var client = new postmark.Client("32f51173-e5ee-4819-90aa-ad9c25c402a8");
@@ -137,29 +161,103 @@ lunchedin.matchedMail = function( user ){
 
 };
 
+lunchedin.summaryMail = function(){
+
+};
+
 lunchedin.addToKnown = function( runCount ){
     // for each participant of a match, check if all others are added - if not - add it
     Match.find({ run: runCount }, function(err, matches){
 
-      console.log(matches.length, "matches found");
+      if(err) console.log("Error retriving matches");
+      else{
 
-      for(var i=0; i < matches.length; matches++){
+            //console.log(matches.length, "matches found for runCount", runCount );
+            for(var i=0; i < matches.length; i++){
 
-          var participants = matches.participants; 
+               //console.log("For Match", i, " ", matches[i].participants.length, "found")
 
-          for(var p=0; p < participants.length - 1; p++){
+                User.find( { 
+                    _id: {$in: matches[i].participants}
+                  }, function(err, participants){
 
-              for( var q=p+1; q < participants.length; q++){
+                        if(err) console.log("Error getting participants");
+                        else{
+                              
+                              for(var pCount=0; pCount< participants.length; pCount++){
+                                  
+                                  var p = participants[pCount]; //console.log("Comparing", p.name);
+                                  
+                                  for(var qCount=0; qCount < participants.length; qCount++){
 
+                                      if(qCount == pCount)
+                                          continue; 
 
+                                      var q = participants[qCount];                                        
+                                      
+                                      if( p.known.indexOf(q._id) == -1)
+                                        p.known.push(q._id);
+                                  }
 
-              }
+                                  p.lunchCount++ ;
+                                  p.save();
+                                 //console.log(p.name, p.known.length);
+                              }
+                        }
 
-          }
-          
+                  });
+                
+            }       
       }
 
     });
+};
+
+lunchedin.setPool = function(){
+
+      console.log("-------------- Refreshing pool-----------------");
+      User.update({}, {inPool: false} , {multi: true}, function(err, users){
+            
+            if(err) console.log(err, "error");
+            else{
+                  var today = new Date();
+                  var day = today.getDay();
+
+                  // populate daily pool
+                  var dayMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                  var holidays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+
+                  /*
+                   *  Sends confirmation mail to users who have marked - 'Ask Me Everyday'
+                   */
+                  User.find({ 
+                        available : ['All'] 
+                  }, function(err, users){
+
+                          if(err) 
+                            console.log("Error fetching pool", err);
+                          else{
+
+                              for(var i=0; i<users.length; i++)
+                                lunchedin.confirmationMail( users[i]);                
+                          }
+                  });
+
+                  /*
+                   * Add all users that have already marked preference 
+                   */
+                  User.update({ available: dayMap[day] }, {inPool:true} , {multi: true}, function(err, users){
+                        if(err) console.log(err, "error");
+                        
+                       //console.log(users.n, "users added to pool");
+
+                        User.find({inPool:true}, function(err, users){
+                          //console.log(users.length, "made active");
+                        })
+
+                  });    
+            }   
+      });     
 };
 
 var clearDatabase = function( database, stringName, callback ){
@@ -183,8 +281,6 @@ var addToDatabase = function( database, jsonObject, stringName, callback ){
                       if(err)
                         console.log("Error: Unable to add to ", stringName, err);
 
-                      //console.log("Added to ", stringName);
-
                       if(callback)
                         callback;   
                   });
@@ -193,6 +289,7 @@ var addToDatabase = function( database, jsonObject, stringName, callback ){
 
 // GLOBAL VARIABLES
 var run = 0;
+
 var primaryAdmin =  {   
                         name: 'Administrator',
                         username: 'admin@trylunchedin.com',
@@ -223,9 +320,14 @@ var init = function(){
       user.halal = false;
       user.lunchCount = 0;
       user.dropCount = 0;
-      user.available = ['Monday', 'Saturday'];
       user.blocked = [];
       user.known = [];
+      user.cuisine = ['Chinese'];
+
+      if(i%2 == 0)
+        user.available = ['Tuesday']
+      else
+        user.available = [];
 
       addToDatabase( User, user, "User", null);
 
@@ -235,17 +337,14 @@ var init = function(){
   }
 
     // loads the dummyUsers from the database
-  var dummyRestaurants = require('./dummyRestaurants');
-  console.log(dummyRestaurants.length, "restaurants loaded.");
+  var allRestaurants = require('./allRestaurants');
+  console.log(allRestaurants.length, "restaurants loaded.");
   
   // pre-process the user data - change to array etc
-  for(var i=0; i<dummyRestaurants.length; i++){
-      var restaurant = dummyRestaurants[i]; 
+  for(var i=0; i<allRestaurants.length; i++){
+      var restaurant = allRestaurants[i]; 
 
-      if(restaurant.cuisine == 0)
-        restaurant.cuisine = [];
-      else 
-        restaurant.cuisine = restaurant.cuisine.replace(/\s/g, '').split(',');
+      restaurant.cuisine = restaurant.cuisine.replace(/\s/g, '').split(',');
 
       addToDatabase( Restaurant, restaurant, "Restaurant", null);
   }
@@ -277,70 +376,34 @@ setTimeout(init, 5000); // initialize after 5 seconds so databases have been pro
  */
 var firstCall = function(){
 
-  //lunchedin.addToKnown();
-  console.log("Running first call...");
+  console.log("-------------- Adding to Known for previous run ", run, "-----------------");
+  lunchedin.addToKnown( run );
 
-  var today = new Date();
-  var day = today.getDay();
 
-  // populate daily pool
-  var dayMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  var holidays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-
-  /*
-   *  Sends confirmation mail to users who have marked - 'Ask Me Everyday'
-   */
-  User.find({ 
-        available : ['All'] 
-  }, function(err, users){
-
-          if(err) 
-            console.log("Error fetching pool", err);
-          else{
-
-              for(var i=0; i<users.length; i++)
-                lunchedin.confirmationMail( users[i]);                
-          }
-  });
-
-  /*
-   * Add all users that have already marked preference 
-   */
-  User.update({ available: dayMap[day] }, {inPool:true} , {multi: true}, function(err, users){
-        if(err) console.log(err, "error");
-        
-        console.log(users.n, "users added to pool");
-
-        User.find({inPool:true}, function(err, users){
-          console.log(users.length, "made active");
-        })
-
-  }); 
+  run++;
+  lunchedin.setPool();
 
   // call secondCall after some predetermined time
-  setTimeout(secondCall, 5000);
+  console.log("-------------- Processing after 5000ms-----------------");
+  setTimeout(secondCall, 10000);
 
 };
-setTimeout(firstCall, 7000);
+
 
 var secondCall = function(){
 
   // deal with pool
+  console.log("-------------- Run ", run, "-----------------");
   User.find({ inPool : true })
-        .sort({ blockedCount: -1, knownCount: 1 })
+        .sort({ blockedCount: -1, lunchCount: 1, knownCount: 1,  })
         .exec( function(err, userPool) {
 
-            console.log(userPool.length, " being matched");
+          console.log("-----------Running Match Algorithm---------------")
+          matchingAlgorithm(userPool);
+  });
 
-            matchingAlgorithm(userPool);
-            
-        });
   // match and mail
 
-  // store matches
-
-  //
-  //console.log("Incrementing run", run++);
 
 };
 
@@ -366,7 +429,6 @@ var secondCall = function(){
   //
   passport.use(new LocalStrategy(function(username, password, done) {
       process.nextTick(function() {
-        console.log("passport");
         User.find({ 
                         'email' : username, //remember! virtuals can't be queried unless exposed!
                         'password' : password 
@@ -428,6 +490,10 @@ var secondCall = function(){
    */
 
   //api -------------
+
+  app.get('/api/firstCall', function(req, res){
+    firstCall();
+  });
   
   // Sends all the users in the database 
   app.get('/api/users', function(req, res){
@@ -512,8 +578,6 @@ var secondCall = function(){
       else{
         res.send('Request not authenticated');
       }
-
-
   });
 
   app.get('/api/cuisines', function(req, res){
@@ -550,32 +614,6 @@ var secondCall = function(){
 
   });
 
-  app.get('/api/runMatchAlgorithm', function(req, res){
-      
-      // only Admins can run the algorithm
-      if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
-            matchingAlgorithm();
-      }
-      else{
-        res.send('Request not authenticated');
-      }
-  })
-
-  app.get('/api/firstcall', function(req, res){
-      firstCall();
-      // only Admins can run the algorithm
-/*      if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
-            firstCall();
-      }
-      else{
-        res.send('Request not authenticated');
-      }*/
-  })
-
-  app.get('/api/today', function(req, res){
-    res.send(activePool);
-  });
-
   app.post('/api/addUser', function(req, res){
 
       // only Admins can add new users
@@ -601,7 +639,7 @@ var secondCall = function(){
         res.send('Request not authenticated');
       }
 
-  })
+  });
 
   app.post('/api/removeUser', function(req, res){
 
@@ -625,7 +663,7 @@ var secondCall = function(){
         res.send('Request not authenticated');
       }
 
-  })
+  });
 
   app.get('/api/restaurants', function(req, res){
       //
@@ -650,7 +688,7 @@ var secondCall = function(){
       else{
         res.send('Request not authenticated');
       }
-  })
+  });
 
   app.post('/api/addRestaurant', function(req, res){
       // only Admins can add new users
@@ -675,7 +713,7 @@ var secondCall = function(){
       else{
         res.send('Request not authenticated');
       }
-  })
+  });
 
   app.post('/api/removeRestaurant', function(req, res){
       // only Admins can delete users
@@ -697,7 +735,7 @@ var secondCall = function(){
       else{
         res.send('Request not authenticated');
       }
-  })
+  });
 
   // name changed from user_pref to edit_user - change in angular app - public
   app.post('/api/editUser', function(req, res){
@@ -742,7 +780,8 @@ var secondCall = function(){
                                  "_id": new ObjectId(req.session.passport.user[0]._id)
                               }, 
                               {
-                                  password: req.body.password, 
+                                  password: req.body.password,
+                                  title: req.body.title, 
                                   phone: req.body.phone,  
                                   tagline: req.body.tagline, 
                                   nationality: req.body.nationality, 
@@ -754,9 +793,9 @@ var secondCall = function(){
                                   known: req.body.known
                               }, 
                               { multi: false }, 
-                              function(){
+                              function(err, users){
                                   // update the current user
-                                  req.session.passport.user[0].password =  req.body.password;
+/*                                  req.session.passport.user[0].password =  req.body.password;
                                   req.session.passport.user[0].phone = req.body.phone;
                                   req.session.passport.user[0].tagline = req.body.tagline; 
                                   req.session.passport.user[0].nationality = req.body.nationality;
@@ -765,9 +804,10 @@ var secondCall = function(){
                                   req.session.passport.user[0].halal = req.body.halal;
                                   req.session.passport.user[0].available = req.body.available;
                                   req.session.passport.user[0].blocked = req.body.blocked;
-                                  req.session.passport.user[0].known = req.body.known;
+                                  req.session.passport.user[0].known = req.body.known;*/
 
-                                  res.json(req.session.passport.user[0]._id);  
+                                  //res.json(req.session.passport.user[0]._id);  
+                                  req.session.passport.user[0] = users[0];
                                   console.log("User update from User-Dashboard");  
                               }
                     )
@@ -809,44 +849,53 @@ var secondCall = function(){
 
   // email apis
   app.get('/api/addToPool', function(req, res){
-
+        
       var qs = querystring.parse(req.url.split("?")[1]),
-      id = qs.id; console.log(id);
-      User.find({
-              email : id
-            }, function(err, user){
+      id = qs.id;
 
-                if(err) console.log("Error while adding user to pool", err);
-                else{
-                  console.log(user);
-                  if(user.length){
-                    //check for duplicates
-                    activePool.push(user[0]);
-                    for(var i=0; i<activePool.length; i++){
-                      var user_i = activePool[i];
-                      if(user_i.email == id)
-                        res.send("You are already signed up for today!");
-                    }
-                  } 
-                  res.end("Added successfully.", activePool);
-                }
-            })      
+      lunchedin.addToPool( run, id ); 
+
+      res.send( "---- Success Message -----" );
+
   });
 
-  app.post('/api/dropOut', function(req, res){
+  app.get('/api/dropOut', function(req, res){
       
       var qs = querystring.parse(req.url.split("?")[1]),
-      objectID = qs.id;
-      matchID = qs.id;
+      objectID = qs.participant;
+      matchID = qs.match;
 
-      var qs = querystring.parse(req.url.split("?")[1]),
-      id = qs.id; console.log(id);
+      console.log(objectID); console.log(matchID);
+
       Match.find({
-              _id : ObjectId(id)
-            }, function(err, user){
+              _id : ObjectId(matchID)
+            }, function(err, matches){
 
-                
-            })    
+            var match = matches[0];
+            match.dropouts.push( match.participants.splice(match.participants.indexOf(objectID), 1) );
+            match.save();
+
+            User.find( { _id: ObjectId(objectID) }, function(err, users){
+
+                var user = users[0];
+                user.dropCount++;
+
+            });
+
+            User.find( { _id: {$in:match.participants} }, function(err, users){
+
+                for(var i=0; i < users.length; i++){
+
+                    var user = users[i];
+
+                    // email
+
+                }
+            });
+
+
+
+      })    
 
   });
 
@@ -964,6 +1013,9 @@ var secondCall = function(){
 
                 if(userPool.length < 3){
                   console.log("Pool length is less than 3");
+                  discardedUsers = discardedUsers.concat(userPool);
+                  userPool = [];
+                  continue;
                 }
 
 
@@ -971,7 +1023,7 @@ var secondCall = function(){
                 //console.log("UserPool Length at", userPool.length);
                 var currUser = userPool.splice(0, 1)[0]; // removes from the userPool also
                 
-                console.log("Starting with", currUser.name);
+                //console.log("Starting with", currUser.name, currUser.known);
 
                 // create a pool for second mate - which should be a close person to the current user
                 var pairMatePool = regroup( userPool, currUser, false ); 
@@ -1006,7 +1058,7 @@ var secondCall = function(){
                 // pick a third person compatible with the second person - and matching his cuisine
                 // if no user with matching cuisine is found, pick first person who gives next pool length > 0
                 var thirdMate = pickNextMate( thirdMatePool, pairMate, false );
-                console.log("Found mate for", currUser.name, "and", pairMate.name, "in", thirdMate.name || 'none');
+                //console.log("Found mate for", currUser.name, "and", pairMate.name, "in", thirdMate.name || 'none');
 
                 // this happens when no third user can give the next pool greater than 0 
                 // in this case, switch off pool length condition - pick a person with compatible cuisine
@@ -1151,7 +1203,7 @@ var secondCall = function(){
 
           // adds the required match
           function addMatch( participants ){
-
+                console.log("-------------Matching--------------");
                 /*
                  * Dynamically constructing the criteria for the query
                  */
@@ -1172,6 +1224,8 @@ var secondCall = function(){
                       halalValue = true;
 
                     criteria.push( { cuisine: { $in: participant.cuisine } } );
+
+                    console.log(participant.name, ": Been on ", participant.lunchCount, " lunches and knows ", participant.knownCount);
                 }
 
                 criteria.push( { veg: vegValue } )
@@ -1184,15 +1238,19 @@ var secondCall = function(){
                   }, function(err, res){
                      if(err) console.log(err);
                      else {
-                              var newMatch =                                           
-                                {
-                                  'run': run,
-                                  'date': Date(),
-                                  'participants': participants,
-                                  'location': res[0]
-                                };
-                                console.log("Match made at", res[0].name);
-                            }
+                          
+                          var newMatch =                                           
+                            {
+                              'run': run,
+                              'date': Date(),
+                              'participants': participants,
+                              'location': res[0],
+                              'dropouts' : []
+                            };
+                          //console.log("Match made at", res[0].name);
+
+                          addToDatabase( Match, newMatch, "Match", null)
+                    }
                 })
           } 
 
@@ -1207,4 +1265,4 @@ var secondCall = function(){
   } // matchingAlgo end
 
 
-
+setTimeout(firstCall, 7000);

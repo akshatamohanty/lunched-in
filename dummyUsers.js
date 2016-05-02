@@ -1,6 +1,6 @@
 var dummyUsers = [
   {
-    "name": "Evangeline",
+    "name": "A",
     "password": 393,
     "title": "Support Staff",
     "picture": "URL",
@@ -12,7 +12,7 @@ var dummyUsers = [
     "cuisine": 0
   },
   {
-    "name": "Germaine",
+    "name": "B",
     "password": 483,
     "title": "Principal Architect",
     "picture": "URL",
@@ -24,7 +24,7 @@ var dummyUsers = [
     "cuisine": "Chinese ,  Korean ,  Thai,  French ,  Western"
   },
   {
-    "name": "Ashton",
+    "name": "C",
     "password": 621,
     "title": "HR",
     "picture": "URL",
@@ -36,7 +36,7 @@ var dummyUsers = [
     "cuisine": "Thai,  Western"
   },
   {
-    "name": "Xenos",
+    "name": "D",
     "password": 895,
     "title": "Principal Architect",
     "picture": "URL",
@@ -48,7 +48,7 @@ var dummyUsers = [
     "cuisine": "Chinese ,  Thai,  Korean , Indian ,  French ,  Western ,  Vietnamese"
   },
   {
-    "name": "Colt",
+    "name": "E",
     "password": 669,
     "title": "Principal Architect",
     "picture": "URL",
@@ -60,7 +60,7 @@ var dummyUsers = [
     "cuisine": 0
   },
   {
-    "name": "Yvonne",
+    "name": "F",
     "password": 531,
     "title": "Support Staff",
     "picture": "URL",
@@ -72,7 +72,7 @@ var dummyUsers = [
     "cuisine": "French ,  Vietnamese ,  Chinese ,  Thai,  Western , Indian"
   },
   {
-    "name": "Demetrius",
+    "name": "G",
     "password": 871,
     "title": "Junior Architect",
     "picture": "URL",
@@ -84,7 +84,7 @@ var dummyUsers = [
     "cuisine": "Chinese"
   },
   {
-    "name": "Shelly",
+    "name": "H",
     "password": 132,
     "title": "HR",
     "picture": "URL",
@@ -96,7 +96,7 @@ var dummyUsers = [
     "cuisine": "Thai"
   },
   {
-    "name": "Colton",
+    "name": "I",
     "password": 534,
     "title": "HR",
     "picture": "URL",
@@ -108,7 +108,7 @@ var dummyUsers = [
     "cuisine": "Chinese"
   },
   {
-    "name": "Jennifer",
+    "name": "J",
     "password": 112,
     "title": "Support Staff",
     "picture": "URL",

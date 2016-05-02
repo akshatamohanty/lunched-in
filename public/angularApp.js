@@ -40,35 +40,8 @@ app.controller("MainCtrl", [
       function($scope, $http){
 
         $scope.loggedInUser = null;
-        $scope.logout = logoutFunction; 
 
-        $scope.cuisines = [];
 
-        $scope.letters = ["A", "B", "C", "D", "E", "F",
-         "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
-
-        $scope.days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-
-        $scope.users = [];
-        $scope.usersAlpha = [];
-        
-        $http.get("/api/users")
-            .success( function(data){
-               console.log("All users loaded", data);
-               $scope.users = data;
-               for(var i=0; i<$scope.letters.length; i++)
-                  $scope.usersAlpha[ $scope.letters[i] ] = [];
-
-               for(var i=0; i<data.length; i++){
-                  $scope.usersAlpha[ data[i].name[0] ].push( data[i] );
-               }
-
-               console.log($scope.usersAlpha);
-              
-            })
-            .error(function(data){
-               console.log("Error:" + data);
-            });
          
         $http.get("/api/getLoggedInUser")
                          .success( function(data){
@@ -84,22 +57,7 @@ app.controller("MainCtrl", [
                          .error(function(data){
                             console.log("Error:" + data);
                          });
-        $http.get("/api/cuisines")
-          .success( function(data){
-
-             $scope.cuisines = data; 
-          })
-          .error(function(data){
-             console.log("Error:" + data);
-          });
-
-        var logoutFunction = function(){
-
-                         $http.get("/logout")
-                             .success( function(data){
-                                  $scope.loggedInUser = null;
-                             });
-        }
+        
 
 
       }
@@ -110,17 +68,53 @@ app.controller("user", [
       function($scope, $http){
 
         $scope.active_user = null;
-        $scope.selectedLetter = 'A';
-        $scope.changeLetter = function(letter){
-          $scope.selectedLetter = letter;
-        }
 
+        $scope.cuisines = [];
 
-        $http.get("/api/getLoggedInUser")
+        $scope.letters = ["A", "B", "C", "D", "E", "F",
+         "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+
+        $scope.days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+
+        $scope.users = [];
+        $scope.usersAlpha = [];
+
+        $http.get("/api/cuisines")
+          .success( function(data){
+
+             $scope.cuisines = data; 
+          })
+          .error(function(data){
+             console.log("Error:" + data);
+        });
+
+        var resetUser = function (){
+          $http.get("/api/getLoggedInUser")
                          .success( function(data){
 
                             if( data ){
                                 $scope.active_user = data; 
+                                $http.get("/api/users")
+                                  .success( function(data){
+                                     
+                                     $scope.users = data;
+
+                                     // Initializing Alpha
+                                     for(var i=0; i<$scope.letters.length; i++)
+                                        $scope.usersAlpha[ $scope.letters[i] ] = [];
+
+                                     for(var i=0; i<data.length; i++){
+                                        if(data[i].email == $scope.active_user.email)
+                                          continue;
+                                        $scope.usersAlpha[ data[i].name[0].toUpperCase() ].push( data[i] ); 
+                                     }
+
+                                     console.log($scope.usersAlpha);
+                                    
+                                  })
+                                  .error(function(data){
+                                     console.log("Error:" + data);
+                                  });
                                                 
                             }
                             else
@@ -130,6 +124,8 @@ app.controller("user", [
                          .error(function(data){
                             console.log("Error:" + data);
                          });
+        }
+        resetUser();
 
         $scope.toggle = function (item, list) {
 
@@ -152,18 +148,23 @@ app.controller("user", [
             return false;
         };
 
-        $scope.updateUser = function(active_user){
+        $scope.updateUser = function(){
 
-            $.post('/api/editUser', active_user, function(data,status,xhr){
-              if (active_user.blocked == null)
-                      active_user.blocked = [];
-                  if (active_user.known == null)
-                      active_user.known = [];
-                  if (active_user.cuisine == null)
-                      active_user.cuisine = [];
-                  if (active_user.available == null)
-                      active_user.available = [];
-              console.log(active_user, status);
+            if ($scope.active_user.blocked == null)
+                $scope.active_user.blocked = [];
+            if ($scope.active_user.known == null)
+                $scope.active_user.known = [];
+            if ($scope.active_user.cuisine == null)
+                $scope.active_user.cuisine = [];
+            if ($scope.active_user.available == null)
+                $scope.active_user.available = [];
+            
+            console.log($scope.active_user);
+            
+            $.post('/api/editUser', $scope.active_user, function(data,status,xhr){
+
+                  resetUser();
+                  console.log($scope.active_user, status);
             })
         };
 
@@ -172,7 +173,7 @@ app.controller("user", [
 app.controller("admin", [
       "$scope", "$http",
       function($scope, $http){
-
+ /*
         $scope.selectedUser = null;
         $scope.selectedRestaurant = null;
 
@@ -263,6 +264,6 @@ app.controller("admin", [
               console.log(status);
             })
         };
-
+*/
       }
 ]);

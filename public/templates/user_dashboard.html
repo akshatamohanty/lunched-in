@@ -1,38 +1,28 @@
-  <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span> 
-          </button>
-          <a class="navbar-brand" href="#">TryLunchedIN</a>
-        </div>
-        <div class="collapse navbar-collapse" id="myNavbar">
-          <ul class="nav navbar-nav navbar-right">
-            <li class='active'><a href="#card">My Card</a></li>
-            <li><a href="#pref">My Preferences</a></li>
-            <li><a href="#mates">My Mates</a></li>
-            <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span></a></li>
-          </ul>
-        </div>
-      </div>
-  </nav>
+
 
   <div class='container-fluid user-dashboard'>
 
     <div class='row'>
-      <br><br>
+
       <!---borders-->
       <div class='xs-hidden col-sm-2'></div>
       
 
       <!---mainsection-->
       <div class='col-sm-8 dashboard-main'>
+
+        <div class='jumbotron row dashboard-header'>
+            <div class='col-sm-4 text-left'>LOGO</div>
+
+            <div class='col-sm-4 text-center'>User's Dashboard</div>
+
+            <div class='col-sm-4 text-right'><button class='btn btn-primary pull-right' ng-click="updateUser(active_user)">Save</button></div>
+        </div>
+
     
         <!--beginning of card-->
         <h3 class='page-header'>{{ active_user.name  }}, your Card -</h3>
-        <button class='btn btn-primary pull-right' ng-click="updateUser(active_user)">Save</button>
+        
         <div class='row'>
           
           <!-- user card display! -->
@@ -74,7 +64,7 @@
                 <div class='col-sm-6'>
                   <md-input-container>
                     <label>Title</label>
-                    <input ng-model="active_user.title" disabled>
+                    <input ng-model="active_user.title">
                   </md-input-container>
                   <md-input-container>
                     <label>Password</label>
@@ -108,13 +98,14 @@
         <br>
 
         <h4>Which cuisines do you like?</h4><br>
-        <md-chips ng-model="active_user.cuisine" readonly="true"></md-chips>
+        <md-chips ng-model="active_user.cuisine"></md-chips>
+        <br>
         <div class='row'>
-          <div class='col-sm-4' ng-repeat='cuisine in cuisines'>
+          <div class='col-sm-2' ng-repeat='cuisine in cuisines'>
                   <div class='cuisine-card card panel panel-default'>
                       <div class='panel-heading card-heading'>
                         <button class='btn btn-info btn-sm' style='margin-bottom:0'  ng-model='active_user' ng-click='toggle(cuisine, active_user.cuisine)'
-                        > {{ exists(cuisine, active_user.cuisine)? "Remove" : "Add" }} {{cuisine}} </button>
+                        > {{ exists(cuisine, active_user.cuisine)? "x" : "+" }} {{cuisine}} </button>
                       </div>           
                       <div class='panel-body card-body'>                        
                         <img src='http://placehold.it/300x75' class='img-responsive'>

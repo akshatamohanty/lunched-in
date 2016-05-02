@@ -1,7 +1,6 @@
 var mongoose = require('mongoose');
 
 var restaurantSchema = {
-	code: { type: String, require: true},
 	name: { type: String, required: true}, 
 	address: { type: String },
 	zip: Number,
@@ -10,7 +9,9 @@ var restaurantSchema = {
 	cuisine: [ String ],
 	halal: { type: Boolean },
 	veg: { type: Boolean },
-	total: Number
+	total: Number,
+	website: { type: String },
+	cleanliness_grade: { type: String }
 };
 
 module.exports = new mongoose.Schema( restaurantSchema );
