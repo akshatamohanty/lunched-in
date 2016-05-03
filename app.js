@@ -323,6 +323,7 @@ var init = function(){
       user.blocked = [];
       user.known = [];
       user.cuisine = ['Chinese'];
+      user.picture = "https://placehold.it/300x150"
 
       if(i%2 == 0)
         user.available = ['Tuesday']
@@ -415,15 +416,6 @@ var secondCall = function(){
    *
    */
 
-
-  passport.serializeUser(function(user, done) { 
-    done(null, user);
-  });
-
-  passport.deserializeUser(function(user, done) {
-    done(null, user);
-  });
-
   //
   //  defining the passport local strategy for authenticating user
   //
@@ -474,9 +466,18 @@ var secondCall = function(){
     res.send('/');
   });
 
+  passport.serializeUser(function(user, done) {
+    done(null, user);
+  });
+
+  passport.deserializeUser(function(user, done) {
+    done(null, user);
+  });
+
   app.get('/api/getLoggedInUser', function(req, res){
 
       if(req.isAuthenticated()){
+        console.log("Sending active user details",req.session.passport.user[0]);
         res.json(req.session.passport.user[0]);       
       }
       else
@@ -774,41 +775,38 @@ var secondCall = function(){
                     )
           }
           else{
-                  console.log("request", req.body);
-                  User.findOneAndUpdate(
-                              { 
-                                 "_id": new ObjectId(req.session.passport.user[0]._id)
-                              }, 
-                              {
-                                  password: req.body.password,
-                                  title: req.body.title, 
-                                  phone: req.body.phone,  
-                                  tagline: req.body.tagline, 
-                                  nationality: req.body.nationality, 
-                                  cuisine: req.body.cuisine,
-                                  veg: req.body.veg,
-                                  halal: req.body.halal,
-                                  available: req.body.available, 
-                                  blocked: req.body.blocked, 
-                                  known: req.body.known
-                              }, 
-                              { multi: false }, 
-                              function(err, users){
-                                  // update the current user
-/*                                  req.session.passport.user[0].password =  req.body.password;
-                                  req.session.passport.user[0].phone = req.body.phone;
-                                  req.session.passport.user[0].tagline = req.body.tagline; 
-                                  req.session.passport.user[0].nationality = req.body.nationality;
-                                  req.session.passport.user[0].cuisine = req.body.cuisine;
-                                  req.session.passport.user[0].veg = req.body.veg;
-                                  req.session.passport.user[0].halal = req.body.halal;
-                                  req.session.passport.user[0].available = req.body.available;
-                                  req.session.passport.user[0].blocked = req.body.blocked;
-                                  req.session.passport.user[0].known = req.body.known;*/
 
-                                  //res.json(req.session.passport.user[0]._id);  
-                                  req.session.passport.user[0] = users[0];
-                                  console.log("User update from User-Dashboard");  
+                  User.find({ 
+                                 "_id": ObjectId(req.body._id)
+                              }, function(err, users){
+                                  if (err) console.log(err);
+                                  else{
+                                          var user = users[0];
+
+                                          user.title = req.body.title;
+                                          user.nationality = req.body.nationality;
+                                          user.phone = req.body.phone;
+                                          user.picture = req.body.picture;
+                                          user.password = req.body.password;
+                                          user.tagline = req.body.tagline;
+                                          user.available = req.body.available; 
+                                          user.cuisine = req.body.cuisine; 
+                                          user.blocked = req.body.blocked;
+                                          user.known = req.body.known; 
+                                          user.veg = req.body.veg; 
+                                          user.halal = req.body.halal;  
+                                          user.save();
+
+                                          console.log("User update from User-Dashboard"); 
+
+                                          req.login(users, function(err) {
+                                              if (err) console.log(err)
+
+                                              setTimeout( function(){ res.sendStatus(200) }, 2000);
+                                          })
+                                  }
+
+ 
                               }
                     )
           }

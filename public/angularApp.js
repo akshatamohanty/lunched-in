@@ -148,6 +148,12 @@ app.controller("user", [
             return false;
         };
 
+        $scope.updateUserPicture = function(new_url){
+            $scope.active_user.picture = new_url;
+            $scope.$parent.loggedInUser.picture = new_url;
+            console.log("Picture updated", $scope.$parent.loggedInUser.picture);
+        }
+
         $scope.updateUser = function(){
 
             if ($scope.active_user.blocked == null)
@@ -163,8 +169,7 @@ app.controller("user", [
             
             $.post('/api/editUser', $scope.active_user, function(data,status,xhr){
 
-                  resetUser();
-                  console.log($scope.active_user, status);
+                  console.log($scope.active_user, status); alert("Updated");
             })
         };
 

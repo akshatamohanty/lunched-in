@@ -21,7 +21,7 @@
 
     
         <!--beginning of card-->
-        <h3 class='page-header'>{{ active_user.name  }}, your Card -</h3>
+        <h3 class='page-header' id='user_card'>{{ active_user.name  }}, your Card -</h3>
         
         <div class='row'>
           
@@ -33,8 +33,8 @@
                   <em>{{ active_user.title }}</em>
                   </div>           
                   <div class='panel-body card-body'>
-                    <img src='http://placehold.it/300x150' class='img-responsive'>
-                  
+                    <img ng-src="{{active_user.picture}}">{{active_user.picture}}
+                    <div class='file-upload'></div>
 
                   <p class='text-center bottom-align'><i class="fa fa-quote-left"></i> {{ active_user.tagline }} 
                   <hr style='padding:0; margin:0'>
@@ -173,7 +173,21 @@
   </div><!--container end-->
 
 <script type="text/javascript">
-$(document).ready(function(){
-  console.log("let's start!");
+$(document).ready(function(){  
+
+  var element = angular.element($('#user_card'));
+  var controller = element.controller();
+  var scope = element.scope(); 
+
+  
+  $('.file-upload').append(
+    $.cloudinary.unsigned_upload_tag("lunchedin_user", 
+        { cloud_name: 'hzif3kbk7' }).bind('cloudinarydone', function(e, data) {
+
+          scope.$apply(function(){
+             scope.$parent.updateUserPicture(data.result.secure_url);
+          });
+
+        }));
 })
 </script>
