@@ -8,28 +8,32 @@
 
       <!---mainsection-->
       <div class='col-sm-8 col-xs-10 dashboard-content'>
+ 
+        <div class='row'>
+            <img class='logo' src='../assets/images/logo.png'/>
 
-        <div class='jumbotron' id='dashboard-header'>
-            <div class='row'>
-                <img class='logo' src='../assets/images/logo.png'/>
-            </div>
-
-            <div class='row text-center text-white'><h3>{{ active_user.name }}'s Dashboard 
-              <button class='btn btn-primary' ng-click="updateUser(active_user)">
+            <button class='btn btn-primary pull-right' ng-click="updateUser(active_user)">Save
                 <i class="fa fa-check-square-o" aria-hidden="true"></i>
-              </button></h3>
+            </button>
+        </div>
+
+        <div class='jumbotron simple-card' id='dashboard-header'>
+            <div class='row text-center text-white'>
+              <h3>{{ active_user.name }}'s Dashboard </h3>
             </div>
         </div>
 
     
         <!--beginning of card-->
-        <h3 class='page-header text-center border padding' id='user_card'>Your Card</h3>
-        
+        <div class='simple-card'>              
+       
+        <h3><i class="fa fa-info-circle" aria-hidden="true"></i> About You </h3>
         <div class='row'>
           
           <!-- user card display! -->
           <div class='col-sm-4'>
-            <div class='card panel panel-default'>
+            
+            <div class='simple-card zero-padding panel panel-default' id='user_card'>
                 <div class='panel-heading card-heading'>
                   <h4 style='margin-bottom:0'>{{ active_user.name }}</h4>
                   <em>{{ active_user.title }}</em>
@@ -86,55 +90,75 @@
           </div>
 
         </div>
+        <hr>
         
-        <!--beginning of preferences-->    
-        <h3 class='page-header border padding text-center'>Your Preferences</h3>
+        <!--beginning of preferences-->
+   
         <div class='row'>
-          <md-checkbox ng-model='active_user.veg'> Are you Vegeterian?</md-checkbox>
-          <md-checkbox ng-model='active_user.halal'> Do you prefer restaurants that serve Halal meat?</md-checkbox>
-        </div>
-
-        <br>
-
-        <h4>Which cuisines do you like?</h4><br>
-        <md-chips ng-model="active_user.cuisine"></md-chips>
-        <br>
-        <div class='row'>
-          <div class='col-sm-2 col-xs-6' ng-repeat='cuisine in cuisines'>
-                  <div class='cuisine-card card panel panel-default' ng-model='active_user' ng-click='toggle(cuisine, active_user.cuisine)'>
-                      <div class='panel-heading card-heading'>
-                        <h6 class='text-center'>{{cuisine}}<h6> 
-                      </div>           
-                      <div class='panel-body card-body zero-padding'>                        
-                        <img src='http://placehold.it/300x150' class='img-responsive cuisine-photo'/>
-                      </div>
-
-                  </div>
+          <div class='col-sm-4'><h3><i class="fa fa-bell" aria-hidden="true"></i> Preferences </h3></div>
+          <div class='col-sm-8'>
+            <md-checkbox ng-model='active_user.veg'> Are you Vegeterian?</md-checkbox>
+            <md-checkbox ng-model='active_user.halal'> Do you prefer restaurants that serve Halal meat?</md-checkbox>
           </div>
         </div>
 
-        <br>
+        <hr>
 
-        <h4>When are you free to lunch?</h4>
-        <md-checkbox ng-repeat='day in days' ng-checked="exists(day, active_user.available)" ng-click="toggle(day, active_user.available)">{{day}}</md-checkbox>
-        <br>
-        <md-checkbox> Ask me everyday </md-checkbox>
-        
+        <div class='row'>
+          <div class='col-sm-4'><h3><i class="fa fa-coffee" aria-hidden="true"></i> Cuisines </h3></div>
+          <div class='col-sm-8'>
+              <md-chips ng-model="active_user.cuisine"></md-chips>
+              <br>
+              <div class='row'>
+                <div class='col-sm-2 col-xs-6' ng-repeat='cuisine in cuisines'>
+                        <div class='cuisine-card card panel panel-default' ng-model='active_user' ng-click='toggle(cuisine, active_user.cuisine)'>
+                            <div class='panel-heading card-heading'>
+                              <h6 class='text-center'>{{cuisine}}<h6> 
+                            </div>           
+                            <div class='panel-body card-body zero-padding'>                        
+                              <img src='http://placehold.it/300x150' class='img-responsive cuisine-photo'/>
+                            </div>
+
+                        </div>
+                </div>
+              </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class='row'>
+          <div class='col-sm-4'><h3><i class="fa fa-clock-o" aria-hidden="true"></i> Good days? </h3></div>
+          <div class='col-sm-8'>
+            <div class='row'>
+              <div class='col-sm-4' >
+                <md-checkbox ng-repeat='day in days' ng-checked="exists(day, active_user.available)" ng-click="toggle(day, active_user.available)" ng-disabled="active_user.available.indexOf('All') > -1">{{day}}</md-checkbox> 
+              </div>
+              <div class='col-sm-2'><em class='text-center'>Or</em></div>
+              <div class='col-sm-6'>
+                <md-checkbox ng-checked="exists('All', active_user.available)" ng-click="active_user.available.indexOf('All')>-1?active_user.available=[]:active_user.available=['All']"> Ask me everyday </md-checkbox>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!--end of preferences-->        
-
+        <hr>
         <!--beginning of mates--> 
-        <h3 class='page-header border padding text-center'>Let's select your lunchmates -</h3>
+
+        <h3><i class="fa fa-group" aria-hidden="true"></i> Lunch Mates </h3>
             <md-tabs md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink>
                 <md-tab ng-repeat="letter in letters" label="{{letter}}">
                     <div class='row'>
                       <div class='col-sm-4' ng-repeat="user in usersAlpha[letter]" ng-model='user'>
+                        <br>
                         <div class='card panel panel-default'>
                             <div class='panel-heading card-heading'>
                               <h4 style='margin-bottom:0'>{{ user.name }}
                                 <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, active_user.known)'
-                                ng-disabled='exists(user._id, active_user.blocked)'>F</button>
+                                ng-disabled='exists(user._id, active_user.blocked)'><i class="fa fa-heart"></i></button>
                                 <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, active_user.blocked)'
-                                ng-disabled='exists(user._id, active_user.known)'>B</button>
+                                ng-disabled='exists(user._id, active_user.known)'><i class="fa fa-circle"></i></button>
                               </h4>
                               <em>{{ user.title }}</em>
                             </div>           
@@ -159,7 +183,8 @@
               </md-tab>                     
             </md-tabs> 
 
-      </div>
+        </div>
+      </div><!---- end of dashboard content -->
       
       <!--border-->
       <div class='col-sm-2 col-xs-1'></div>
