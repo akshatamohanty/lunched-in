@@ -108,7 +108,7 @@ body {
     box-shadow: 5px 0px 40px rgba(0,0,0, .2);
 }
 
- .panel-footer .btn:hover {
+.panel-footer .btn:hover {
     border: 1px solid #2f6596;
     background-color: #fff !important;
     color: #2f6596;
@@ -129,7 +129,7 @@ body {
     background-color: #fff !important;
 }
 
- .panel-footer h3 {
+.panel-footer h3 {
     font-size: 32px;
 }
 
@@ -174,26 +174,42 @@ body {
     font-style: normal;
 }
 
-
-/*body{
-  color: #666;
-}
-
-.navbar {
-    margin-bottom: 0;
-    z-index: 9999;
-    border: 0;
-    font-size: 12px !important;
-    line-height: 1.42857143 !important;
-    letter-spacing: 4px;
-    border-radius: 0;
-}*/
-
-.user-dashboard{
+/******* User Dashboard CSS ****************/
+.user-dashboard-body{
   background-color: #e5e5e5;
 }
 
-.dashboard-main{
+#dashboard-header{
+  margin: 0px;  
+  padding: 0px; 
+  background-image: url('../images/header-picture.jpg');
+  background-size: cover;
+  background-position: top-left;
+}
+
+.logo{
+  height: 20px;
+  margin-left: 4%; 
+  margin-top: -45px;
+}
+
+.text-white{
+  color: white;
+}
+
+.border{
+  border: 1px solid black;
+}
+
+.padding{
+  padding: 1%;
+}
+
+.zero-padding{
+  padding: 0 !important;
+}
+
+.dashboard-content{
   background: #fff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   margin: 0;
@@ -202,16 +218,11 @@ body {
   padding-top: 2%;
 }
 
-/*.carousel-caption{
-  color: #222;
-}*/
-
 .card {
   background: #fff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   transition: all 0.2s ease-in-out;
   border: none;
-  height: 300px;
 }
 
 .card:hover {
@@ -238,46 +249,11 @@ body {
 }
 
 .cuisine-card{
-  height: 75px;
-}
-
-
-/*
-.user-card{
   
 }
 
-.user-card .selected{
-
-}
-
-.user-card .panel-heading{
-  padding:0;
-}
-
-.user-card .panel-body{
-  padding: 1%;
-}
-
-.user-card-frame{
-  height: 600px !important;
-}
-
-.pagination-sm li{
-  border-radius: 0px !important;
-}
-
-.contact-cards{
-  height: 600px !important;
-}
-*/
 
 input{
   font-size: 12px;
 }
 
-.header-bar{
-  background-color: #eee;
-  height: 60px;
-  margin: 0;
-}
