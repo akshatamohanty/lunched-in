@@ -78,7 +78,7 @@ app.use(passport.session());
 // set up database ==== only for testing === 
 var lunchedin = {};
 lunchedin.mails = false; 
-
+lunchedin.timeToSecondCall = 120000;
 lunchedin.addUser = function(user){
 
       if( user.name != undefined && user.email != undefined){
@@ -389,7 +389,7 @@ initializeDatabases(); // clear the database
  *  
  *
  */
-lunchedin.timeToSecondCall = 10000;
+
 lunchedin.firstCall = function(){
 
   console.log("-------------- Adding to Known for previous run ", run, "-----------------");
