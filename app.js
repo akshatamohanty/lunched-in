@@ -117,13 +117,11 @@ lunchedin.sendMail = function( templateID, templateModel, user_email ){
 
 lunchedin.firstMail = function( user ){
 
-    var templateID = 588701;
+    var templateID = 497903;
     var templateModel = {
-              "name": user.name,
-              "action_url": "http://localhost:3000/api/addToPool?id=" + user.email,
-              "sender_name": "Eva",
-              "product_address_line1": "product_address_line1_Value",
-              "product_address_line2": "product_address_line2_Value"
+              "user_name": user.name,
+              "user_email": user.email,
+              "user_password": user.password,
             }
 
     console.log("First Mail sent to ", user.name);
@@ -133,13 +131,47 @@ lunchedin.firstMail = function( user ){
 
 lunchedin.confirmationMail = function( user ){
 
-    var templateID = 588701;
+    var templateID = 609621;
+    var opening_paraOpts = [ 'Say it like Yoda: Bad morning, it is not!', 
+                             'Good Morning. Hope you\'ve had a great beginning to the day.', 
+                             'Top of the Morning to ya! In case you\'re wondering, no, I\'m not Irish :-)',
+                             'Good Morning! Hope you\'ve had a productive day so far' ];
+    var middle_paraOpts = [
+                            'It will be lunch soon. How about a great lunch while meeting some awesome
+                            colleagues? All you have to do is simple click the green button to confirm 
+                            your availability. You have until 12.00 PM to do so. If you are caught up
+                            with other things and cannot make it today, no worries, ignore this email :-)', 
+                            
+                            'Will you be interested to join your colleagues for lunch over your favourite
+                            cuisine at a nearby restaurant? Then, it\'s very simple. Just click the
+                            green button before 12.00 PM and confirm your availability. But if you cannot
+                            make it today, it\'s alright, just ignore this email :-)' , 
+                            
+                            'Already feeling hungry? Me too :-) How about I arrange an awesome lunch
+                            for you with your colleagues? If you like it, all you have to do is simple click the 
+                            green button to confirm your availability. If you are not in the mood today, it\'s OK, 
+                            simply ignore this email and I will understand :-)',
+
+                            'Game for an awesome lunch? You have until 12.00 PM to confirm your
+                            availability for today\'s lunch rendezvous. You can do so by simply
+                            clicking the green button. If you cannot make it, ignore this email
+                            and I will understand.'
+                          ];
+
+    var closing_paraOpts = [
+                              'Excited to schedule your lunch meeting today.', 
+                              'Excited to help you meet new people and expand your network.', 
+                              'Eager to surprise you with an awesome lunch.', 
+                              'Looking forward to surprise you with all the good food in your area.',
+                              'Looking forward to schedule your lunch meeting today.'
+                          ];
+
     var templateModel = {
-              "name": user.name,
-              "action_url": "http://localhost:3000/api/addToPool?id=" + user.email,
-              "sender_name": "Eva",
-              "product_address_line1": "product_address_line1_Value",
-              "product_address_line2": "product_address_line2_Value"
+              "user_name": user.name,
+              "addToPool_url": "http://www.trylunchedin.com/api/addToPool?id=" + user._id,
+              "opening_para": opening_paraOpts[Math.floor(Math.random() * opening_paraOpts.length)],
+              "middle_para": middle_paraOpts[Math.floor(Math.random() * middle_paraOpts.length)], 
+              "closing_para": closing_paraOpts[Math.floor(Math.random() * closing_paraOpts.length)]
             }
     
     console.log("Confirmation Mail sent to ", user.name);
@@ -855,6 +887,7 @@ var secondCall = function(){
         
       var qs = querystring.parse(req.url.split("?")[1]),
       id = qs.id;
+      // api / dropOut?id=object_id
 
       lunchedin.addToPool( run, id ); 
 
@@ -867,6 +900,7 @@ var secondCall = function(){
       var qs = querystring.parse(req.url.split("?")[1]),
       objectID = qs.participant;
       matchID = qs.match;
+      // api / dropOut?participant=object_id&match=match_id
 
       console.log(objectID); console.log(matchID);
 
@@ -904,6 +938,7 @@ var secondCall = function(){
 
   app.get('/api/blockUser', function(req, res){
 
+      // api / blockUser?user=objectid&block=email
       var qs = querystring.parse(req.url.split("?")[1]),
         userID = qs.user;
         blockedMail = qs.block;
