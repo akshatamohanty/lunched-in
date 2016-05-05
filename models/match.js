@@ -7,7 +7,7 @@ var matchSchema = {
 	date: { type: Date, required: true}, 
 	participants: [ { type: mongoose.Schema.Types.ObjectId, ref: 'User'  }], 
 	dropouts: [ { type: mongoose.Schema.Types.ObjectId, ref: 'User'  }],
-	location: Restaurant.restaurantSchema
+	location: { type: Restaurant.restaurantSchema, required: false }
 };
 
 module.exports = new mongoose.Schema( matchSchema );

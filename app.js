@@ -84,17 +84,19 @@ lunchedin.addToPool = function( runCount, userID ){
 
       if(matches.length>0){
         console.log("Matches found for run ", run);
+        // - Means the algorithm has already run for that time - can't add to pool - what if there were no matches for that run?
         return false; 
       }
       else{
         
         console.log("Matches not found for run ", run);
-        User.find({ _id: ObjectId(userID)}, function(err, users){
+        User.find({ _id: ObjectId(userID) }, function(err, users){
 
-            users[0].inPool = true; 
-            users[0].save();
-            console.log(users[0].name, " added to pool");
-
+            if(users.length){
+              users[0].inPool = true; 
+              users[0].save();
+              console.log(users[0].name, " added to pool");
+            }
         })
         return true; 
       }
@@ -392,6 +394,9 @@ var firstCall = function(){
 
 
 var secondCall = function(){
+
+  // add a dummy match for this run
+  addToDatabase( Match, { run: run, date: Date() } , "Match", null)
 
   // deal with pool
   console.log("-------------- Run ", run, "-----------------");
@@ -894,6 +899,37 @@ var secondCall = function(){
 
 
       })    
+
+  });
+
+  app.get('/api/blockUser', function(req, res){
+
+      var qs = querystring.parse(req.url.split("?")[1]),
+        userID = qs.user;
+        blockedMail = qs.block;
+
+      User.find( { _id: ObjectId(userID) }, function(err, user){
+
+          if(err) console.log(err);  
+          else{
+                  var user = user[0];
+                  User.find({ email: blockedMail }, function(err, user2){
+
+                        if(err) console.log(err);
+                        else{
+                              var user2 = user2[0];
+                              if( user.blocked.indexOf( user2._id ) == -1){
+                                user.blocked.push(user2._id);
+                                res.send(user.name, ", ", user2.name, "has been blocked.")
+                                user.save();
+                              }
+                              else
+                                res.send(user.name, ", ", user2.name, "was already blocked.");                         
+                        }
+
+                  })
+          }
+      });
 
   });
 
