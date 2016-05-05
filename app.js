@@ -77,6 +77,17 @@ app.use(passport.session());
 
 // set up database ==== only for testing === 
 var lunchedin = {};
+lunchedin.mails = false; 
+
+lunchedin.addUser = function(user){
+
+      if( user.name != undefined && user.email != undefined){
+        user.password = Math.round((Math.pow(36, 6 + 1) - Math.random() * Math.pow(36, 6))).toString(36).slice(1);
+        addToDatabase( User, user, "User", null);
+        lunchedin.firstMail( user );
+      }
+
+};
 
 lunchedin.addToPool = function( runCount, userID ){
 
@@ -105,6 +116,9 @@ lunchedin.addToPool = function( runCount, userID ){
 
 lunchedin.sendMail = function( templateID, templateModel, user_email ){
 
+    if(!lunchedin.mails)
+      return;
+
     var client = new postmark.Client("32f51173-e5ee-4819-90aa-ad9c25c402a8");
 
     client.sendEmailWithTemplate({
@@ -123,9 +137,8 @@ lunchedin.firstMail = function( user ){
               "user_email": user.email,
               "user_password": user.password,
             }
-
-    console.log("First Mail sent to ", user.name);
-    //lunchedin.sendMail( templateID, templateModel, user.email)
+    console.log("Sending first mail to", user.name);
+    lunchedin.sendMail( templateID, templateModel, user.email)
 
 };
 
@@ -137,25 +150,25 @@ lunchedin.confirmationMail = function( user ){
                              'Top of the Morning to ya! In case you\'re wondering, no, I\'m not Irish :-)',
                              'Good Morning! Hope you\'ve had a productive day so far' ];
     var middle_paraOpts = [
-                            'It will be lunch soon. How about a great lunch while meeting some awesome
-                            colleagues? All you have to do is simple click the green button to confirm 
-                            your availability. You have until 12.00 PM to do so. If you are caught up
-                            with other things and cannot make it today, no worries, ignore this email :-)', 
+                            'It will be lunch soon. How about a great lunch while meeting some awesome'
+                            + ' colleagues? All you have to do is simple click the green button to confirm'
+                            + ' your availability. You have until 12.00 PM to do so. If you are caught up'
+                            + ' with other things and cannot make it today, no worries, ignore this email :-)', 
                             
-                            'Will you be interested to join your colleagues for lunch over your favourite
-                            cuisine at a nearby restaurant? Then, it\'s very simple. Just click the
-                            green button before 12.00 PM and confirm your availability. But if you cannot
-                            make it today, it\'s alright, just ignore this email :-)' , 
+                            'Will you be interested to join your colleagues for lunch over your favourite'
+                            + ' cuisine at a nearby restaurant? Then, it\'s very simple. Just click the'
+                            + ' green button before 12.00 PM and confirm your availability. But if you cannot'
+                            + ' make it today, it\'s alright, just ignore this email :-)' , 
                             
-                            'Already feeling hungry? Me too :-) How about I arrange an awesome lunch
-                            for you with your colleagues? If you like it, all you have to do is simple click the 
-                            green button to confirm your availability. If you are not in the mood today, it\'s OK, 
-                            simply ignore this email and I will understand :-)',
+                            'Already feeling hungry? Me too :-) How about I arrange an awesome lunch'
+                            + ' for you with your colleagues? If you like it, all you have to do is simple click the' 
+                            + ' green button to confirm your availability. If you are not in the mood today, it\'s OK,' 
+                            + ' simply ignore this email and I will understand :-)',
 
-                            'Game for an awesome lunch? You have until 12.00 PM to confirm your
-                            availability for today\'s lunch rendezvous. You can do so by simply
-                            clicking the green button. If you cannot make it, ignore this email
-                            and I will understand.'
+                            'Game for an awesome lunch? You have until 12.00 PM to confirm your'
+                            + ' availability for today\'s lunch rendezvous. You can do so by simply'
+                            + ' clicking the green button. If you cannot make it, ignore this email'
+                            + ' and I will understand.'
                           ];
 
     var closing_paraOpts = [
@@ -175,29 +188,24 @@ lunchedin.confirmationMail = function( user ){
             }
     
     console.log("Confirmation Mail sent to ", user.name);
-    //lunchedin.sendMail( templateID, templateModel, user.email)
+    lunchedin.sendMail( templateID, templateModel, user.email)
 
 };
 
-lunchedin.matchedMail = function( user ){
+lunchedin.matchedMail = function( match, user ){
 
     var templateID = 588701;
     var templateModel = {
               "name": user.name,
-              "action_url": "http://localhost:3000/api/addToPool?id=" + user.email,
-              "sender_name": "Eva",
-              "product_address_line1": "product_address_line1_Value",
-              "product_address_line2": "product_address_line2_Value"
+              "participants": match.participants, 
+
             }
 
     console.log("Matched Mail sent to ", user.name);
-    //lunchedin.sendMail( templateID, templateModel, user.email)
+    lunchedin.sendMail( templateID, templateModel, user.email)
 
 };
 
-lunchedin.summaryMail = function(){
-
-};
 
 lunchedin.addToKnown = function( runCount ){
     // for each participant of a match, check if all others are added - if not - add it
@@ -315,6 +323,8 @@ var addToDatabase = function( database, jsonObject, stringName, callback ){
                       if(err)
                         console.log("Error: Unable to add to ", stringName, err);
 
+                      console.log("Added ", stringName);
+
                       if(callback)
                         callback;   
                   });
@@ -332,72 +342,42 @@ var primaryAdmin =  {
                     };
 
 
-var cuisineList = ['Chinese', 'Continental', 'Korean', 'Thai', 'Indian','Western', 'Vietnamese', 'Japanese'];
+var cuisineList = ['American', 'Western', 'Salads', 'Asian', 'Chinese', 'Pernakan', 'Korean', 'Australian', 
+                   'French', 'Italian', 'Fusion', 'International', 'Japanese', 'Thai', 'German', 
+                   'Indian', 'Indonesian', 'Malay', 'Mexican', 'Vietnamese', 'Mediterranean', 'Russian', 'Spanise'];
 
 /* Adds the preliminary user details and restaurants */
-var init = function(){
-  // loads the dummyUsers from the database
-  var dummyUsers = require('./dummyUsers');
-  console.log(dummyUsers.length, "users loaded.");
+lunchedin.startSystem = function(){
+ 
+  clearDatabase( User, "User", null );
   
-  // pre-process the user data - change to array etc
-  for(var i=0; i<dummyUsers.length; i++){
-      
-      var user = dummyUsers[i]; 
-      
-
-      //user.tagline="";
-      //user.nationality="";
-      //user.cuisine = []; // not enough - fix null values on client side
-      //user.available = [];
-      user.veg = false;
-      user.halal = false;
-      user.lunchCount = 0;
-      user.dropCount = 0;
-      user.blocked = [];
-      user.known = [];
-      user.cuisine = ['Chinese'];
-      user.picture = "https://placehold.it/300x150"
-
-      if(i%2 == 0)
-        user.available = ['Tuesday']
-      else
-        user.available = [];
-
-      addToDatabase( User, user, "User", null);
-
-      //lunchedin.firstMail( user );
-      console.log("Sent first mail to ", user.name);
-
-  }
-
-    // loads the dummyUsers from the database
-  var allRestaurants = require('./allRestaurants');
-  console.log(allRestaurants.length, "restaurants loaded.");
-  
-  // pre-process the user data - change to array etc
-  for(var i=0; i<allRestaurants.length; i++){
-      var restaurant = allRestaurants[i]; 
-
-      restaurant.cuisine = restaurant.cuisine.replace(/\s/g, '').split(',');
-
-      addToDatabase( Restaurant, restaurant, "Restaurant", null);
-  }
-
-
-  // loads the restaurants from the database
-  //matchingAlgorithm();
+  clearDatabase( Match, "Matches", null);
 }
 
 /* Clears all databases */
 var initializeDatabases = function() {
     clearDatabase( Admin, "Admin", addToDatabase( Admin, primaryAdmin, "Admin", null) );
-    clearDatabase( User, "User", null );
     clearDatabase( Restaurant, "Restaurants", null );
-    clearDatabase( Match, "Matches", null);
+
+    var helloworld = function(){
+      // loads the dummyUsers from the database
+      var allRestaurants = require('./allRestaurants');
+      console.log(allRestaurants.length, "restaurants loaded.");
+      
+      // pre-process the user data - change to array etc
+      for(var i=0; i<allRestaurants.length; i++){
+          var restaurant = allRestaurants[i]; 
+
+          restaurant.cuisine = restaurant.cuisine.replace(/\s/g, '').split(',');
+
+          addToDatabase( Restaurant, restaurant, "Restaurant", null);
+      }    
+    }
+
+  setTimeout(helloworld, 5000);
 }
 initializeDatabases(); // clear the database
-setTimeout(init, 5000); // initialize after 5 seconds so databases have been properly configured
+//setTimeout(init, 5000); // initialize after 5 seconds so databases have been properly configured
 
 
 /*
@@ -409,7 +389,8 @@ setTimeout(init, 5000); // initialize after 5 seconds so databases have been pro
  *  
  *
  */
-var firstCall = function(){
+lunchedin.timeToSecondCall = 10000;
+lunchedin.firstCall = function(){
 
   console.log("-------------- Adding to Known for previous run ", run, "-----------------");
   lunchedin.addToKnown( run );
@@ -419,13 +400,14 @@ var firstCall = function(){
   lunchedin.setPool();
 
   // call secondCall after some predetermined time
-  console.log("-------------- Processing after 5000ms-----------------");
-  setTimeout(secondCall, 10000);
+  console.log("-------------- Processing after " + lunchedin.timeToSecondCall + "ms-----------------");
+  
+  setTimeout(lunchedin.secondCall, lunchedin.timeToSecondCall);
 
 };
 
 
-var secondCall = function(){
+lunchedin.secondCall = function(){
 
   // add a dummy match for this run
   addToDatabase( Match, { run: run, date: Date() } , "Match", null)
@@ -444,6 +426,10 @@ var secondCall = function(){
 
 
 };
+
+lunchedin.reportCall = function(){
+
+}
 
 // routes ================
 
@@ -528,10 +514,34 @@ var secondCall = function(){
    */
 
   //api -------------
+  app.get('/api/start', function(req, res){
+    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+            lunchedin.startSystem();
+            res.send('done!')
+    }
+    else
+      res.send('not authenticated');
+  });
 
   app.get('/api/firstCall', function(req, res){
-    firstCall();
+    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+      lunchedin.firstCall();
+      res.send('done!')
+    }
+   else
+    res.send('not authenticated');     
   });
+
+  app.get('/api/toggleMails', function(req, res){
+    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+       lunchedin.mails = !lunchedin.mails;
+       res.send("set to", lunchedin.mails);     
+    }
+    else
+      res.send('not authenticated');     
+  });
+
+
   
   // Sends all the users in the database 
   app.get('/api/users', function(req, res){
@@ -662,11 +672,11 @@ var secondCall = function(){
               'email' : req.body.email
             }, function(err, user){
 
-                if(err) console.log("Error while adding user", err);
+                if(err) console.log("Error while adding user", err); 
 
                 // user is always an array - remember this!
                 if(user.length == 0)
-                  addToDatabase( User, req.body, "User", null )
+                  lunchedin.addUser(req.body);
                 
                 res.send("Admin Request Approved: Added new user");
 
@@ -1332,6 +1342,3 @@ var secondCall = function(){
           }    
 
   } // matchingAlgo end
-
-
-setTimeout(firstCall, 7000);

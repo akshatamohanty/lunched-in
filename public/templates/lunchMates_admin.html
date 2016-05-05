@@ -1,178 +1,32 @@
-<div class='dashboard-header pageTitle'> 
-	<div class='row'>
-		<div class='col-xs-8'>Lunchmates</div>
-		<div class='col-xs-4'> 
-    	<md-input-container>
-        <md-select ng-model="selectedUser" placeholder="Select User">
-          <md-option ng-value="user" ng-repeat="user in users">{{ user.name }}</md-option>
-        </md-select>
-      </md-input-container>
-		</div>
-	</div>
+<div class='row'>
+  <md-input-container class='col-sm-3'>
+    <label>Name</label>
+    <input ng-model="newuser.name">
+  </md-input-container>
+  <md-input-container class='col-sm-3'> 
+    <label>Email</label>
+    <input ng-model="newuser.email">
+  </md-input-container>
+  <button class='btn btn-primary' ng-click='addUser()'>Invite User</button>
 </div>
-<div class='adminViewContainer dashboard-header'> 
-  <div class='container-fluid user-dashboard'>
-
-    <div class='row'>
-      <br><br>
-      <!---borders-->
-      <div class='xs-hidden col-sm-2'></div>
-      
-
-      <!---mainsection-->
-      <div class='col-sm-8 dashboard-main'>
-    
-        <!--beginning of card-->
-        <h3 class='page-header'>{{ selectedUser.name  }}, your Card -</h3>
-        <h6>{{ selectedUser._id  }}</h6>
-        <button class='btn btn-primary pull-right' ng-click="updateUserByAdmin(selectedUser)">Save</button>
-        <div class='row'>
-          
-          <!-- user card display! -->
-          <div class='col-sm-4'>
-            <div class='card panel panel-default'>
-                <div class='panel-heading card-heading'>
-                  <h4 style='margin-bottom:0'>{{ selectedUser.name }}</h4>
-                  <em>{{ selectedUser.title }}</em>
-                  </div>           
-                  <div class='panel-body card-body'>
-                    <img src='http://placehold.it/300x150' class='img-responsive'>
-                  
-
-                  <p class='text-center bottom-align'><i class="fa fa-quote-left"></i> {{ selectedUser.tagline }} 
-                  <hr style='padding:0; margin:0'>
-                  </p>
-                  <p class='text-center bottom-align'><span class="glyphicon glyphicon-phone"></span> {{ selectedUser.phone }} 
-                  </p>
-                </div>
-            </div>
-          </div>
-
-          <div class='col-sm-8'>
-              <div class='row'>
-                <div class='col-sm-6'>
-                  <md-input-container>
-                    <label>Name</label>
-                    <input ng-model="selectedUser.name" disabled>
-                  </md-input-container>
-                  <md-input-container>
-                    <label>Email</label>
-                    <input ng-model="selectedUser.email" disabled>
-                  </md-input-container>
-                  <md-input-container>
-                    <label>Phone</label>
-                    <input ng-model="selectedUser.phone">
-                  </md-input-container>
-                </div>
-                <div class='col-sm-6'>
-                  <md-input-container>
-                    <label>Title</label>
-                    <input ng-model="selectedUser.title" disabled>
-                  </md-input-container>
-                  <md-input-container>
-                    <label>Password</label>
-                    <input ng-model="selectedUser.password">
-                  </md-input-container>
-                  <md-input-container>
-                    <label>Nationality</label>
-                    <input ng-model="selectedUser.nationality">
-                  </md-input-container>
-                </div>
-              </div>
-              <div class='row' style='margin:1%;'>  
-                <md-input-container>
-                  <label>You, in 50 characters!</label>
-                  <textarea ng-model="selectedUser.tagline" md-maxlength="50" rows="1"></textarea>
-                </md-input-container>
-              </div>
-          </div>
-
-        </div>
-        <!--end of card-->
-        <hr id='pref'>
-        
-        <!--beginning of preferences-->    
-        <h3 class='page-header'>Your Preferences</h3>
-        <div class='row'>
-          <md-checkbox ng-model='selectedUser.veg'> Are you Vegeterian?</md-checkbox>
-          <md-checkbox ng-model='selectedUser.halal'> Do you prefer restaurants that serve Halal meat?</md-checkbox>
-        </div>
-
-        <br>
-
-        <h4>Which cuisines do you like?</h4><br>
-        <md-chips ng-model="selectedUser.cuisine" readonly="true"></md-chips>
-        <div class='row'>
-          <div class='col-sm-4' ng-repeat='cuisine in cuisines'>
-                  <div class='cuisine-card card panel panel-default'>
-                      <div class='panel-heading card-heading'>
-                        <button class='btn btn-info btn-sm' style='margin-bottom:0'  ng-model='selectedUser' ng-click='toggle(cuisine, selectedUser.cuisine)'
-                        > {{ exists(cuisine, selectedUser.cuisine)? "Remove" : "Add" }} {{cuisine}} </button>
-                      </div>           
-                      <div class='panel-body card-body'>                        
-                        <img src='http://placehold.it/300x75' class='img-responsive'>
-                      </div>
-
-                  </div>
-          </div>
-        </div>
-
-        <br>
-
-        <h4>When are you free to lunch?</h4>
-        <md-checkbox ng-repeat='day in days' ng-checked="exists(day, selectedUser.available)" ng-click="toggle(day, selectedUser.available)">{{day}}</md-checkbox>
-        
-        <!--end of preferences-->
-        <hr  id='mates'>
-        
-
-        <!--beginning of mates--> 
-        <h3>Let's select your lunchmates -</h3>
-            <md-tabs md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink>
-                <md-tab ng-repeat="letter in letters" label="{{letter}}">
-                    <div class='row'>
-                      <div class='col-sm-4' ng-repeat="user in usersAlpha[letter]" ng-model='user'>
-                        <div class='card panel panel-default'>
-                            <div class='panel-heading card-heading'>
-                              <h4 style='margin-bottom:0'>{{ user.name }}
-                                <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, selectedUser.known || 0)'
-                                ng-disabled='exists(user._id, selectedUser.blocked || 1)'>F</button>
-                                <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, selectedUser.blocked)'
-                                ng-disabled='exists(user._id, selectedUser.known)'>B</button>
-                              </h4>
-                              <em>{{ user.title }}</em>
-                            </div>           
-                            <div class='panel-body card-body'>
-                              <img src='http://placehold.it/300x150' class='img-responsive'>
-       
-                              <p class='text-center'><i class="fa fa-quote-left"></i> {{ user.tagline }} 
-                              
-                              </p>
-                            </div>
-                            <div class='panel-footer'>
-                              <p class='text-center' style='padding:0'>
-                                <span class="glyphicon glyphicon-phone"></span> {{ user.phone }} 
-                              </p>
-                            </div>
 
 
-                        </div>
-
-                      </div>
-                    </div>    
-              </md-tab>                     
-            </md-tabs> 
-
-
-
-
-
-            
-        
-      </div>
-      
-      <!--border-->
-      <div class='xs-hidden col-sm-2'></div>
-    </div><!-- row end-->
-  </div><!--container end-->
+<div class='row' style="border-bottom: 1px solid black;">
+  <div class='col-sm-3'>Name</div>
+  <div class='col-sm-4'>Email</div>
+  <div class='col-sm-1'>Known Count</div>
+  <div class='col-sm-1'>Blocked Count</div>
+  <div class='col-sm-2'>Available</div>
+  <div class='col-sm-1'>Number of Cuisines</div>
+</div>
+<div ng-repeat="user in users">
+  <div class='row' style="border-bottom: 1px solid black;border-top: 1px solid black; ">{{ user._id }}</div>
+  <div class='row text-left'>
+    <div class='col-sm-3'>{{ user.name }}</div>
+    <div class='col-sm-4'>{{ user.email }}</div>
+    <div class='col-sm-1'>{{ user.known.length }}</div>
+    <div class='col-sm-1'>{{ user.blocked.length }}</div>
+    <div class='col-sm-2'>{{ user.available }}</div>
+    <div class='col-sm-1'>{{ user.cuisine.length }}</div>
+  </div>
 </div>

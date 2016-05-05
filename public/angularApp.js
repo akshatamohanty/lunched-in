@@ -178,27 +178,36 @@ app.controller("user", [
 app.controller("admin", [
       "$scope", "$http",
       function($scope, $http){
- /*
-        $scope.selectedUser = null;
-        $scope.selectedRestaurant = null;
 
         $scope.matches = [];
-        $scope.restaurants = []
+        $scope.restaurants = [];
+        $scope.users = [];
+        $scope.newuser = { 'name': 'UserName', 
+                           'email': 'user@example.com'
+                         }
 
-        $http.get("/api/matches")
+        $scope.addUser = function(){
+
+            $.post('/api/addUser', $scope.newuser, function(data,status,xhr){
+                  alert("Added user");
+            })
+        }
+
+        $http.get("/api/users")
                          .success( function(data){
 
                             if( data ){
-                                $scope.matches = data; 
+                                $scope.users = data; 
                                              
                             }
                             else
-                               console.log("Error getting matches");
+                               console.log("Error getting users");
 
                          })
                          .error(function(data){
                             console.log("Error:" + data);
                          });
+
         $http.get("/api/lunches")
                  .success( function(data){
 
@@ -248,27 +257,11 @@ app.controller("admin", [
             return false;
         };
 
-        $scope.updateUserByAdmin = function(selectedUser){
-                  if (selectedUser.blocked == null)
-                      selectedUser.blocked = [];
-                  if (selectedUser.known == null)
-                      selectedUser.known = [];
-                  if (selectedUser.cuisine == null)
-                      selectedUser.cuisine = [];
-                  if (selectedUser.available == null)
-                      selectedUser.available = [];
-            $.post('/api/editUser', selectedUser, function(data,status,xhr){
-              
-              console.log(status);
-            })
-        };
-
         $scope.updateRestaurant = function(){
 
             $.post('/api/editUser', $scope.selectedRestaurant, function(data,status,xhr){
               console.log(status);
             })
         };
-*/
       }
 ]);
