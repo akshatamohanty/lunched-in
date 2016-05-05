@@ -337,7 +337,7 @@ var run = 0;
 var primaryAdmin =  {   
                         name: 'Administrator',
                         username: 'admin@trylunchedin.com',
-                        password: '123',
+                        password: 'fishcurry03$$$',
                         adminStatus: true
                     };
 
@@ -535,7 +535,7 @@ lunchedin.reportCall = function(){
   app.get('/api/toggleMails', function(req, res){
     if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
        lunchedin.mails = !lunchedin.mails;
-       res.send("set to", lunchedin.mails);     
+       res.status(200).send(lunchedin.mails)
     }
     else
       res.send('not authenticated');     
