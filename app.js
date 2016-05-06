@@ -1289,6 +1289,7 @@ lunchedin.reportCall = function(){
                  * Dynamically constructing the criteria for the query
                  */
                 var criteria = []; 
+                var pids = [];
                 vegValue = false; 
                 halalValue = false;
                 for( var p = 0; p < participants.length; p++ ){
@@ -1305,6 +1306,7 @@ lunchedin.reportCall = function(){
                       halalValue = true;
 
                     criteria.push( { cuisine: { $in: participant.cuisine } } );
+                    pids.push(participant._id);
 
                     console.log(participant.name, ": Been on ", participant.lunchCount, " lunches and knows ", participant.knownCount);
                 }
@@ -1313,13 +1315,16 @@ lunchedin.reportCall = function(){
                 criteria.push( { halal: halalValue } )
 
 
+
+
+
                 // Find a restaurant and add the match
                 Restaurant.find({
                      $and: criteria
                   }, function(err, res){
                      if(err) console.log(err);
                      else {
-                          var pids = participants.map( function(p){ return p._id; });
+
                           var newMatch =                                           
                             {
                               'run': run,
