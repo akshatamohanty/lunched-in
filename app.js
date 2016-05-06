@@ -245,7 +245,7 @@ lunchedin.addToKnown = function( runCount ){
 
                                   p.lunchCount++ ;
                                   p.save();
-                                 //console.log(p.name, p.known.length);
+                                 console.log(p.name, p.known.length);
                               }
                         }
 
@@ -393,12 +393,12 @@ initializeDatabases(); // clear the database
  */
 
 lunchedin.firstCall = function(){
-
-  console.log("-------------- Adding to Known for previous run ", run, "-----------------");
-  lunchedin.addToKnown( run );
-
-
   run++;
+  console.log("-------------- Adding to Known for previous run ", run-1, "-----------------");
+  lunchedin.addToKnown( run-1 );
+
+
+
   lunchedin.setPool();
 
   // call secondCall after some predetermined time
