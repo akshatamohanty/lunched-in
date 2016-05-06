@@ -78,10 +78,12 @@ app.use(passport.session());
 // set up database ==== only for testing === 
 var lunchedin = {};
 lunchedin.mails = false; 
-lunchedin.timeToSecondCall = 120000;
+lunchedin.timeToSecondCall = 300000;
 lunchedin.addUser = function(user){
 
       if( user.name != undefined && user.email != undefined){
+        user.lunchCount = 0;
+        user.dropCount = 0;
         user.password = Math.round((Math.pow(36, 6 + 1) - Math.random() * Math.pow(36, 6))).toString(36).slice(1);
         addToDatabase( User, user, "User", null);
         lunchedin.firstMail( user );
@@ -1317,16 +1319,16 @@ lunchedin.reportCall = function(){
                   }, function(err, res){
                      if(err) console.log(err);
                      else {
-                          
+                          var pids = participants.map( function(p){ return p._id; });
                           var newMatch =                                           
                             {
                               'run': run,
                               'date': Date(),
-                              'participants': participants,
+                              'participants': pids,
                               'location': res[0],
                               'dropouts' : []
                             };
-                          //console.log("Match made at", res[0].name);
+                          console.log("Match made at", res[0].name);
 
                           addToDatabase( Match, newMatch, "Match", null)
                     }
