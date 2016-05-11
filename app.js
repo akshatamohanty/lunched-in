@@ -78,7 +78,9 @@ app.use(passport.session());
 // set up database ==== only for testing === 
 var lunchedin = {};
 lunchedin.mails = false; 
+lunchedin.timeToFirstCall = 120000;
 lunchedin.timeToSecondCall = 120000;
+lunchedin.autorun = false; 
 lunchedin.addUser = function(user){
 
       if( user.name != undefined && user.email != undefined){
@@ -350,7 +352,6 @@ var cuisineList = ['American', 'Western', 'Salads', 'Asian', 'Chinese', 'Pernaka
 lunchedin.startSystem = function(){
  
   clearDatabase( User, "User", null );
-  
   clearDatabase( Match, "Matches", null);
 }
 
@@ -402,7 +403,8 @@ lunchedin.firstCall = function(){
   // call secondCall after some predetermined time
   console.log("-------------- Processing after " + lunchedin.timeToSecondCall + "ms-----------------");
   
-  setTimeout(lunchedin.secondCall, lunchedin.timeToSecondCall);
+  if (lunchedin.autorun)
+    setTimeout(lunchedin.secondCall, lunchedin.timeToSecondCall);
 
 };
 
@@ -428,7 +430,11 @@ lunchedin.secondCall = function(){
 };
 
 lunchedin.reportCall = function(){
+  
+  // send mails finally
 
+  if(lunchedin.autorun)
+    setTimeout(lunchedin.firstCall, lunchedin.timeToFirstCall);
 }
 
 // routes ================
@@ -525,17 +531,35 @@ lunchedin.reportCall = function(){
 
   app.get('/api/firstCall', function(req, res){
     if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
-      lunchedin.firstCall();
-      res.send('done!')
+          lunchedin.firstCall();
+          res.send('done!')
+    }
+    else
+      res.send('not authenticated');     
+  });
+
+  app.get('/api/firstCall', function(req, res){
+    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+          lunchedin.secondCall();
+          res.send('done!')
     }
    else
     res.send('not authenticated');     
   });
 
+  app.get('/api/autorun', function(req, res){
+    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+          lunchedin.autorun = !lunchedin.autorun;
+          res.status(200).send(lunchedin.autorun);
+    }
+    else
+      res.send('not authenticated');     
+  });
+
   app.get('/api/toggleMails', function(req, res){
     if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
-       lunchedin.mails = !lunchedin.mails;
-       res.status(200).send(lunchedin.mails)
+          lunchedin.mails = !lunchedin.mails;
+          res.status(200).send(lunchedin.mails)
     }
     else
       res.send('not authenticated');     
@@ -606,22 +630,7 @@ lunchedin.reportCall = function(){
 
                   });
             }
-            else{
-                   
-                  console.log("Single User detected");
-                  //use mongoose to get all lunches for this user in the database
-                  Match.find( { 
-                    'participants._id': req.session.passport.user[0]._id
-                  }, function(err, lunches){
 
-                        if(err)
-                          res.send(err);
-
-                        console.log("Number of lunches found for user: ", lunches.length);
-                        res.send(lunches);
-
-                  });
-            }
       } 
       else{
         res.send('Request not authenticated');
@@ -639,28 +648,6 @@ lunchedin.reportCall = function(){
       }
   });
 
-  // Admin Only APIs
-  app.post('/api/addCuisine', function(req, res){
-
-      // only Admins can add new users
-      if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
-
-            // add a cuisine to the cuisine list if it doesn't exist already
-            if(cuisineList.indexOf(req.body.cuisineName) == -1){
-                cuisineList.push(req.body.cuisineName);
-                console.log("New Cuisine:", req.body.cuisineName, "added.");
-                console.log("All Cuisines:", cuisineList);
-                res.send(cuisineList);
-            }
-            else
-              console.log("Cuisine already exists!");
-
-      }
-      else{
-        res.send('Request not authenticated');
-      }
-
-  });
 
   app.post('/api/addUser', function(req, res){
 
@@ -689,29 +676,6 @@ lunchedin.reportCall = function(){
 
   });
 
-  app.post('/api/removeUser', function(req, res){
-
-      // only Admins can delete users
-      if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
-
-            // add only if no user with same email exists
-            User.find({
-              'email' : req.body.email
-            })
-            .remove( function(err, user){
-
-                if(err) console.log("Error while deleting user", err);
-                
-                res.send("Admin Request Approved: Deleted User");
-
-            }); 
-
-      }
-      else{
-        res.send('Request not authenticated');
-      }
-
-  });
 
   app.get('/api/restaurants', function(req, res){
       //
@@ -738,53 +702,6 @@ lunchedin.reportCall = function(){
       }
   });
 
-  app.post('/api/addRestaurant', function(req, res){
-      // only Admins can add new users
-      if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
-
-            // add only if no user with same email exists
-            Restaurant.find({
-              'code' : req.body.code
-            }, function(err, restaurant){
-
-                if(err) console.log("Error while adding restaurant", err);
-
-                // user is always an array - remember this!
-                if(restaurant.length == 0)
-                  addToDatabase( Restaurant, req.body, "Restaurant", null )
-                
-                res.send("Admin Request Approved: Added new restaurant");
-
-            })
-
-      }
-      else{
-        res.send('Request not authenticated');
-      }
-  });
-
-  app.post('/api/removeRestaurant', function(req, res){
-      // only Admins can delete users
-      if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
-
-            // add only if no user with same email exists
-            Restaurant.find({
-              'code' : req.body.code
-            })
-            .remove( function(err, user){
-
-                if(err) console.log("Error while deleting restaurant", err);
-                
-                res.send("Admin Request Approved: Deleted Restaurant");
-
-            }); 
-
-      }
-      else{
-        res.send('Request not authenticated');
-      }
-  });
-
   // name changed from user_pref to edit_user - change in angular app - public
   app.post('/api/editUser', function(req, res){
 
@@ -802,7 +719,7 @@ lunchedin.reportCall = function(){
                                     password: req.body.password, 
                                     title: req.body.title, 
                                     picture: req.body.picture, 
-                                    //email: req.body.email, 
+                                    gender: req.body.gender, 
                                     phone: req.body.phone, 
                                     tagline: req.body.tagline, 
                                     nationality: req.body.nationality,
@@ -833,6 +750,7 @@ lunchedin.reportCall = function(){
                                           user.title = req.body.title;
                                           user.nationality = req.body.nationality;
                                           user.phone = req.body.phone;
+                                          user.gender = req.body.gender;
                                           user.picture = req.body.picture;
                                           user.password = req.body.password;
                                           user.tagline = req.body.tagline;
@@ -859,38 +777,6 @@ lunchedin.reportCall = function(){
           }
       }
   });
-
-  // name changed from user_pref to edit_user - change in angular app - public
-  app.post('/api/editRestaurant', function(req, res){
-
-      if(req.isAuthenticated()){
-        
-          // if user is admin - the body of the request will have email of the user which is to be updated
-          if( req.session.passport.user[0].adminStatus ){
-
-                  User.findOneAndUpdate(
-                              { 
-                                 'code': req.body.code
-                              }, 
-                              {
-                                  //code: { type: String, require: true},
-                                  name: req.body.name, 
-                                  address: req.body.address,
-                                  cuisine: req.body.cuisine,
-                                  scheduled: req.body.scheduled,
-                                  total: req.body.total
-                              }, 
-                              { multi: false }, 
-                              function(){
-                                console.log("Updated restaurant details");
-                              }
-                    )
-
-                    res.json("Successfully updated restaurant details");   
-          }
-      }
-  });
-
 
   // email apis
   app.get('/api/addToPool', function(req, res){
@@ -978,95 +864,6 @@ lunchedin.reportCall = function(){
 
   });
 
-  app.post('/api/resetPassword', function(req, res){
-          
-          console.log(req.body);
-
-          User.find({
-            'email': req.body.email
-          }, function(err, user){ 
-
-              if(user){
-                var password = user[0].password; 
-
-                // send a mail with this password; 
-                res.send("Email sent! Please check your email.");
-                var postmark = require("postmark")(process.env.POSTMARK_API_TOKEN)
-
-                postmark.send({
-                    "From": "admin@trylunchedin.com",
-                    "To": req.body.email,
-                    "Subject": "Password Recovery - TryLunchedIn",
-                    "TextBody": "Hello!",
-                    "Tag": "password-recovery"
-                }, function(error, success) {
-                    if(error) {
-                        console.error("Unable to send via postmark: " + error.message);
-                       return;
-                    }
-                    console.info("Sent to postmark for delivery")
-                });
-              }
-
-              if(!user.length)
-                res.send("Sorry! This email is not registered with us.")
-
-          });  
-  });
-
-  app.post('/signUp', function(req, res){
-          
-          console.log(req.body);
-
-          User.find({
-            'email': req.body.email
-          }, function(err, user){ 
-
-              if(user){
-                res.send("Oops.. Looks like this email has already been registered with us.");
-
-              if(!user.length){
-                // send a mail with this password; 
-
-
-                    var client = new postmark.Client("32f51173-e5ee-4819-90aa-ad9c25c402a8");
-
-                    client.sendEmailWithTemplate({
-                      "From": "admin@trylunchedin.com",
-                      "To": req.body.email,
-                      "TemplateId": 497903,
-                      "TemplateModel": {
-                        "product_name": "TryLunchedIn",
-                        "username": req.body.email,
-                        "action_url": "admin@trylunchedin.com",
-                        "product_address_line1": "Singapore"
-                      }
-                    });
-
-                    client.send({
-                        "From": "admin@TryLunchedIn.com",
-                        "To": "trylunchedin@gmail.com",
-                        "Subject": "New Sign Up on TryLunchedIn",
-                        "TextBody": req.body.email+" just signed up on TryLunchedIn!",
-                        "Tag": "sign-up"
-                        }, function(error, success) {
-                        if(error) {
-                            console.error("Unable to send via postmark: " + error.message);
-                           return;
-                        }
-                        console.info("Sent to postmark for delivery")
-                    });
-
-                    console.info("Sent to postmark for delivery")
-                }
-
-                res.send("Thank you! Please check your inbox for a mail from us!")
-              }
-              
-              
-
-          });  
-  });
 
   app.get('*', function(req, res){ 
         res.send('Sorry! We haven\'t written this API yet! Got a suggestion? Mail us at admin@trylunchedin.com!');

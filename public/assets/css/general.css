@@ -1,3 +1,8 @@
+@font-face {
+    font-family: Variane;
+    src: url(Variane.ttf);
+}
+
 html {
 
 }
@@ -5,6 +10,99 @@ html {
 body { 
   
 }
+
+video { 
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  z-index: -100;
+  background-size: cover;
+  transition: 1s opacity;
+}
+
+#intro{
+  position: absolute;
+  top: 24%;
+  left: 20%;
+  width: 60%;
+  line-height: 200%;
+  font-family: Variane;
+  font-size: 60px;
+  color: #eee;
+}
+
+#lunchedin{
+  margin-top: -30px;
+  height: 60px;
+}
+
+/* make keyframes that tell the start state and the end state of our object */
+@-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@-moz-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+.fade-in {
+  opacity:0;  /* make things invisible upon start */
+  -webkit-animation:fadeIn ease-in 1;  /* call our keyframe named fadeIn, use animattion ease-in and repeat it only 1 time */
+  -moz-animation:fadeIn ease-in 1;
+  animation:fadeIn ease-in 1;
+
+  -webkit-animation-fill-mode:forwards;  /* this makes sure that after animation is done we remain at the last keyframe value (opacity: 1)*/
+  -moz-animation-fill-mode:forwards;
+  animation-fill-mode:forwards;
+
+  -webkit-animation-duration:1s;
+  -moz-animation-duration:1s;
+  animation-duration:1s;
+}
+
+.fade-in.one {
+  -webkit-animation-delay: 1s;
+  -moz-animation-delay: 1s;
+  animation-delay: 1s;
+}
+
+.fade-in.two {
+  -webkit-animation-delay: 2s;
+  -moz-animation-delay:2s;
+  animation-delay: 2s;
+}
+
+.fade-in.three {
+  -webkit-animation-delay: 3s;
+  -moz-animation-delay: 3s;
+  animation-delay: 3s;
+}
+
+.logo{
+  height: 30px;
+}
+
+.white-text{
+  color: #fff;
+}
+
+.center{
+  margin-left: 35%;
+}
+
+#clients{
+  height: 45px;
+  background-color: #eee;
+  border-bottom: 2px solid #222;
+}
+
+.page-section{
+  height: 100vh;
+}
+
+
+
+
+
+
+
 
 .jumbotron{
   border-radius: 0 !important;
@@ -63,9 +161,7 @@ body {
   padding: 10%;
 }
 
-.full-page{
-  height: 100vh;
-}
+
 
 .page-header{
   color: #2f6596;
@@ -79,11 +175,6 @@ body {
 .full-page-padding{
   padding-left: 10% !important;
   padding-right: 10% !important;
-}
-
-.white-text{
-  color: #2f6596;
-  text-align: right;
 }
 
 .bg-grey{
@@ -187,11 +278,6 @@ body {
   background-position: top-left;
 }
 
-.logo{
-  height: 30px;
-  margin-left: 4%; 
-  margin-bottom: 1%;
-}
 
 .text-white{
   color: white;
