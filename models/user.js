@@ -4,6 +4,7 @@ var userSchema = {
 	inPool: { type: Boolean }, 
 	name: { type: String, required: true}, 
 	password: { type: String, required: true }, 
+	gender: { type: String }, 
 	title: { type: String }, 
 	picture: { type: String }, 
 	email: { type: String, required: true }, 
