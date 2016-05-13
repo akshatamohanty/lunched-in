@@ -73,18 +73,129 @@ app.use(expressSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// General Functions
+//
+//
 
+var clearDatabase = function( database, stringName, callback ){
 
-// set up database ==== only for testing === 
+  database.remove({}, function(err, doc){
+        if(err) console.log("Error: ", stringName, " Database has not been reset. ", err);
+
+        //console.log(stringName, " Database has been reset."); 
+
+        if(callback)
+          callback;   
+    });
+
+};
+
+var addToDatabase = function( database, jsonObject, stringName, callback ){
+    
+    database.create( jsonObject, 
+                  function(err, user){
+
+                      if(err)
+                        console.log("Error: Unable to add to ", stringName, err);
+
+                      console.log("Added ", stringName);
+
+                      if(callback)
+                        callback;   
+                  });
+};
+
+//  Initialization Function
+//      Runs only once when dynos are reset
+//      Adds the restaurants
+var initialize = function() {
+    
+    // Primary Admin Added directly from Mongo
+    /*var primaryAdmin =  {   
+                            name: 'Administrator',
+                            username: 'admin@trylunchedin.com',
+                            password: 'fishcurry03$$$',
+                            adminStatus: true
+                        };*/  
+    //clearDatabase( Admin, "Admin", addToDatabase( Admin, primaryAdmin, "Admin", null) );
+    clearDatabase( Restaurant, "Restaurants", null );
+
+    var loadRestaurants = function(){
+      // loads the dummyUsers from the database
+      var allRestaurants = require('./allRestaurants');
+      console.log(allRestaurants.length, "restaurants loaded.");
+      
+      // pre-process the user data - change to array etc
+      for(var i=0; i<allRestaurants.length; i++){
+          var restaurant = allRestaurants[i]; 
+
+          restaurant.cuisine = restaurant.cuisine.replace(/\s/g, '').split(',');
+
+          addToDatabase( Restaurant, restaurant, "Restaurant", null);
+      }    
+    }
+
+  setTimeout(loadRestaurants, 5000);
+}
+initialize(); 
+
+// GLOBAL Variables and Functions for LunchedIn
+//
+//
+
+// GLOBAL VARIABLES
+var run;  // intialized in the firstCall function
+
+var cuisineList = ['American', 'Western', 'Salads', 'Asian', 'Chinese', 'Pernakan', 'Korean', 'Australian', 
+                   'French', 'Italian', 'Fusion', 'International', 'Japanese', 'Thai', 'German', 
+                   'Indian', 'Indonesian', 'Malay', 'Mexican', 'Vietnamese', 'Mediterranean', 'Russian', 'Spanish'];
+
 var lunchedin = {};
+
+//- If set to true, mailing functionality is activated
 lunchedin.mails = false; 
 
-lunchedin.timeToFirstCall = 120000;
-lunchedin.timeToSecondCall = 120000;
+//- First Call : 
+//    Mails everyone to join the pool
+//    Adds people who have marked that day (deprecated functionality)
+lunchedin.timeToFirstCall = 300000; // 5minutes - ThirdCall to FirstCall Gap
+
+//- Second Call : 
+//    Runs matching algorithm
+//    Sends mails to matches
+lunchedin.timeToSecondCall = 120000; // 2 minutes - FirstCall to SecondCall Gap
+
+//- Third Call : 
+//    Goes through the matches for today and incase of dropouts, mails the concerned people
+//    Increases lunchedCount of people
+//    Increases restaurantCount of restaurant
+//    AddsToKnown 
+lunchedin.timeToThirdCall = 300000; // 5 minutes - SecondCall to ThirdCall Gap
+
+//- Keeps calling all three functions automatically after set times, if set to true
+//- Set to true, for production
 lunchedin.autorun = false; 
 
-lunchedin.timeToSecondCall = 300000;
+/*
+ *  Returns true if today is a holiday, else returns false
+ *  
+ */
+lunchedin.checkHoliday = function(){
 
+}
+
+/*
+ *  Returns the last run value as inferred from the Matches
+ *  
+ */
+lunchedin.getLastRun = function(){
+
+}
+
+/*
+ *  Adds a new user to the database and send him / her an invite
+ *  Autogenerates a password
+ */
 lunchedin.addUser = function(user){
 
       if( user.name != undefined && user.email != undefined){
@@ -97,6 +208,10 @@ lunchedin.addUser = function(user){
 
 };
 
+/*
+ *  Adds a user to current pool only if no matches have been made for that run
+ *  
+ */
 lunchedin.addToPool = function( runCount, userID ){
 
   Match.find({ run: runCount }, function(err, matches){
@@ -122,6 +237,10 @@ lunchedin.addToPool = function( runCount, userID ){
   });
 };
 
+/*
+ *  General function to send any mail to any user
+ *  
+ */
 lunchedin.sendMail = function( templateID, templateModel, user_email ){
 
     if(!lunchedin.mails)
@@ -137,6 +256,10 @@ lunchedin.sendMail = function( templateID, templateModel, user_email ){
     });
 };
 
+/*
+ *  Invitation Mail
+ *  
+ */
 lunchedin.firstMail = function( user ){
 
     var templateID = 497903;
@@ -150,6 +273,10 @@ lunchedin.firstMail = function( user ){
 
 };
 
+/*
+ *  Morning mail - which asks user to join the pool
+ *  
+ */
 lunchedin.confirmationMail = function( user ){
 
     var templateID = 609621;
@@ -200,6 +327,10 @@ lunchedin.confirmationMail = function( user ){
 
 };
 
+/*
+ *  Matched Mail
+ *  
+ */
 lunchedin.matchedMail = function( match, user ){
 
     var templateID = 588701;
@@ -214,8 +345,31 @@ lunchedin.matchedMail = function( match, user ){
 
 };
 
+/*
+ *  Cancelled Mail
+ *  
+ */
+lunchedin.canceledMail = function( match, user ){
 
-lunchedin.addToKnown = function( runCount ){
+    var templateID = 588701;
+    var templateModel = {
+              "name": user.name,
+              "participants": match.participants, 
+
+            }
+
+    console.log("Canceled Mail sent to ", user.name);
+    lunchedin.sendMail( templateID, templateModel, user.email)
+
+};
+
+
+/*
+ *  Goes through matches of a particular run and adds people who went to the lunch to each others known list,
+ *  increments restaurant counters and lunch counts, increments dropCounters
+ *  
+ */
+lunchedin.updateStatistics = function( runCount ){
     // for each participant of a match, check if all others are added - if not - add it
     Match.find({ run: runCount }, function(err, matches){
 
@@ -263,6 +417,72 @@ lunchedin.addToKnown = function( runCount ){
     });
 };
 
+/*
+ *  Goes through matches of a particular run and sends mail to concerned people about dropouts
+ *  
+ */
+lunchedin.checkDropouts = function( runCount ){
+    // for each participant of a match, check if all others are added - if not - add it
+    Match.find({ run: runCount }, function(err, matches){
+
+      if(err) console.log("Error retriving matches");
+      else{
+
+            //console.log(matches.length, "matches found for runCount", runCount );
+            for(var i=0; i < matches.length; i++){
+
+               //console.log("For Match", i, " ", matches[i].participants.length, "found")
+
+                User.find( { 
+                    _id: {$in: matches[i].participants}
+                  }, function(err, participants){
+
+                        if(err) console.log("Error getting participants");
+                        else{
+                              
+                              for(var pCount=0; pCount< participants.length; pCount++){
+                                  
+                                  var p = participants[pCount]; //console.log("Comparing", p.name);
+                                  
+                                  for(var qCount=0; qCount < participants.length; qCount++){
+
+                                      if(qCount == pCount)
+                                          continue; 
+
+                                      var q = participants[qCount];                                        
+                                      
+                                      if( p.known.indexOf(q._id) == -1)
+                                        p.known.push(q._id);
+                                  }
+
+                                  p.lunchCount++ ;
+                                  p.save();
+                                 console.log(p.name, p.known.length);
+                              }
+                        }
+
+                  });
+                
+            }       
+      }
+
+    });
+};
+
+/*
+ *  Goes through the matches for the current run and mails the people
+ *  
+ */
+lunchedin.mailMatches = function( runCount ){
+
+    console.log("-------------- Mailing matches -----------------");     
+};
+
+
+/*
+ *  Sets the pool for that day and email people to join the pool 
+ *  
+ */
 lunchedin.setPool = function(){
 
       console.log("-------------- Refreshing pool-----------------");
@@ -270,18 +490,18 @@ lunchedin.setPool = function(){
             
             if(err) console.log(err, "error");
             else{
-                  var today = new Date();
+/*                  var today = new Date();
                   var day = today.getDay();
 
                   // populate daily pool
                   var dayMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                  var holidays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+                  var holidays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];*/
 
                   /*
                    *  Sends confirmation mail to users who have marked - 'Ask Me Everyday'
                    */
                   User.find({ 
-                        available : ['All'] 
+                        //available : ['All'] // Availability functionality deprecated - will mail all users
                   }, function(err, users){
 
                           if(err) 
@@ -294,9 +514,9 @@ lunchedin.setPool = function(){
                   });
 
                   /*
-                   * Add all users that have already marked preference 
+                   * Add all users that have already marked preference - deprecated
                    */
-                  User.update({ available: dayMap[day] }, {inPool:true} , {multi: true}, function(err, users){
+                  /*User.update({ available: dayMap[day] }, {inPool:true} , {multi: true}, function(err, users){
                         if(err) console.log(err, "error");
                         
                        //console.log(users.n, "users added to pool");
@@ -305,89 +525,14 @@ lunchedin.setPool = function(){
                           //console.log(users.length, "made active");
                         })
 
-                  });    
+                  });*/   
             }   
       });     
 };
 
-var clearDatabase = function( database, stringName, callback ){
 
-  database.remove({}, function(err, doc){
-        if(err) console.log("Error: ", stringName, " Database has not been reset. ", err);
-
-        //console.log(stringName, " Database has been reset."); 
-
-        if(callback)
-          callback;   
-    });
-
-};
-
-var addToDatabase = function( database, jsonObject, stringName, callback ){
-    
-    database.create( jsonObject, 
-                  function(err, user){
-
-                      if(err)
-                        console.log("Error: Unable to add to ", stringName, err);
-
-                      console.log("Added ", stringName);
-
-                      if(callback)
-                        callback;   
-                  });
-};
-
-
-// GLOBAL VARIABLES
-var run = 0;
-
-var primaryAdmin =  {   
-                        name: 'Administrator',
-                        username: 'admin@trylunchedin.com',
-                        password: 'fishcurry03$$$',
-                        adminStatus: true
-                    };
-
-
-var cuisineList = ['American', 'Western', 'Salads', 'Asian', 'Chinese', 'Pernakan', 'Korean', 'Australian', 
-                   'French', 'Italian', 'Fusion', 'International', 'Japanese', 'Thai', 'German', 
-                   'Indian', 'Indonesian', 'Malay', 'Mexican', 'Vietnamese', 'Mediterranean', 'Russian', 'Spanise'];
-
-/* Adds the preliminary user details and restaurants */
-lunchedin.startSystem = function(){
- 
-  clearDatabase( User, "User", null );
-  clearDatabase( Match, "Matches", null);
-}
-
-/* Clears all databases */
-var initializeDatabases = function() {
-    clearDatabase( Admin, "Admin", addToDatabase( Admin, primaryAdmin, "Admin", null) );
-    clearDatabase( Restaurant, "Restaurants", null );
-
-    var helloworld = function(){
-      // loads the dummyUsers from the database
-      var allRestaurants = require('./allRestaurants');
-      console.log(allRestaurants.length, "restaurants loaded.");
-      
-      // pre-process the user data - change to array etc
-      for(var i=0; i<allRestaurants.length; i++){
-          var restaurant = allRestaurants[i]; 
-
-          restaurant.cuisine = restaurant.cuisine.replace(/\s/g, '').split(',');
-
-          addToDatabase( Restaurant, restaurant, "Restaurant", null);
-      }    
-    }
-
-  setTimeout(helloworld, 5000);
-}
-initializeDatabases(); // clear the database
-//setTimeout(init, 5000); // initialize after 5 seconds so databases have been properly configured
-
-
-/*
+/*  CALLS
+ *
  *  Function will be called by match algorithm and related APIs
  *  Will - 1) Will analyse each match from previous run and perform addToKnown operation
  *       - 2) Will add to activePool
@@ -398,24 +543,36 @@ initializeDatabases(); // clear the database
  */
 
 lunchedin.firstCall = function(){
-  run++;
-  console.log("-------------- Adding to Known for previous run ", run-1, "-----------------");
-  lunchedin.addToKnown( run-1 );
 
+  /*
+   *  Checks if it is a holiday - if holiday, calls itself again after 24hours
+   */
+  if( lunchedin.checkHoliday() ==  true )
+    setTimeout(lunchedin.firstCall, 86400000); 
+  else{
+    if (lunchedin.autorun)
+      setTimeout(lunchedin.secondCall, lunchedin.timeToSecondCall);
+  } 
 
+  /*
+   *  Initialize run based on Matches
+   */
+  run = lunchedin.getLastRun() + 1;
 
   lunchedin.setPool();
 
   // call secondCall after some predetermined time
   console.log("-------------- Processing after " + lunchedin.timeToSecondCall + "ms-----------------");
   
-  if (lunchedin.autorun)
-    setTimeout(lunchedin.secondCall, lunchedin.timeToSecondCall);
+
 
 };
 
 
 lunchedin.secondCall = function(){
+
+  if(lunchedin.autorun)
+    setTimeout(lunchedin.thirdCall, lunchedin.timeToThirdCall);
 
   // add a dummy match for this run
   addToDatabase( Match, { run: run, date: Date() } , "Match", null)
@@ -431,16 +588,25 @@ lunchedin.secondCall = function(){
   });
 
   // match and mail
-
+  lunchedin.mailMatches( run );
 
 };
 
-lunchedin.reportCall = function(){
-  
-  // send mails finally
+lunchedin.thirdCall = function(){
 
   if(lunchedin.autorun)
     setTimeout(lunchedin.firstCall, lunchedin.timeToFirstCall);
+
+  if(lunchedin.autorun)
+    setTimeout(lunchedin.firstCall, lunchedin.timeToFirstCall);
+
+  // check for dropOuts
+  console.log("-------------- Checking for dropouts for Run ", run, "-----------------");
+  lunchedin.checkDropouts( run );
+
+  console.log("-------------- Updating counters and known for Run ", run, "-----------------");
+  lunchedin.updateStatistics( run );
+
 }
 
 // routes ================
@@ -525,35 +691,38 @@ lunchedin.reportCall = function(){
    * 
    */
 
-  //api -------------
-  app.get('/api/start', function(req, res){
-    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
-            lunchedin.startSystem();
-            res.send('done!')
-    }
-    else
-      res.send('not authenticated');
-  });
-
+  // ==========================================================================
+  /*
+   *  Admin only APIs
+   */
   app.get('/api/firstCall', function(req, res){
     if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
           lunchedin.firstCall();
-          res.send('done!')
+          res.status(200).send(lunchedin.autorun);
     }
     else
-      res.send('not authenticated');     
+      res.send('Not authenticated');     
   });
 
-  app.get('/api/firstCall', function(req, res){
+  app.get('/api/secondCall', function(req, res){
     if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
           lunchedin.secondCall();
-          res.send('done!')
+          res.status(200).send(lunchedin.autorun);
     }
    else
-    res.send('not authenticated');     
+    res.send('Not authenticated');     
   });
 
-  app.get('/api/autorun', function(req, res){
+  app.get('/api/thirdCall', function(req, res){
+    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+          lunchedin.thirdCall();
+          res.status(200).send(lunchedin.autorun);
+    }
+   else
+    res.send('Not authenticated');     
+  });
+
+  app.get('/api/toggleAutorun', function(req, res){
     if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
           lunchedin.autorun = !lunchedin.autorun;
           res.status(200).send(lunchedin.autorun);
@@ -571,8 +740,120 @@ lunchedin.reportCall = function(){
       res.send('not authenticated');     
   });
 
+  app.get('/api/restaurants', function(req, res){
+      //
+      // This authentication is important for every request to the API 
+      //
+      if(req.isAuthenticated()){   //!! TODO: find if this is safe? I think there's a loophole - if req can be tampered around with
+        
+            // get mongoose to extract all users in the database
+            Restaurant.find(function(err, restaurants){
 
+                    if(err)
+                      res.send(err);
+
+                    // if user is admin - send all information 
+                    if( req.session.passport.user[0].adminStatus ){
+                          //console.log("Admin Request Approved: Sending complete data", restaurants);
+                          res.json(restaurants);
+                    }
+            });
+
+      } 
+      else{
+        res.send('Request not authenticated');
+      }
+  });
+
+  app.get('/api/setTime', function(req, res){
+    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+        // api / setTime?thirdToFirst=time1&firstToSecond=time2&secondToThird=time3
+        var qs = querystring.parse(req.url.split("?")[1]);
+        lunchedin.timeToFirstCall = qs.thirdToFirst;
+        lunchedin.timeToSecondCall = qs.firstToSecond;
+        lunchedin.timeToThirdCall = qs.secondToThird;
+        res.status(200).send(lunchedin.timeToFirstCall + "  " + lunchedin.timeToSecondCall + " " + lunchedin.timeToThirdCall);
+    }
+    else
+      res.send('Not authenticated');   
+  });
   
+
+
+
+  // Sends Matches Data 
+  app.get('/api/lunches', function(req, res){
+      
+      if(req.isAuthenticated()){   //!! TODO: find if this is safe? I think there's a loophole - if req can be tampered around with
+
+            // if user is admin - send all information 
+            if( req.session.passport.user[0].adminStatus ){
+
+                  console.log("Admin Request Approved: Sending complete data of matches");
+                  
+                  Match.find( function(err, lunches){
+
+                        if(err)
+                          res.send(err);
+
+                        res.send(lunches);
+
+                  });
+            }
+
+      } 
+      else{
+        res.send('Request not authenticated');
+      }
+  });
+
+  // Adds user
+  app.post('/api/addUser', function(req, res){
+
+      // only Admins can add new users
+      if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+
+            // add only if no user with same email exists
+            User.find({
+              'email' : req.body.email
+            }, function(err, user){
+
+                if(err) console.log("Error while adding user", err); 
+
+                // user is always an array - remember this!
+                if(user.length == 0)
+                  lunchedin.addUser(req.body);
+                
+                res.send("Admin Request Approved: Added new user");
+
+            })
+
+      }
+      else{
+        res.send('Request not authenticated');
+      }
+
+  });
+  
+
+
+  // ==========================================================================
+  // Information APIs
+  //
+  //
+
+  // Sends Cuisine
+  app.get('/api/cuisines', function(req, res){
+      
+      // anyone who is authenticated can get the cuisinelist
+      if( req.isAuthenticated() ){
+            res.send(cuisineList);
+      }
+      else{
+        res.send('Request not authenticated');
+      }
+  });
+
   // Sends all the users in the database 
   app.get('/api/users', function(req, res){
 
@@ -608,97 +889,6 @@ lunchedin.reportCall = function(){
                           })
 
                           res.json(compressedUserData);
-                    }
-            });
-
-      } 
-      else{
-        res.send('Request not authenticated');
-      }
-  });
-
-   // getting today's lunch match for a user
-  app.get('/api/lunches', function(req, res){
-      
-      if(req.isAuthenticated()){   //!! TODO: find if this is safe? I think there's a loophole - if req can be tampered around with
-
-            // if user is admin - send all information 
-            if( req.session.passport.user[0].adminStatus ){
-
-                  console.log("Admin Request Approved: Sending complete data of matches");
-                  
-                  Match.find( function(err, lunches){
-
-                        if(err)
-                          res.send(err);
-
-                        res.send(lunches);
-
-                  });
-            }
-
-      } 
-      else{
-        res.send('Request not authenticated');
-      }
-  });
-
-  app.get('/api/cuisines', function(req, res){
-      
-      // anyone who is authenticated can get the cuisinelist
-      if( req.isAuthenticated() ){
-            res.send(cuisineList);
-      }
-      else{
-        res.send('Request not authenticated');
-      }
-  });
-
-
-  app.post('/api/addUser', function(req, res){
-
-      // only Admins can add new users
-      if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
-
-            // add only if no user with same email exists
-            User.find({
-              'email' : req.body.email
-            }, function(err, user){
-
-                if(err) console.log("Error while adding user", err); 
-
-                // user is always an array - remember this!
-                if(user.length == 0)
-                  lunchedin.addUser(req.body);
-                
-                res.send("Admin Request Approved: Added new user");
-
-            })
-
-      }
-      else{
-        res.send('Request not authenticated');
-      }
-
-  });
-
-
-  app.get('/api/restaurants', function(req, res){
-      //
-      // This authentication is important for every request to the API 
-      //
-      if(req.isAuthenticated()){   //!! TODO: find if this is safe? I think there's a loophole - if req can be tampered around with
-        
-            // get mongoose to extract all users in the database
-            Restaurant.find(function(err, restaurants){
-
-                    if(err)
-                      res.send(err);
-
-                    // if user is admin - send all information 
-                    if( req.session.passport.user[0].adminStatus ){
-                          //console.log("Admin Request Approved: Sending complete data", restaurants);
-                          res.json(restaurants);
                     }
             });
 
@@ -784,7 +974,11 @@ lunchedin.reportCall = function(){
       }
   });
 
-  // email apis
+
+  // ==========================================================================
+  //
+  //  User based Email APIs
+  // 
   app.get('/api/addToPool', function(req, res){
         
       var qs = querystring.parse(req.url.split("?")[1]),
@@ -813,27 +1007,6 @@ lunchedin.reportCall = function(){
             var match = matches[0];
             match.dropouts.push( match.participants.splice(match.participants.indexOf(objectID), 1) );
             match.save();
-
-            User.find( { _id: ObjectId(objectID) }, function(err, users){
-
-                var user = users[0];
-                user.dropCount++;
-
-            });
-
-            User.find( { _id: {$in:match.participants} }, function(err, users){
-
-                for(var i=0; i < users.length; i++){
-
-                    var user = users[i];
-
-                    // email
-
-                }
-            });
-
-
-
       })    
 
   });
@@ -870,7 +1043,44 @@ lunchedin.reportCall = function(){
 
   });
 
+  app.get('/api/blockRestaurant', function(req, res){
 
+      // api / blockUser?user=objectid&block=email
+      var qs = querystring.parse(req.url.split("?")[1]),
+        userID = qs.user;
+        blockedRId = qs.block;
+
+      User.find( { _id: ObjectId(userID) }, function(err, user){
+
+          if(err) console.log(err);  
+          else{
+                  var user = user[0];
+                  Restaurant.find({ _id: ObjectId(blockedRId)}, function(err, restaurants){
+
+                        if(err) console.log(err);
+                        else{
+                              var restaurant = restaurants[0];
+                              if( user.blockedRestaurants.indexOf( restaurant._id ) == -1){
+                                user.blockedRestaurants.push(restaurant._id);
+                                res.send(user.name, ", ", restaurant.name, "has been blocked.")
+                                user.save();
+                              }
+                              else
+                                res.send(user.name, ", ", restaurant.name, "was already blocked.");                         
+                        }
+
+                  })
+          }
+      });
+
+  });
+
+
+
+
+
+
+  // ===========================================================================
   app.get('*', function(req, res){ 
         res.send('Sorry! We haven\'t written this API yet! Got a suggestion? Mail us at admin@trylunchedin.com!');
   });
@@ -882,6 +1092,7 @@ lunchedin.reportCall = function(){
   console.log("App listening on port 8080");    
 
 
+  // ============================================================================
   function matchingAlgorithm( userPool ){
 
 
@@ -999,6 +1210,8 @@ lunchedin.reportCall = function(){
               Restaurant.find({
                 $and: [ { cuisine: { $in: user1.cuisine } }, 
                         { cuisine: { $in: user2.cuisine } },
+                        { _id: { $nin: user1.blockedRestaurants } }, 
+                        { _id: { $nin: user2.blockedRestaurants } }, 
                         { veg: user1.veg || user2.veg },
                         { halal: user1.halal || user2.halal },
                       ]  
@@ -1107,6 +1320,7 @@ lunchedin.reportCall = function(){
                       halalValue = true;
 
                     criteria.push( { cuisine: { $in: participant.cuisine } } );
+                    criteria.push( { _id: { $nin: participant.blockedRestaurants } } );
                     pids.push(participant._id);
 
                     console.log(participant.name, ": Been on ", participant.lunchCount, " lunches and knows ", participant.knownCount);
@@ -1114,10 +1328,6 @@ lunchedin.reportCall = function(){
 
                 criteria.push( { veg: vegValue } )
                 criteria.push( { halal: halalValue } )
-
-
-
-
 
                 // Find a restaurant and add the match
                 Restaurant.find({

@@ -24,6 +24,10 @@ var userSchema = {
 	known: [ {
 	    type: mongoose.Schema.Types.ObjectId, ref: 'User'
 	  } 
+	],
+	blockedRestaurants: [ {
+	    type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant'
+	  } 
 	]
 };
 
