@@ -1,48 +1,129 @@
-  <video autoplay  id="bgvid" loop>
-    <source src="https://fpdl.vimeocdn.com/vimeo-prod-skyfire-std-us/01/1453/6/157269920/489780589.mp4?token=57337f5a_0x6c7f418c252da7df1bf63010d92d34f244383e80" type="video/mp4">
-  </video>
+<div class='row page-section' id='home'>
 
-   
-    <form id='loginForm' role="form" method="post" action="/login">
-      <div class=" form-group">
-        <input type="email" class="form-control" name="username" placeholder="Enter Email">
+    <div class='col-sm-2 col-xs-hidden'></div>
+    
+    <div class='col-sm-8 col-xs-12'>
+
+      <div class='fade-in one'><img id='lunchedin' src='../assets/images/logo.png'></img></div>
+      
+      <div class='fade-in two' id='tagline'>Connecting Colleagues with Cuisines...</div>
+
+      <div class='fade-in three' id="loginForm">
+        <button id='enter' class="btn btn-info btn-block"> Enter </button>
+        <script>  
+            $('#enter').click(function(){
+              $('#logininBlk').slideToggle(500);
+            });
+        </script>
+        <form id='logininBlk' role="form" method="post" action="/login" style='display:none'>
+            <div class=" form-group">
+              <input type="email" class=" form-control" name="username" placeholder="Enter Email">
+            </div>
+            <div class=" form-group">
+              <input type="password" class=" form-control" name="password" placeholder="Enter Password">
+            </div>         
+            <button type="submit" class="btn btn-info btn-lg btn-block btn-danger"> Log In </button>
+        </form>
       </div>
-      <div class=" form-group">
-        <input type="password" class=" form-control" name="password" placeholder="Enter Password">
-      </div>         
-      <button type="submit" class="btn btn-info btn-lg btn-block btn-danger"> Log In </button>
-    </form>
+
+    </div>
     
-  <div class='row text-center' id='intro'>
-    <div class='col-sm-4 fade-in one'><div id='people'>People</div></div>
-    <div class='col-sm-4 fade-in three'><img id='lunchedin' src='../assets/images/logo.png'></img></div>
-    <div class='col-sm-4 fade-in two'><div id='food'>Food</div> </div>
-  </div>
-    
+    <div class='col-sm-2 col-xs-hidden'></div>
 
+</div>
 
+<div id='clients'>AEDAS</div>
 
-  <div id='clients'></div>
+<div class="row page-section" id='intro'>
+  
+  <div>
+    <h1>Hi, I'm Eva</h1>   
+    <p>Your personal assistant bot to help you build your network over lunch. You tell me your preferences and I'll 
+       help you meet new people over lunch at restaurant near you that serves your favourite food.</p>
+    <p>No sign-in, no password, no download, all you do is - </p>
+    <p> Email <span class='text-primary'> eva@trylunchedin.com </span> when you are ready! </li>
+    <p> Show up! </li>
 
-  <div id='about' class='page-section'></div>
+  </div> 
 
-  <div id='howitworks'  class='page-section'></div>
+</div>
 
-  <footer class="container-fluid full-page-padding bg-grey" id='contact'>
-    <div class=" row">
-      <div class=" col-sm-7"></div>
-      <div class=" col-sm-5 text-right">
-        <h4>We would love to hear from you.</h4>
-        <p><span class=" glyphicon glyphicon-map-marker"></span> Singapore </p>
-        <p><span class=" glyphicon glyphicon-phone"></span> +00 1515151515</p>
-        <p><span class=" glyphicon glyphicon-envelope"></span> admin@trylunchedin.com</p> 
+<div class="row page-section" id='howitworks'>
+
+    <h1>How It Works</h1>   
+
+    <div class='row' style='margin-top: 40px;'>
+      <div class='col-md-4'>
+        <h1><span class=" glyphicon glyphicon-link"></h1>
+      </div>
+      <div class='col-md-8' style='padding-top: 2%'>
+        <p>You want to meet new people and grow your network over lunch hour, but don't know when where and how?</p>
       </div>
     </div>
-  </footer>
 
-<script>
-  $(document).ready(function(){
+    <div class='row'  style='margin-top: 40px;'>
+      <div class='col-md-4'>
+        <h1><span class=" glyphicon glyphicon-check"></h1>
+      </div>
+      <div class='col-md-8' style='padding-top: 2%'>
+        <p>Enter Eva. You tell her your preferences and let her know if you are available for lunch that day.</p>
+      </div>
+    </div>
+
+    <div class='row'  style='margin-top: 40px;'>
+      <div class='col-md-4'>
+        <h1><span class=" glyphicon glyphicon-random"></h1>
+      </div>
+      <div class='col-md-8' style='padding-top: 2%'>
+        <p>Knowing your preferences, Eva finds you suitable people with whom  you can lunch at a restaurant near you.</p>
+      </div>
+    </div>
+
+    <div class='row'  style='margin-top: 40px;'>
+      <div class='col-md-4'>
+        <h1><span class=" glyphicon glyphicon-envelope"></h1>
+      </div>
+      <div class='col-md-8' style='padding-top: 2%'>
+        <p>Like magic, the invitation arrives in your inbox before lunch.</p>
+      </div>
+    </div>
+
+</div>
+
+
+<div class="row" id='footer'>
+    <h1>About Us</h1>
+
+    <div class="col-sm-3 people">
+        <div class='row'>
+          <div class='col-sm-6'><img src='http://placehold.it/80x80'/></div>
+          <div class='col-sm-6' style='padding-top: 30px'>Hello!</div>
+        </div>
+        <p>  Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem  Lorem Lorem Lorem </p>
+    </div>
+
+    <div class="col-sm-3 people">
+        <div class='row'>
+          <div class='col-sm-6'><img src='http://placehold.it/80x80'/></div>
+          <div class='col-sm-6' style='padding-top: 30px'>Hello!</div>
+        </div>
+        <p>  Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem  Lorem Lorem Lorem </p>
+    </div>
     
-  });
-</script>
+    <div class="col-sm-3 people">
+        <div class='row'>
+          <div class='col-sm-6'><img src='http://placehold.it/80x80'/></div>
+          <div class='col-sm-6' style='padding-top: 30px'>Hello!</div>
+        </div>
+        <p>  Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem  Lorem Lorem Lorem </p>
+    </div>
+
+    <div class="col-sm-3 text-center">
+      <p>Home</p>
+      <p>How it works</p>
+      <p>About</p>
+      <p>Feedback</p>
+      <p>Privacy Policy</p>
+    </div>
+</div>
 
