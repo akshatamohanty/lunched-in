@@ -119,7 +119,7 @@ var cuisineList = ['American', 'Western', 'Salads', 'Asian', 'Chinese', 'Pernaka
 
 var lunchedin = {};
 
-lunchedin.production = false; 
+lunchedin.production = true; 
 
 lunchedin.run;  // intialized in the firstCall function
 
@@ -350,7 +350,7 @@ lunchedin.confirmationMail = function( user ){
  */
 lunchedin.matchedMail = function( match, user ){
 
-    var templateID = 588701;
+    var templateID = 610803;
 
     
     var today = new Date(); 
@@ -740,11 +740,11 @@ lunchedin.secondCall = function(){
   });
 
   // match and mail
-  // wait for 30s for matches to be made
+  // TODO: wait for 30s for matches to be made - wait 10 minutes
   // ATTENTION: MODIFY IN PRODUCTION
   setTimeout( function(){
           lunchedin.mailMatches( lunchedin.run )
-        }, 10000 );
+        }, 300000 );
 };
 
 lunchedin.thirdCall = function(){
@@ -848,8 +848,38 @@ lunchedin.thirdCall = function(){
   /*
    *  Admin only APIs
    */
+  app.get('/api/reset', function(req, res){
+    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){ //TODO
+          
+        clearDatabase( Match, "Matches", null ); 
+        clearDatabase( User, "Users", null ); 
+        clearDatabase( Restaurant, "Restaurants", null );
+
+        var loadRestaurants = function(){
+          // loads the dummyUsers from the database
+          var allRestaurants = require('./allRestaurants');
+          console.log(allRestaurants.length, "restaurants loaded.");
+          
+          // pre-process the user data - change to array etc
+          for(var i=0; i<allRestaurants.length; i++){
+              var restaurant = allRestaurants[i]; 
+
+              restaurant.cuisine = restaurant.cuisine.replace(/\s/g, '').split(',');
+              restaurant.total = 0;
+
+              addToDatabase( Restaurant, restaurant, "Restaurant", null);
+          }    
+        }
+
+        setTimeout(loadRestaurants, 5000); 
+        res.send('Refreshed matches, users and restuarants.')
+    }
+    else
+      res.send('Not authenticated');     
+  });
+
   app.get('/api/firstCall', function(req, res){
-    if( 1/*req.isAuthenticated() && req.session.passport.user[0].adminStatus*/ ){ //TODO
+    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){ //TODO
           lunchedin.firstCall();
           res.status(200).send(lunchedin.production);
     }
@@ -858,7 +888,7 @@ lunchedin.thirdCall = function(){
   });
 
   app.get('/api/secondCall', function(req, res){
-    if(1/* req.isAuthenticated() && req.session.passport.user[0].adminStatus */){ //TODO
+    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus){ //TODO
           lunchedin.secondCall();
           res.status(200).send(lunchedin.production);
     }
@@ -867,7 +897,7 @@ lunchedin.thirdCall = function(){
   });
 
   app.get('/api/thirdCall', function(req, res){
-    if( 1/*req.isAuthenticated() && req.session.passport.user[0].adminStatus */){ //TODO
+    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){ //TODO
           lunchedin.thirdCall();
           res.status(200).send(lunchedin.production);
     }
@@ -1540,40 +1570,7 @@ lunchedin.thirdCall = function(){
 //  Initialization Function
 //      Runs only once when dynos are reset
 //      Adds the restaurants
-var initialize = function() {
-    
-    // Primary Admin Added directly from Mongo
-    /*var primaryAdmin =  {   
-                            name: 'Administrator',
-                            username: 'admin@trylunchedin.com',
-                            password: 'fishcurry03$$$',
-                            adminStatus: true
-                        };*/  
-
-    // TODO : Remove in production
-    if(!lunchedin.production){
-        //clearDatabase( Admin, "Admin", addToDatabase( Admin, primaryAdmin, "Admin", null) );
-        clearDatabase( Restaurant, "Restaurants", null );
-        clearDatabase( Match, "Matches", null ); //testing
-
-        var loadRestaurants = function(){
-          // loads the dummyUsers from the database
-          var allRestaurants = require('./allRestaurants');
-          console.log(allRestaurants.length, "restaurants loaded.");
-          
-          // pre-process the user data - change to array etc
-          for(var i=0; i<allRestaurants.length; i++){
-              var restaurant = allRestaurants[i]; 
-
-              restaurant.cuisine = restaurant.cuisine.replace(/\s/g, '').split(',');
-              restaurant.total = 0;
-
-              addToDatabase( Restaurant, restaurant, "Restaurant", null);
-          }    
-        }
-
-        setTimeout(loadRestaurants, 5000);      
-    }
+var initialize = function() {   
 
     // Production settings
     if(lunchedin.production == true){
@@ -1582,28 +1579,18 @@ var initialize = function() {
       // TODO: set to true for actual production
       lunchedin.mails = true;
 
-      lunchedin.timeToSecondCall = 60000;
-      lunchedin.timeToThirdCall = 60000; 
+      lunchedin.timeToSecondCall = 10800000;  // After 8am, run after 3 hours - 3*60*60s - 11am - mails go at 11.30am
+      lunchedin.timeToThirdCall = 7200000; //  After 11am, run after 2 hours - 2*60*60s - 1pm - dropout mails
 
       // TODO: chron jon
       // schedule firstcall to be run everyday
       var rule = new schedule.RecurrenceRule();
-      rule.dayOfWeek = [0, new schedule.Range(0, 6)];
       rule.hour = 8;
       rule.minute = 0;
-
-      // TODO: remove in production; for testing
-      var rule2 = new schedule.RecurrenceRule();
-      rule2.minute = 1;
-      lunchedin.mails = false;
-
-      var rule = new schedule.RecurrenceRule();
-      rule.second = 30;
       schedule.scheduleJob(rule, function(){
-          console.log(new Date(), 'The 30th second of the minute.');
+          console.log(new Date(), 'The 8th hour of the day');
+          lunchedin.firstCall();
       });
-
-      var j = schedule.scheduleJob(rule2, function(){ console.log("hell world"); } );
 
       console.log("In production. Mails: ", lunchedin.mails,
                                   "Time to firstCall:", lunchedin.timeToSecondCall, 
@@ -1611,8 +1598,6 @@ var initialize = function() {
                                   ".Scheduled Job.")
 
     }
-
-    //lunchedin.version++;
 
 }
 initialize(); // runs everytime dynos are set
