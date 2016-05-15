@@ -6,6 +6,7 @@ var userSchema = {
 	password: { type: String, required: true }, 
 	gender: { type: String }, 
 	title: { type: String }, 
+	linkedin: { type: String }, 
 	picture: { type: String }, 
 	email: { type: String, required: true }, 
 	phone: { type: String }, 
