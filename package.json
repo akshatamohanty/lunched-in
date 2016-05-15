@@ -19,7 +19,8 @@
     "morgan": "~1.6.1",
     "passport": "~0.2.0",
     "passport-local": "1.0.0",
-    "postmark": "^1.2.1"
+    "postmark": "^1.2.1",
+    "node-schedule": "1.1.0"
   },
   "engines": {
     "node": "4.2.4"

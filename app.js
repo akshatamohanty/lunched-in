@@ -27,6 +27,8 @@ var async = require('async');
 var postmark = require("postmark");
 var querystring = require("querystring");
 
+var schedule = require('node-schedule'); 
+
 
 // configuration ==============================
 /* 
@@ -185,7 +187,7 @@ lunchedin.checkHoliday = function(date){
 lunchedin.getLastRun = function(){
 
   // Finding all because this is faster than aggregation
-  Match.find({})
+/*  Match.find({})
         .sort({ run: -1 })
         .exec( function(err, matches) {
 
@@ -198,7 +200,8 @@ lunchedin.getLastRun = function(){
             console.log("Found past matches for run ", matches[0].run)
             return matches[0].run; 
           }
-  });
+  });*/
+    console.log("This shouldn't be called!");
 
 }
 
@@ -230,14 +233,14 @@ lunchedin.addToPool = function( runCount, userID ){
 
   Match.find({ run: runCount }, function(err, matches){
 
-      if(matches.length>0){
+      if(matches != undefined && matches.length>0){
         console.log("Matches found for run ", runCount);
         // - Means the algorithm has already run for that time - can't add to pool - what if there were no matches for that run?
         return false; 
       }
       else{
         
-        console.log("Matches not found for run ", ruCount);
+        console.log("Matches not found for run ", runCount);
         User.find({ _id: ObjectId(userID) }, function(err, users){
 
             if(users.length){
@@ -356,10 +359,14 @@ lunchedin.matchedMail = function( match, user ){
     var template = {};
 
     template.user_name = lunchedin.getFirstName(user.name);
+    //api / dropOut?participant=object_id&match=match_id
+    template.dropoutURL = "http://trylunchedin.herokuapp.com/api/dropOut?participant=" 
+                                  + user._id 
+                                  + "&match=" + match._id;
     
     template.where = {};
     template.where.rest_name = match.location.name;
-    template.where.address = match.location.address; cuisine, website, zip
+    template.where.address = match.location.address; 
     template.where.cuisine = match.location.cuisine; 
     template.where.website = match.location.website; 
     template.where.directionURL = "https://www.google.com.sg/maps/dir/Aedas+Limited,+10+Hoe+Chiang+Road,+Singapore+089315/" 
@@ -369,46 +376,46 @@ lunchedin.matchedMail = function( match, user ){
     // TODO - make these into functions to construct the string
     template.where.blockString = "http://trylunchedin.herokuapp.com/api/blockRestaurant?user=" 
                                   + user._id 
-                                  + "&block=" + where._id;
+                                  + "&block=" + match.location._id;
 
     template.when = (new Date()).toDateString().substr(4);  // May 15 2016
     
     template.people = [];
-    var participants = match.participants.map( function(p){
-      User.find({ _id: p._id }, function(err, users){
-        if(!err)
-          return users[0];
-      })
-    })
+    User.find( { 
+                  _id: {$in: match.participants}
+                }, function(err, participants){
 
-    for( p in participants ){
+                    if(participants != undefined && participants.length > 0){
+                      for( p in participants ){
 
-        var pObj = {};
+                          var pObj = {};
 
-        var participant = participants[p];
+                          var participant = participants[p]; 
 
-        pObj.name = participant.name; 
-        pObj.title = participant.title; 
-        pObj.phone = participant.phone; 
-        pObj.picture = participant.picture; 
-        pObj.linkedin = participant.linkedin;
-        pObj.blockString = "http://trylunchedin.herokuapp.com/api/blockUser?user=" 
-                                  + user._id 
-                                  + "&block=" + participant.email;
+                          pObj.name = participant.name; 
+                          pObj.title = participant.title; 
+                          pObj.phone = participant.phone; 
+                          pObj.picture = participant.picture; 
+                          pObj.linkedin = participant.linkedin;
+                          pObj.blockString = "http://trylunchedin.herokuapp.com/api/blockUser?user=" 
+                                                    + user._id 
+                                                    + "&block=" + participant.email;
 
-        if(participant.email == user.email){
-            pObj.name = 'You';
-            pObj.phone = ""; 
-            pObj.title = "";
-        }
+                          if(participant.email == user.email){
+                              pObj.name = 'You';
+                              pObj.phone = ""; 
+                              pObj.title = "";
+                          }
 
-        template.people.push(pObj);
+                          template.people.push(pObj);
 
-    }
+                      }
 
-    console.log("Matched Mail sent to ", user.name);
-    lunchedin.sendMail( templateID, template, user.email)
+                      console.log("Matched Mail sent to ", user.name);
+                      lunchedin.sendMail( templateID, template, user.email)
+                    }
 
+                });
 };
 
 /*
@@ -424,40 +431,35 @@ lunchedin.canceledMail = function( match, user ){
     
     template.user_name = lunchedin.getFirstName(user.name);
     template.people = [];
-    var dropOuts = match.dropOuts.map( function(p){
-      User.find({ _id: p._id }, function(err, users){
-        if(!err)
-          return users[0];
-      })
-    })
+    User.find( { 
+                  _id: {$in: match.dropouts}
+                }, function(err, dropOuts){
+                    
+                    if(dropOuts != undefined && dropOuts.length > 0 ){
+                          for( p in dropOuts ){
 
-    for( p in dropOuts ){
+                              var pObj = {};
 
-        var pObj = {};
+                              var dropOut = dropOuts[p];
 
-        var dropOut = dropOuts[p];
+                              pObj.name = dropOut.name; 
+                              pObj.title = dropOut.title; 
+                              pObj.phone = dropOut.phone; 
+                              pObj.picture = dropOut.picture; 
+                              pObj.linkedin = dropOut.linkedin;
+                              //pObj.blockString = "http://trylunchedin.herokuapp.com/api/blockUser?user=" 
+                                                        + user._id 
+                                                        + "&block=" + dropOut.email;
 
-        pObj.name = participant.name; 
-        pObj.title = participant.title; 
-        pObj.phone = participant.phone; 
-        pObj.picture = participant.picture; 
-        pObj.linkedin = participant.linkedin;
-        pObj.blockString = "http://trylunchedin.herokuapp.com/api/blockUser?user=" 
-                                  + user._id 
-                                  + "&block=" + participant.email;
 
-        if(participant.email == user.email){
-            pObj.name = 'You';
-            pObj.phone = ""; 
-            pObj.title = "";
-        }
+                              template.people.push(pObj);
 
-        template.people.push(pObj);
+                          }
 
-    }
-
-    console.log("Drop-out Alert Mail sent to ", user.name);
-    lunchedin.sendMail( templateID, template, user.email)
+                          console.log("Drop-out Alert Mail sent to ", user.name);
+                          lunchedin.sendMail( templateID, template, user.email)                      
+                    }
+                });
 };
 
 
@@ -476,11 +478,16 @@ lunchedin.updateStatistics = function( runCount ){
             //console.log(matches.length, "matches found for runCount", runCount );
             for(var i=0; i < matches.length; i++){
 
+                // skipping the dummy match
+                if(matches[i].participants.length == 0 && matches[i].dropouts.length == 0)
+                  continue;
+
+                console.log("Updating statistics for match", matches[i]);
                 // increasing restaurant count by number of people who went there
                 Restaurant.find( { _id: matches[i].location._id }, function(err, rest){
 
                       if(!err){
-                        rest[0].total = rest[0].total + matches[i].participants.length;
+                        rest[0].total++; //= rest[0].total + matches[i].participants.length;
                         rest[0].save();
                       }
                 });
@@ -523,7 +530,7 @@ lunchedin.updateStatistics = function( runCount ){
 
                                   p.lunchCount++ ;
                                   p.save();
-                                  console.log(p.name, p.known.length);
+                                  console.log(p.name, "knows", p.known.length);
                               }
                         }
 
@@ -680,8 +687,8 @@ lunchedin.firstCall = function(){
   if( lunchedin.checkHoliday() ==  true && lunchedin.production ){
     console.log("Holiday! I'll sleep today - match tomorrow.");
     
-    if(lunchedin.production)
-      setTimeout(lunchedin.firstCall, 86400000); 
+/*    if(lunchedin.production)
+      setTimeout(lunchedin.firstCall, 86400000); */
   }
   else{
 
@@ -692,13 +699,25 @@ lunchedin.firstCall = function(){
      *  Initialize run based on Matches
      *  Run starts from 1 
      */
-    lunchedin.run = lunchedin.getLastRun() + 1;
+      Match.find({})
+        .sort({ run: -1 })
+        .exec( function(err, matches) {
 
-    lunchedin.setPool();
+          console.log("-----------Getting last run count---------------")
+          if(matches.length == 0 || matches == undefined){
+            console.log("No matches in database. First run!");
+            lunchedin.run = 1; 
+          }
+          else{
+            console.log("Found past matches for run ", matches[0].run)
+            lunchedin.run = matches[0].run + 1; 
+          }
 
-    // call secondCall after some predetermined time
-    console.log("-------------- Processing after " + lunchedin.timeToSecondCall + "ms-----------------");
-  } 
+          lunchedin.setPool();
+          // call secondCall after some predetermined time
+          //console.log("-------------- Processing after " + lunchedin.timeToSecondCall + "ms-----------------");
+        }); 
+  }
 };
 
 
@@ -721,8 +740,11 @@ lunchedin.secondCall = function(){
   });
 
   // match and mail
-  lunchedin.mailMatches( lunchedin.run );
-
+  // wait for 30s for matches to be made
+  // ATTENTION: MODIFY IN PRODUCTION
+  setTimeout( function(){
+          lunchedin.mailMatches( lunchedin.run )
+        }, 10000 );
 };
 
 lunchedin.thirdCall = function(){
@@ -732,10 +754,10 @@ lunchedin.thirdCall = function(){
     setTimeout(lunchedin.firstCall, lunchedin.timeToFirstCall); */
 
   // check for dropOuts
-  console.log("-------------- Checking for dropouts for Run ", run, "-----------------");
+  console.log("-------------- Checking for dropouts for Run ", lunchedin.run, "-----------------");
   lunchedin.checkDropouts( lunchedin.run );
 
-  console.log("-------------- Updating counters and known for Run ", run, "-----------------");
+  console.log("-------------- Updating counters and known for Run ", lunchedin.run, "-----------------");
   lunchedin.updateStatistics( lunchedin.run );
 
 }
@@ -827,7 +849,7 @@ lunchedin.thirdCall = function(){
    *  Admin only APIs
    */
   app.get('/api/firstCall', function(req, res){
-    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+    if( 1/*req.isAuthenticated() && req.session.passport.user[0].adminStatus*/ ){ //TODO
           lunchedin.firstCall();
           res.status(200).send(lunchedin.production);
     }
@@ -836,7 +858,7 @@ lunchedin.thirdCall = function(){
   });
 
   app.get('/api/secondCall', function(req, res){
-    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+    if(1/* req.isAuthenticated() && req.session.passport.user[0].adminStatus */){ //TODO
           lunchedin.secondCall();
           res.status(200).send(lunchedin.production);
     }
@@ -845,7 +867,7 @@ lunchedin.thirdCall = function(){
   });
 
   app.get('/api/thirdCall', function(req, res){
-    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+    if( 1/*req.isAuthenticated() && req.session.passport.user[0].adminStatus */){ //TODO
           lunchedin.thirdCall();
           res.status(200).send(lunchedin.production);
     }
@@ -1117,7 +1139,11 @@ lunchedin.thirdCall = function(){
       id = qs.id;
       // api / dropOut?id=object_id
 
-      lunchedin.addToPool( lunchedin.run, id ); 
+      try{
+        lunchedin.addToPool( lunchedin.run, id );
+      }catch(err){
+        console.log(err);
+      }
 
       res.send( "---- Success Message -----" );
 
@@ -1130,17 +1156,26 @@ lunchedin.thirdCall = function(){
       matchID = qs.match;
       // api / dropOut?participant=object_id&match=match_id
 
-      console.log(objectID); console.log(matchID);
+      if(ObjectId.isValid(objectID) && ObjectId.isValid(matchID)){
+         Match.find({
+                _id : ObjectId(matchID)
+              }, function(err, matches){
 
-      Match.find({
-              _id : ObjectId(matchID)
-            }, function(err, matches){
+              if(err || matches.length == 0) console.log("match not found");
+              else{
+                var match = matches[0];
 
-            var match = matches[0];
-            match.dropouts.push( match.participants.splice(match.participants.indexOf(objectID), 1) );
-            match.save();
-      })    
-
+                //TODO: Refactor by adding to match query
+                if( match.dropouts.indexOf( objectID ) == -1 && match.participants.indexOf( objectID ) != -1){
+                  match.dropouts.push( match.participants.splice(match.participants.indexOf(objectID), 1) );
+                  match.save();
+                  console.log("Dropped-out");
+                }
+              }
+        })       
+      }
+      else
+        console.log("Invalid query");
   });
 
   app.get('/api/blockUser', function(req, res){
@@ -1150,28 +1185,31 @@ lunchedin.thirdCall = function(){
         userID = qs.user;
         blockedMail = qs.block;
 
-      User.find( { _id: ObjectId(userID) }, function(err, user){
+      if(ObjectId.isValid(userID)){
+          User.find( { _id: ObjectId(userID) }, function(err, user){
 
-          if(err) console.log(err);  
-          else{
-                  var user = user[0];
-                  User.find({ email: blockedMail }, function(err, user2){
+              if(err || user.length == 0) console.log(err);  
+              else{
+                      var user = user[0];
+                      User.find({ email: blockedMail }, function(err, user2){
 
-                        if(err) console.log(err);
-                        else{
-                              var user2 = user2[0];
-                              if( user.blocked.indexOf( user2._id ) == -1){
-                                user.blocked.push(user2._id);
-                                res.send(user.name, ", ", user2.name, "has been blocked.")
-                                user.save();
-                              }
-                              else
-                                res.send(user.name, ", ", user2.name, "was already blocked.");                         
-                        }
+                            if(err || user2.length==0 ) console.log(err);
+                            else{
+                                  var user2 = user2[0];
+                                  if( user.blocked.indexOf( user2._id ) == -1){
+                                    user.blocked.push(user2._id);
+                                    res.send(user.name, ", ", user2.name, "has been blocked.")
+                                    user.save();
+                                  }
+                                  else
+                                    res.send(user.name, ", ", user2.name, "was already blocked.");                         
+                            }
 
-                  })
-          }
-      });
+                      })
+              }
+          });
+      }
+
 
   });
 
@@ -1179,31 +1217,34 @@ lunchedin.thirdCall = function(){
 
       // api / blockRestaurant?user=objectid&block=email
       var qs = querystring.parse(req.url.split("?")[1]),
-        userID = qs.user;
-        blockedRId = qs.block;
+      userID = qs.user;
+      blockedRId = qs.block;
 
-      User.find( { _id: ObjectId(userID) }, function(err, user){
+      // check if objectID is valid
+      if(ObjectId.isValid(userID) && ObjectId.isValid(blockedRId)){
+         User.find( { _id: ObjectId(userID) }, function(err, user){
 
-          if(err) console.log(err);  
-          else{
-                  var user = user[0];
-                  Restaurant.find({ _id: ObjectId(blockedRId)}, function(err, restaurants){
+            if(err) console.log(err);  
+            else{
+                    var user = user[0];
+                    Restaurant.find({ _id: ObjectId(blockedRId)}, function(err, restaurants){
 
-                        if(err) console.log(err);
-                        else{
-                              var restaurant = restaurants[0];
-                              if( user.blockedRestaurants.indexOf( restaurant._id ) == -1){
-                                user.blockedRestaurants.push(restaurant._id);
-                                res.send(user.name, ", ", restaurant.name, "has been blocked.")
-                                user.save();
-                              }
-                              else
-                                res.send(user.name, ", ", restaurant.name, "was already blocked.");                         
-                        }
+                          if(err || restaurants.length==0 ) console.log(err);
+                          else{
+                                var restaurant = restaurants[0]; console.log("Found", restaurant);
+                                if( user.blockedRestaurants.indexOf( restaurant._id ) == -1){
+                                  user.blockedRestaurants.push(restaurant._id);
+                                  res.send(user.name, ", ", restaurant.name, "has been blocked.")
+                                  user.save();
+                                }
+                                else
+                                  res.send(user.name, ", ", restaurant.name, "was already blocked.");                         
+                          }
 
-                  })
-          }
-      });
+                    })
+            }
+        });       
+      }
 
   });
 
@@ -1464,7 +1505,9 @@ lunchedin.thirdCall = function(){
                 // Find a restaurant and add the match
                 Restaurant.find({
                      $and: criteria
-                  }, function(err, res){
+                  })
+                .sort({ total: 1 })
+                .exec(function(err, res){
                      if(err) console.log(err);
                      else {
 
@@ -1480,7 +1523,7 @@ lunchedin.thirdCall = function(){
 
                           addToDatabase( Match, newMatch, "Match", null)
                     }
-                })
+                });
           } 
 
           // removes the users from the pool
@@ -1507,7 +1550,7 @@ var initialize = function() {
                             adminStatus: true
                         };*/  
 
-    // TODO : Change to checking if restaurants are populated
+    // TODO : Remove in production
     if(!lunchedin.production){
         //clearDatabase( Admin, "Admin", addToDatabase( Admin, primaryAdmin, "Admin", null) );
         clearDatabase( Restaurant, "Restaurants", null );
@@ -1532,20 +1575,44 @@ var initialize = function() {
         setTimeout(loadRestaurants, 5000);      
     }
 
+    // Production settings
     if(lunchedin.production == true){
 
       //lunchedin.autorun = true; 
+      // TODO: set to true for actual production
       lunchedin.mails = true;
 
-      lunchedin.timeToSecondCall = 120000;
-      lunchedin.timeToThirdCall = 120000; 
+      lunchedin.timeToSecondCall = 60000;
+      lunchedin.timeToThirdCall = 60000; 
 
       // TODO: chron jon
       // schedule firstcall to be run everyday
+      var rule = new schedule.RecurrenceRule();
+      rule.dayOfWeek = [0, new schedule.Range(0, 6)];
+      rule.hour = 8;
+      rule.minute = 0;
+
+      // TODO: remove in production; for testing
+      var rule2 = new schedule.RecurrenceRule();
+      rule2.minute = 1;
+      lunchedin.mails = false;
+
+      var rule = new schedule.RecurrenceRule();
+      rule.second = 30;
+      schedule.scheduleJob(rule, function(){
+          console.log(new Date(), 'The 30th second of the minute.');
+      });
+
+      var j = schedule.scheduleJob(rule2, function(){ console.log("hell world"); } );
+
+      console.log("In production. Mails: ", lunchedin.mails,
+                                  "Time to firstCall:", lunchedin.timeToSecondCall, 
+                                  "Time to thirdCall", lunchedin.timeToThirdCall, 
+                                  ".Scheduled Job.")
 
     }
 
-    lunchedin.version++;
+    //lunchedin.version++;
 
 }
 initialize(); // runs everytime dynos are set
