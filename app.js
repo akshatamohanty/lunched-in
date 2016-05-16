@@ -1585,8 +1585,8 @@ var initialize = function() {
       // TODO: chron jon
       // schedule firstcall to be run everyday
       var rule = new schedule.RecurrenceRule();
-      rule.hour = 8;
-      rule.minute = 0;
+      rule.hour = 11;
+      rule.minute = 30;
       schedule.scheduleJob(rule, function(){
           console.log(new Date(), 'The 8th hour of the day');
           lunchedin.firstCall();
