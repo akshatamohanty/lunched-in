@@ -113,15 +113,16 @@ var addToDatabase = function( database, jsonObject, stringName, callback ){
 //
 
 // GLOBAL VARIABLES
-var cuisineList = ['American', 'Western', 'Salads', 'Asian', 'Chinese', 'Pernakan', 'Korean', 'Australian', 
-                   'French', 'Italian', 'Fusion', 'International', 'Japanese', 'Thai', 'German', 
-                   'Indian', 'Indonesian', 'Malay', 'Mexican', 'Vietnamese', 'Mediterranean', 'Russian', 'Spanish'];
+var cuisineList = ['American', 'Australian', 'Chinese', 'French', 'Fusion', 'German', 'Indian', 'Indonesian', 'International', 
+                  'Italian', 'Japanese', 'Korean', 'Malay', 'Mexican', 'Pernakan', 'Russian', 'Salads', 'Singaporean', 'Spanish', 
+                  'Thai', 'Vietnamese', 'Western'];
 
 var lunchedin = {};
 
 lunchedin.production = true; 
 
 lunchedin.run;  // intialized in the firstCall function
+lunchedin.discardedUsers = [];
 
 //- If set to true, mailing functionality is activated
 lunchedin.mails = false; 
@@ -206,7 +207,13 @@ lunchedin.getLastRun = function(){
 }
 
 lunchedin.getFirstName = function(user_name){
-  return user_name.split(" ")[0]
+  try{
+    return user_name.split(" ")[0]
+  }catch(e){
+    console.log("Error getting first name", e);
+    return user_name;
+  }
+
 }
 
 /*
@@ -218,6 +225,8 @@ lunchedin.addUser = function(user){
       if( user.name != undefined && user.email != undefined){
         user.lunchCount = 0;
         user.dropCount = 0;
+        user.veg = false; 
+        user.halal = false;
         user.password = Math.round((Math.pow(36, 6 + 1) - Math.random() * Math.pow(36, 6))).toString(36).slice(1);
         addToDatabase( User, user, "User", null);
         lunchedin.firstMail( user );
@@ -359,6 +368,7 @@ lunchedin.matchedMail = function( match, user ){
     var template = {};
 
     template.user_name = lunchedin.getFirstName(user.name);
+    template.picture = user.picture;
     //api / dropOut?participant=object_id&match=match_id
     template.dropoutURL = "http://trylunchedin.herokuapp.com/api/dropOut?participant=" 
                                   + user._id 
@@ -388,9 +398,13 @@ lunchedin.matchedMail = function( match, user ){
                     if(participants != undefined && participants.length > 0){
                       for( p in participants ){
 
+
                           var pObj = {};
 
                           var participant = participants[p]; 
+
+                          if(participant.email == user.email)
+                              continue;
 
                           pObj.name = participant.name; 
                           pObj.title = participant.title; 
@@ -401,11 +415,7 @@ lunchedin.matchedMail = function( match, user ){
                                                     + user._id 
                                                     + "&block=" + participant.email;
 
-                          if(participant.email == user.email){
-                              pObj.name = 'You';
-                              pObj.phone = ""; 
-                              pObj.title = "";
-                          }
+
 
                           template.people.push(pObj);
 
@@ -482,11 +492,11 @@ lunchedin.updateStatistics = function( runCount ){
                 if(matches[i].participants.length == 0 && matches[i].dropouts.length == 0)
                   continue;
 
-                console.log("Updating statistics for match", matches[i]);
+                console.log("Updating statistics for match", matches[i]._id);
                 // increasing restaurant count by number of people who went there
                 Restaurant.find( { _id: matches[i].location._id }, function(err, rest){
 
-                      if(!err){
+                      if(!err && rest.length != 0){
                         rest[0].total++; //= rest[0].total + matches[i].participants.length;
                         rest[0].save();
                       }
@@ -735,16 +745,73 @@ lunchedin.secondCall = function(){
         .sort({ blockedCount: -1, lunchCount: 1, knownCount: 1,  })
         .exec( function(err, userPool) {
 
-          console.log("-----------Running Match Algorithm---------------")
-          matchingAlgorithm(userPool);
+          if(userPool.length == 0)
+            console.log("No users!");
+          else{
+              console.log("-----------Running Match Algorithm---------------")
+              matchingAlgorithm(userPool);            
+            }
   });
+
+  function discarded(){
+   // Find suitable party for discarded users to join
+    for( var k=0; k < lunchedin.discardedUsers.length; k++){
+
+      var d_user = lunchedin.discardedUsers[k];  
+      Match.find( { 
+               run : lunchedin.run,
+              'location._id' : {$nin: d_user.blockedRestaurants},
+              'location.veg' : d_user.veg, 
+              'location.halal' : d_user.halal, 
+              'location.cuisine' :{$in: d_user.cuisine}, 
+               participants : {$nin: d_user.blocked}
+              }, function(err, matches){
+
+                // no suitable matches found - discard user
+                if(err || matches.length == 0){
+                  console.log("No match found for discarded user");
+                }
+                else{
+                  
+                  for(var m=0; m < matches.length; m++){
+
+                      var match = matches[m]; 
+
+                      if(match.participants.length == 0 || match.participants.length > 4)
+                        continue;
+
+                      //console.log("Trying for a match for discarded user", match, d_user);
+                      User.find({
+                        _id: {$in: match.participants},
+                        blocked : { $ne: ObjectId(d_user._id) } 
+                      }, function(err, users){
+
+                          if( !err && users != undefined && users.length > 0){
+                            match.participants.push(d_user);
+                            match.save();
+                            console.log("Discarded user placed!");
+                          }else{
+                            console.log("No match found for discarded user");
+                          }
+
+                      });                                  
+                  }
+
+                }                    
+
+      });                     
+    }         
+  }
+
+  // for discarded users
+  setTimeout( discarded, 1200000 );
 
   // match and mail
   // TODO: wait for 30s for matches to be made - wait 10 minutes
   // ATTENTION: MODIFY IN PRODUCTION
   setTimeout( function(){
           lunchedin.mailMatches( lunchedin.run )
-        }, 300000 );
+        }, 1800000 );
 };
 
 lunchedin.thirdCall = function(){
@@ -855,24 +922,31 @@ lunchedin.thirdCall = function(){
         clearDatabase( User, "Users", null ); 
         clearDatabase( Restaurant, "Restaurants", null );
 
-        var loadRestaurants = function(){
-          // loads the dummyUsers from the database
-          var allRestaurants = require('./allRestaurants');
-          console.log(allRestaurants.length, "restaurants loaded.");
-          
-          // pre-process the user data - change to array etc
-          for(var i=0; i<allRestaurants.length; i++){
-              var restaurant = allRestaurants[i]; 
-
-              restaurant.cuisine = restaurant.cuisine.replace(/\s/g, '').split(',');
-              restaurant.total = 0;
-
-              addToDatabase( Restaurant, restaurant, "Restaurant", null);
-          }    
-        }
-
-        setTimeout(loadRestaurants, 5000); 
         res.send('Refreshed matches, users and restuarants.')
+    }
+    else
+      res.send('Not authenticated');     
+  });
+
+  app.get('/api/resetRestaurants', function(req, res){
+    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){ //TODO
+          
+        // loads the dummyUsers from the database
+        var allRestaurants = require('./allRestaurants');
+        console.log(allRestaurants.length, "restaurants loaded.");
+        
+        // pre-process the user data - change to array etc
+        for(var i=0; i<allRestaurants.length; i++){
+            var restaurant = allRestaurants[i]; 
+
+            restaurant.cuisine = restaurant.cuisine.replace(/\s/g, '').split(',');
+            restaurant.total = 0;
+
+            addToDatabase( Restaurant, restaurant, "Restaurant", null);
+        }    
+        
+
+        res.send('Refreshed restuarants.')
     }
     else
       res.send('Not authenticated');     
@@ -1048,30 +1122,31 @@ lunchedin.thirdCall = function(){
             // get mongoose to extract all users in the database
             User.find(function(err, users){
 
-                    if(err)
+                    if(err || users.length == 0)
                       res.send(err);
-
-                    // if user is admin - send all information 
-                    if( req.session.passport.user[0].adminStatus ){
-                          console.log("Admin Request Approved: Sending complete data", users);
-                          res.json(users);
-                    }
                     else{
-                          console.log("Compressing Data");
-                          var compressedUserData = users.map( function(user){
-                               return {
-                                      _id: user._id,
-                                      name: user.name, 
-                                      title: user.title, 
-                                      picture: user.picture, 
-                                      email: user.email, 
-                                      phone: user.phone, 
-                                      tagline: user.tagline, 
-                                      nationality: user.nationality
-                               }
-                          })
+                       // if user is admin - send all information 
+                      if( req.session.passport.user[0].adminStatus ){
+                            console.log("Admin Request Approved: Sending complete data");
+                            res.json(users);
+                      }
+                      else{
+                            console.log("Compressing Data");
+                            var compressedUserData = users.map( function(user){
+                                 return {
+                                        _id: user._id,
+                                        name: user.name, 
+                                        title: user.title, 
+                                        picture: user.picture, 
+                                        email: user.email, 
+                                        phone: user.phone, 
+                                        tagline: user.tagline, 
+                                        nationality: user.nationality
+                                 }
+                            })
 
-                          res.json(compressedUserData);
+                            res.json(compressedUserData);
+                      }                     
                     }
             });
 
@@ -1088,7 +1163,7 @@ lunchedin.thirdCall = function(){
         
           // if user is admin - the body of the request will have email of the user which is to be updated
           if( req.session.passport.user[0].adminStatus ){
-
+/*
                   User.findOneAndUpdate(
                               { 
                                     email: req.body.email  // don't change to id - doesn't work!
@@ -1109,20 +1184,20 @@ lunchedin.thirdCall = function(){
                               }, 
                               { multi: false }, 
                               function(err, user){
-                                if(err) console.log(err);
+                                if(err || user.length == 0) console.log(err);
                                 else{
                                   console.log("Updated user details", user);
                                   res.json("Success");  
                                 }
                               }
-                    )
+                    )*/
           }
           else{
 
                   User.find({ 
                                  "_id": ObjectId(req.body._id)
                               }, function(err, users){
-                                  if (err) console.log(err);
+                                  if (err || users.length==0 ) console.log(err);
                                   else{
                                           var user = users[0];
 
@@ -1169,13 +1244,12 @@ lunchedin.thirdCall = function(){
       id = qs.id;
       // api / dropOut?id=object_id
 
-      try{
-        lunchedin.addToPool( lunchedin.run, id );
-      }catch(err){
-        console.log(err);
+      if(ObjectId.isValid(id)){
+          lunchedin.addToPool( lunchedin.run, id );
+          res.send( "<h1>Thanks</h1>" );
       }
-
-      res.send( "---- Success Message -----" );
+        
+      
 
   });
 
@@ -1254,7 +1328,7 @@ lunchedin.thirdCall = function(){
       if(ObjectId.isValid(userID) && ObjectId.isValid(blockedRId)){
          User.find( { _id: ObjectId(userID) }, function(err, user){
 
-            if(err) console.log(err);  
+            if(err || user.length == 0) console.log(err);  
             else{
                     var user = user[0];
                     Restaurant.find({ _id: ObjectId(blockedRId)}, function(err, restaurants){
@@ -1299,21 +1373,16 @@ lunchedin.thirdCall = function(){
   function matchingAlgorithm( userPool ){
 
 
-          var discardedUsers = [];
+          lunchedin.discardedUsers = [];
           
           while(userPool.length > 0){
 
-                if(userPool.length == 5){
-                  console.log("Pool length is 5");
-                }
-
                 if(userPool.length < 3){
                   console.log("Pool length is less than 3");
-                  discardedUsers = discardedUsers.concat(userPool);
+                  lunchedin.discardedUsers = lunchedin.discardedUsers.concat(userPool);
                   userPool = [];
-                  continue;
+                  continue;      
                 }
-
 
                 //always at index 0 - because the first user is always removed; remove the first user
                 //console.log("UserPool Length at", userPool.length);
@@ -1328,7 +1397,7 @@ lunchedin.thirdCall = function(){
                 // if pairMatePool.length == 0 - no pair available - can't do anything - user has already been removed from the pool
                 if(pairMatePool.length == 0){
                     console.log("Match not found for", currUser.name);
-                    discardedUsers.push(currUser);
+                    lunchedin.discardedUsers.push(currUser);
                     continue;                            
                 }
 
@@ -1419,7 +1488,7 @@ lunchedin.thirdCall = function(){
                         { halal: user1.halal || user2.halal },
                       ]  
               }, function(err, restaurant){
-                 if(err){
+                 if(err || restaurant.length == 0){
                    console.log(err);
                    return false;
                  } 
@@ -1536,9 +1605,9 @@ lunchedin.thirdCall = function(){
                 Restaurant.find({
                      $and: criteria
                   })
-                .sort({ total: 1 })
+                .sort({ price: 1, total: 1 })
                 .exec(function(err, res){
-                     if(err) console.log(err);
+                     if(err || res.length==0) console.log(err);
                      else {
 
                           var newMatch =                                           
@@ -1579,16 +1648,16 @@ var initialize = function() {
       // TODO: set to true for actual production
       lunchedin.mails = true;
 
-      lunchedin.timeToSecondCall = 10800000;  // After 8am, run after 3 hours - 3*60*60s - 11am - mails go at 11.30am
-      lunchedin.timeToThirdCall = 7200000; //  After 11am, run after 2 hours - 2*60*60s - 1pm - dropout mails
+      lunchedin.timeToSecondCall = 10800000;  // After 7.30am, run after 3 hours - 3*60*60s - 10.30am - mails go at 11.00am
+      lunchedin.timeToThirdCall = 7200000; //  After 10.30am, run after 2 hours - 2*60*60s - 12.30pm - dropout mails
 
       // TODO: chron jon
       // schedule firstcall to be run everyday
       var rule = new schedule.RecurrenceRule();
-      rule.hour = 8;
-      rule.minute = 0;
+      rule.hour = 23;
+      rule.minute = 30;
       schedule.scheduleJob(rule, function(){
-          console.log(new Date(), 'The 8th hour of the day');
+          console.log(new Date(), 'Waka Waka!');
           lunchedin.firstCall();
       });
 
