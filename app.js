@@ -370,7 +370,7 @@ lunchedin.matchedMail = function( match, user ){
     template.user_name = lunchedin.getFirstName(user.name);
     template.picture = user.picture;
     //api / dropOut?participant=object_id&match=match_id
-    template.dropoutURL = "http://trylunchedin.herokuapp.com/api/dropOut?participant=" 
+    template.dropoutURL = "http://www.trylunchedin.com/api/dropOut?participant=" 
                                   + user._id 
                                   + "&match=" + match._id;
     
@@ -384,7 +384,7 @@ lunchedin.matchedMail = function( match, user ){
 
     // api / blockRestaurant?user=objectid&block=email
     // TODO - make these into functions to construct the string
-    template.where.blockString = "http://trylunchedin.herokuapp.com/api/blockRestaurant?user=" 
+    template.where.blockString = "http://www.trylunchedin.com/api/blockRestaurant?user=" 
                                   + user._id 
                                   + "&block=" + match.location._id;
 
@@ -411,7 +411,7 @@ lunchedin.matchedMail = function( match, user ){
                           pObj.phone = participant.phone; 
                           pObj.picture = participant.picture; 
                           pObj.linkedin = participant.linkedin;
-                          pObj.blockString = "http://trylunchedin.herokuapp.com/api/blockUser?user=" 
+                          pObj.blockString = "http://www.trylunchedin.com/api/blockUser?user=" 
                                                     + user._id 
                                                     + "&block=" + participant.email;
 
