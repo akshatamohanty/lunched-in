@@ -120,6 +120,7 @@ var cuisineList = ['American', 'Australian', 'Chinese', 'French', 'Fusion', 'Ger
 var lunchedin = {};
 
 lunchedin.production = true; 
+lunchedin.speedrun = false;
 
 lunchedin.run;  // intialized in the firstCall function
 lunchedin.discardedUsers = [];
@@ -147,6 +148,12 @@ lunchedin.timeToSecondCall = 120000; // 2 minutes - FirstCall to SecondCall Gap
 //    Increases restaurantCount of restaurant
 //    AddsToKnown 
 lunchedin.timeToThirdCall = 300000; // 5 minutes - SecondCall to ThirdCall Gap
+
+lunchedin.timeForDiscardedUsers_speedrun = 10000; 
+lunchedin.timeForDiscardedUsers_normal = 1200000;
+
+lunchedin.timeToMail_speedrun = 30000; 
+lunchedin.timeToMail_normal = 1800000;
  
 
 /*
@@ -621,7 +628,8 @@ lunchedin.mailMatches = function( runCount ){
             }       
       }
 
-    });  
+    });
+
 };
 
 
@@ -694,7 +702,7 @@ lunchedin.firstCall = function(){
    *  Checks if it is a holiday - if holiday, calls itself again after 24hours
    *  By-passes if not in production
    */
-  if( lunchedin.checkHoliday() ==  true && lunchedin.production ){
+  if( lunchedin.checkHoliday() ==  true ){
     console.log("Holiday! I'll sleep today - match tomorrow.");
     
 /*    if(lunchedin.production)
@@ -702,7 +710,7 @@ lunchedin.firstCall = function(){
   }
   else{
 
-    if (lunchedin.production)
+    if (lunchedin.speedrun)
       setTimeout(lunchedin.secondCall, lunchedin.timeToSecondCall);
 
     /*
@@ -733,7 +741,10 @@ lunchedin.firstCall = function(){
 
 lunchedin.secondCall = function(){
 
-  if(lunchedin.production)
+  if( lunchedin.checkHoliday() ==  true )
+    return; 
+
+  if(lunchedin.speedrun)
     setTimeout(lunchedin.thirdCall, lunchedin.timeToThirdCall);
 
   // add a dummy match for this run
@@ -807,14 +818,21 @@ lunchedin.secondCall = function(){
   }
 
   // for discarded users
-  setTimeout( discarded, 1200000 );
+  setTimeout( discarded, lunchedin.speedrun? lunchedin.timeForDiscardedUsers_speedrun : lunchedin.timeForDiscardedUsers_normal );
 
   // match and mail
   // TODO: wait for 30s for matches to be made - wait 10 minutes
   // ATTENTION: MODIFY IN PRODUCTION
   setTimeout( function(){
+          lunchedin.discardedUsers = []; // safety net - redundant
           lunchedin.mailMatches( lunchedin.run )
-        }, 1800000 );
+
+          console.log("-------------- Pool refresh after running algorithm in second call -----------------");
+          User.update({}, {inPool: false} , {multi: true}, function(err, users){
+            if(!err) console.log("Pool refreshed after running algorithm");
+          }
+
+        }, lunchedin.speedrun ? lunchedin.timeToMail_speedrun : lunchedin.timeToMail_normal );
 };
 
 lunchedin.thirdCall = function(){
@@ -822,13 +840,25 @@ lunchedin.thirdCall = function(){
   /* Deprecated because of chron
   if(lunchedin.autorun)
     setTimeout(lunchedin.firstCall, lunchedin.timeToFirstCall); */
+  if( lunchedin.checkHoliday() ==  true )
+    return;
 
-  // check for dropOuts
-  console.log("-------------- Checking for dropouts for Run ", lunchedin.run, "-----------------");
-  lunchedin.checkDropouts( lunchedin.run );
+  console.log("-------------- Checking for clean pool -----------------");
+  User.find({ 
+            inPool : true
+        }, function( err, users ){
 
-  console.log("-------------- Updating counters and known for Run ", lunchedin.run, "-----------------");
-  lunchedin.updateStatistics( lunchedin.run );
+            if(users.length == 0){
+                // check for dropOuts
+                console.log("-------------- Checking for dropouts for Run ", lunchedin.run, "-----------------");
+                lunchedin.checkDropouts( lunchedin.run );
+
+                console.log("-------------- Updating counters and known for Run ", lunchedin.run, "-----------------");
+                lunchedin.updateStatistics( lunchedin.run );
+            }
+            else
+              console.log("ATTENTION: Unclean pool in third call");
+  });
 
 }
 
@@ -955,16 +985,40 @@ lunchedin.thirdCall = function(){
       res.send('Not authenticated');     
   });
 
-  app.get('/api/firstCall', function(req, res){
+  app.get('/api/about', function(req, res){
     if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){ //TODO
-          lunchedin.firstCall();
-          res.status(200).send(lunchedin.production);
+          res.status(200).send("Production:", lunchedin.production, 
+                               "\nSpeedRun:", lunchedin.speedrun,
+                               "\nMails:", lunchedin.mails,
+                               "\nTime till second call (speedrun):", lunchedin.timeToSecondCall,
+                               "\nTime till third call (speedrun):", lunchedin.timeToThirdCall,
+                               "\nTime for discarded users processing (normal):", lunchedin.timeForDiscardedUsers_normal,
+                               "\nTime for discarded users processing (speedrun):", lunchedin.timeForDiscardedUsers_speedrun, 
+                               "\nTime for mailing matches (speedrun):", lunchedin.timeForDiscardedUsers_speedrun,
+                               "\nTime for mailing matches (normal):", lunchedin.timeForDiscardedUsers_speedrun );
     }
     else
       res.send('Not authenticated');     
   });
 
-  app.get('/api/secondCall', function(req, res){
+  app.get('/api/firstCall', function(req, res){
+    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){ //TODO
+          lunchedin.firstCall();
+          res.status(200).send("Production:", lunchedin.production, 
+                               "\nSpeedRun:", lunchedin.speedrun,
+                               "\nMails:", lunchedin.mails,
+                               "\nTime till second call (speedrun):", lunchedin.timeToSecondCall,
+                               "\nTime till third call (speedrun):", lunchedin.timeToThirdCall,
+                               "\nTime for discarded users processing (normal):", lunchedin.timeForDiscardedUsers_normal,
+                               "\nTime for discarded users processing (speedrun):", lunchedin.timeForDiscardedUsers_speedrun, 
+                               "\nTime for mailing matches (speedrun):", lunchedin.timeForDiscardedUsers_speedrun,
+                               "\nTime for mailing matches (normal):", lunchedin.timeForDiscardedUsers_speedrun );
+    }
+    else
+      res.send('Not authenticated');     
+  });
+
+/*  app.get('/api/secondCall', function(req, res){
     if( req.isAuthenticated() && req.session.passport.user[0].adminStatus){ //TODO
           lunchedin.secondCall();
           res.status(200).send(lunchedin.production);
@@ -980,12 +1034,37 @@ lunchedin.thirdCall = function(){
     }
    else
     res.send('Not authenticated');     
-  });
+  });*/
 
   app.get('/api/toggleProduction', function(req, res){
     if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
           lunchedin.production = !lunchedin.production;
-          res.status(200).send(lunchedin.production);
+          res.status(200).send("Production:", lunchedin.production, 
+                               "\nSpeedRun:", lunchedin.speedrun,
+                               "\nMails:", lunchedin.mails,
+                               "\nTime till second call (speedrun):", lunchedin.timeToSecondCall,
+                               "\nTime till third call (speedrun):", lunchedin.timeToThirdCall,
+                               "\nTime for discarded users processing (normal):", lunchedin.timeForDiscardedUsers_normal,
+                               "\nTime for discarded users processing (speedrun):", lunchedin.timeForDiscardedUsers_speedrun, 
+                               "\nTime for mailing matches (speedrun):", lunchedin.timeForDiscardedUsers_speedrun,
+                               "\nTime for mailing matches (normal):", lunchedin.timeForDiscardedUsers_speedrun );
+    }
+    else
+      res.send('not authenticated');     
+  });
+
+  app.get('/api/toggleSpeedRun', function(req, res){
+    if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
+          lunchedin.speedrun = !lunchedin.production;
+          res.status(200).send("Production:", lunchedin.production, 
+                               "\nSpeedRun:", lunchedin.speedrun,
+                               "\nMails:", lunchedin.mails,
+                               "\nTime till second call (speedrun):", lunchedin.timeToSecondCall,
+                               "\nTime till third call (speedrun):", lunchedin.timeToThirdCall,
+                               "\nTime for discarded users processing (normal):", lunchedin.timeForDiscardedUsers_normal,
+                               "\nTime for discarded users processing (speedrun):", lunchedin.timeForDiscardedUsers_speedrun, 
+                               "\nTime for mailing matches (speedrun):", lunchedin.timeForDiscardedUsers_speedrun,
+                               "\nTime for mailing matches (normal):", lunchedin.timeForDiscardedUsers_speedrun );
     }
     else
       res.send('not authenticated');     
@@ -994,7 +1073,15 @@ lunchedin.thirdCall = function(){
   app.get('/api/toggleMails', function(req, res){
     if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
           lunchedin.mails = !lunchedin.mails;
-          res.status(200).send(lunchedin.mails)
+          res.status(200).send("Production:", lunchedin.production, 
+                               "\nSpeedRun:", lunchedin.speedrun,
+                               "\nMails:", lunchedin.mails,
+                               "\nTime till second call (speedrun):", lunchedin.timeToSecondCall,
+                               "\nTime till third call (speedrun):", lunchedin.timeToThirdCall,
+                               "\nTime for discarded users processing (normal):", lunchedin.timeForDiscardedUsers_normal,
+                               "\nTime for discarded users processing (speedrun):", lunchedin.timeForDiscardedUsers_speedrun, 
+                               "\nTime for mailing matches (speedrun):", lunchedin.timeForDiscardedUsers_speedrun,
+                               "\nTime for mailing matches (normal):", lunchedin.timeForDiscardedUsers_speedrun );
     }
     else
       res.send('not authenticated');     
@@ -1025,7 +1112,7 @@ lunchedin.thirdCall = function(){
       }
   });
 
-  app.get('/api/setTime', function(req, res){
+/*  app.get('/api/setTime', function(req, res){
     if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
         // api / setTime?thirdToFirst=time1&firstToSecond=time2&secondToThird=time3
         var qs = querystring.parse(req.url.split("?")[1]);
@@ -1037,7 +1124,7 @@ lunchedin.thirdCall = function(){
     else
       res.send('Not authenticated');   
   });
-  
+  */
 
 
 
@@ -1225,7 +1312,7 @@ lunchedin.thirdCall = function(){
                                           req.login(users, function(err) {
                                               if (err) console.log(err)
 
-                                              setTimeout( function(){ res.sendStatus(200) }, 2000);
+                                              setTimeout( function(){ res.sendStatus(200) }, 1500);
                                           })
                                   }
 
@@ -1651,8 +1738,8 @@ var initialize = function() {
       // TODO: set to true for actual production
       lunchedin.mails = true;
 
-      lunchedin.timeToSecondCall = 10800000;  // After 7.30am, run after 3 hours - 3*60*60s - 10.30am - mails go at 11.00am
-      lunchedin.timeToThirdCall = 7200000; //  After 10.30am, run after 2 hours - 2*60*60s - 12.30pm - dropout mails
+      //lunchedin.timeToSecondCall = 10800000;  // After 7.30am, run after 3 hours - 3*60*60s - 10.30am - mails go at 11.00am
+      //lunchedin.timeToThirdCall = 7200000; //  After 10.30am, run after 2 hours - 2*60*60s - 12.30pm - dropout mails
 
       // TODO: chron jon
       // schedule firstcall to be run everyday
@@ -1660,14 +1747,27 @@ var initialize = function() {
       rule.hour = 23;
       rule.minute = 30;
       schedule.scheduleJob(rule, function(){
-          console.log(new Date(), 'Waka Waka!');
+          console.log(new Date(), 'Waka Waka! First Call - Invite them!');
           lunchedin.firstCall();
       });
 
-      console.log("In production. Mails: ", lunchedin.mails,
-                                  "Time to firstCall:", lunchedin.timeToSecondCall, 
-                                  "Time to thirdCall", lunchedin.timeToThirdCall, 
-                                  ".Scheduled Job.")
+      var rule2 = new schedule.RecurrenceRule();
+      rule2.hour = 3;
+      rule2.minute = 30;
+      schedule.scheduleJob(rule2, function(){
+          console.log(new Date(), 'Waka Waka! Second Call - Match them!');
+          lunchedin.secondCall();
+      });
+
+      var rule3 = new schedule.RecurrenceRule();
+      rule3.hour = 4;
+      rule3.minute = 15;
+      schedule.scheduleJob(rule3, function(){
+          console.log(new Date(), 'Waka Waka! Third Call - Spoiler Alert');
+          lunchedin.thirdCall();
+      });
+
+      console.log("In production. Mails: ", lunchedin.mails, lunchedin.speedrun, ".Scheduled Jobs.")
 
     }
 
