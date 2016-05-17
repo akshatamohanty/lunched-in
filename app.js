@@ -818,7 +818,7 @@ lunchedin.secondCall = function(){
   }
 
   // for discarded users
-  setTimeout( discarded, lunchedin.speedrun? lunchedin.timeForDiscardedUsers_speedrun : lunchedin.timeForDiscardedUsers_normal );
+  setTimeout( discarded, (lunchedin.speedrun? lunchedin.timeForDiscardedUsers_speedrun : lunchedin.timeForDiscardedUsers_normal) );
 
   // match and mail
   // TODO: wait for 30s for matches to be made - wait 10 minutes
@@ -830,9 +830,9 @@ lunchedin.secondCall = function(){
           console.log("-------------- Pool refresh after running algorithm in second call -----------------");
           User.update({}, {inPool: false} , {multi: true}, function(err, users){
             if(!err) console.log("Pool refreshed after running algorithm");
-          }
+          });
 
-        }, lunchedin.speedrun ? lunchedin.timeToMail_speedrun : lunchedin.timeToMail_normal );
+        }, (lunchedin.speedrun ? lunchedin.timeToMail_speedrun : lunchedin.timeToMail_normal) );
 };
 
 lunchedin.thirdCall = function(){
