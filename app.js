@@ -987,15 +987,15 @@ lunchedin.thirdCall = function(){
 
   app.get('/api/about', function(req, res){
     if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){ //TODO
-          res.status(200).send("Production:", lunchedin.production, 
-                               "\nSpeedRun:", lunchedin.speedrun,
-                               "\nMails:", lunchedin.mails,
-                               "\nTime till second call (speedrun):", lunchedin.timeToSecondCall,
-                               "\nTime till third call (speedrun):", lunchedin.timeToThirdCall,
-                               "\nTime for discarded users processing (normal):", lunchedin.timeForDiscardedUsers_normal,
-                               "\nTime for discarded users processing (speedrun):", lunchedin.timeForDiscardedUsers_speedrun, 
-                               "\nTime for mailing matches (speedrun):", lunchedin.timeForDiscardedUsers_speedrun,
-                               "\nTime for mailing matches (normal):", lunchedin.timeForDiscardedUsers_speedrun );
+          res.status(200).send("Production:" +  lunchedin.production +
+                               "\nSpeedRun:" + lunchedin.speedrun +
+                               "\nMails:" + lunchedin.mails +
+                               "\nTime till second call (speedrun):" + lunchedin.timeToSecondCall +
+                               "\nTime till third call (speedrun):" + lunchedin.timeToThirdCall +
+                               "\nTime for discarded users processing (normal):" + lunchedin.timeForDiscardedUsers_normal +
+                               "\nTime for discarded users processing (speedrun):" + lunchedin.timeForDiscardedUsers_speedrun + 
+                               "\nTime for mailing matches (speedrun):" + lunchedin.timeForDiscardedUsers_speedrun +
+                               "\nTime for mailing matches (normal):" + lunchedin.timeForDiscardedUsers_speedrun );
     }
     else
       res.send('Not authenticated');     
@@ -1055,7 +1055,7 @@ lunchedin.thirdCall = function(){
 
   app.get('/api/toggleSpeedRun', function(req, res){
     if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
-          lunchedin.speedrun = !lunchedin.production;
+          lunchedin.speedrun = !lunchedin.speedrun;
           res.status(200).send("Production:", lunchedin.production, 
                                "\nSpeedRun:", lunchedin.speedrun,
                                "\nMails:", lunchedin.mails,
