@@ -383,7 +383,7 @@ lunchedin.matchedMail = function( match, user ){
     template.dropoutURL = "http://www.trylunchedin.com/api/dropOut?participant=" 
                                   + user._id 
                                   + "&match=" + match._id;
-    console.log(match);
+    //console.log(match);
     template.where = {};
     template.where.rest_name = match.location.name;
     template.where.address = match.location.address; 
