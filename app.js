@@ -568,7 +568,7 @@ lunchedin.updateStatistics = function( runCount ){
  */
 lunchedin.checkDropouts = function( runCount ){
     // for each participant of a match, check if all others are added - if not - add it
-    Match.find({ run: runCount }, function(err, matches){
+    Match.find({ run: runCount, location: {$exists:true} }, function(err, matches){
 
       if(err) console.log("Error retriving matches");
       else{
@@ -604,7 +604,10 @@ lunchedin.checkDropouts = function( runCount ){
  */
 lunchedin.mailMatches = function( runCount ){
  
-    Match.find({ run: runCount }, function(err, matches){
+    Match.find(
+      { run: runCount,
+        location: {$exists:true} 
+      }, function(err, matches){
 
       if(err) console.log("Error retriving matches");
       else{
@@ -614,7 +617,7 @@ lunchedin.mailMatches = function( runCount ){
 
                 var match = matches[i];
 
-                if(match.participants.length && match.location != undefined){
+                if(match.participants.length != 0 && match.location != undefined){
                     User.find( { 
                         _id: {$in: match.participants}
                       }, function(err, participants){
@@ -777,6 +780,7 @@ lunchedin.secondCall = function(){
       var d_user = lunchedin.discardedUsers[k];  
       Match.find( { 
                run : lunchedin.run,
+               location: {$exists:true},
               'location._id' : {$nin: d_user.blockedRestaurants},
               'location.veg' : d_user.veg, 
               'location.halal' : d_user.halal, 
