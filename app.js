@@ -366,6 +366,9 @@ lunchedin.confirmationMail = function( user ){
  */
 lunchedin.matchedMail = function( match, user ){
 
+    if(match==undefined || user == undefined)
+      return; 
+
     var templateID = 610803;
 
     
@@ -611,7 +614,7 @@ lunchedin.mailMatches = function( runCount ){
 
                 var match = matches[i];
 
-                if(match.participants.length){
+                if(match.participants.length && match.location != undefined){
                     User.find( { 
                         _id: {$in: match.participants}
                       }, function(err, participants){
@@ -1039,15 +1042,15 @@ lunchedin.thirdCall = function(){
   app.get('/api/toggleProduction', function(req, res){
     if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
           lunchedin.production = !lunchedin.production;
-          res.status(200).send("Production:", lunchedin.production, 
-                               "\nSpeedRun:", lunchedin.speedrun,
-                               "\nMails:", lunchedin.mails,
-                               "\nTime till second call (speedrun):", lunchedin.timeToSecondCall,
-                               "\nTime till third call (speedrun):", lunchedin.timeToThirdCall,
-                               "\nTime for discarded users processing (normal):", lunchedin.timeForDiscardedUsers_normal,
-                               "\nTime for discarded users processing (speedrun):", lunchedin.timeForDiscardedUsers_speedrun, 
-                               "\nTime for mailing matches (speedrun):", lunchedin.timeForDiscardedUsers_speedrun,
-                               "\nTime for mailing matches (normal):", lunchedin.timeForDiscardedUsers_speedrun );
+          res.status(200).send("<b>Production:" + lunchedin.production + '</b>' +
+                               "<br>SpeedRun:" + lunchedin.speedrun +
+                               "<br>Mails:" + lunchedin.mails +
+                               "<br>Time till second call (speedrun):" + lunchedin.timeToSecondCall +
+                               "<br>Time till third call (speedrun):" + lunchedin.timeToThirdCall +
+                               "<br>Time for discarded users processing (normal):" + lunchedin.timeForDiscardedUsers_normal +
+                               "<br>Time for discarded users processing (speedrun):" + lunchedin.timeForDiscardedUsers_speedrun + 
+                               "<br>Time for mailing matches (speedrun):" + lunchedin.timeForDiscardedUsers_speedrun +
+                               "<br>Time for mailing matches (normal):" + lunchedin.timeForDiscardedUsers_speedrun );
     }
     else
       res.send('not authenticated');     
@@ -1056,15 +1059,15 @@ lunchedin.thirdCall = function(){
   app.get('/api/toggleSpeedRun', function(req, res){
     if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
           lunchedin.speedrun = !lunchedin.speedrun;
-          res.status(200).send("Production:", lunchedin.production, 
-                               "\nSpeedRun:", lunchedin.speedrun,
-                               "\nMails:", lunchedin.mails,
-                               "\nTime till second call (speedrun):", lunchedin.timeToSecondCall,
-                               "\nTime till third call (speedrun):", lunchedin.timeToThirdCall,
-                               "\nTime for discarded users processing (normal):", lunchedin.timeForDiscardedUsers_normal,
-                               "\nTime for discarded users processing (speedrun):", lunchedin.timeForDiscardedUsers_speedrun, 
-                               "\nTime for mailing matches (speedrun):", lunchedin.timeForDiscardedUsers_speedrun,
-                               "\nTime for mailing matches (normal):", lunchedin.timeForDiscardedUsers_speedrun );
+          res.status(200).send("Production:" + lunchedin.production + 
+                               "<br><b>SpeedRun:" + lunchedin.speedrun + '</b>' +
+                               "<br>Mails:" + lunchedin.mails +
+                               "<br>Time till second call (speedrun):" + lunchedin.timeToSecondCall +
+                               "<br>Time till third call (speedrun):" + lunchedin.timeToThirdCall +
+                               "<br>Time for discarded users processing (normal):" + lunchedin.timeForDiscardedUsers_normal +
+                               "<br>Time for discarded users processing (speedrun):" + lunchedin.timeForDiscardedUsers_speedrun + 
+                               "<br>Time for mailing matches (speedrun):" + lunchedin.timeForDiscardedUsers_speedrun +
+                               "<br>Time for mailing matches (normal):" + lunchedin.timeForDiscardedUsers_speedrun );
     }
     else
       res.send('not authenticated');     
@@ -1073,15 +1076,15 @@ lunchedin.thirdCall = function(){
   app.get('/api/toggleMails', function(req, res){
     if( req.isAuthenticated() && req.session.passport.user[0].adminStatus ){
           lunchedin.mails = !lunchedin.mails;
-          res.status(200).send("Production:", lunchedin.production, 
-                               "\nSpeedRun:", lunchedin.speedrun,
-                               "\nMails:", lunchedin.mails,
-                               "\nTime till second call (speedrun):", lunchedin.timeToSecondCall,
-                               "\nTime till third call (speedrun):", lunchedin.timeToThirdCall,
-                               "\nTime for discarded users processing (normal):", lunchedin.timeForDiscardedUsers_normal,
-                               "\nTime for discarded users processing (speedrun):", lunchedin.timeForDiscardedUsers_speedrun, 
-                               "\nTime for mailing matches (speedrun):", lunchedin.timeForDiscardedUsers_speedrun,
-                               "\nTime for mailing matches (normal):", lunchedin.timeForDiscardedUsers_speedrun );
+          res.status(200).send("Production:" + lunchedin.production + 
+                               "<br>SpeedRun:" + lunchedin.speedrun +
+                               "<br><b>Mails:" + lunchedin.mails + '</b>' +
+                               "<br>Time till second call (speedrun):" + lunchedin.timeToSecondCall +
+                               "<br>Time till third call (speedrun):" + lunchedin.timeToThirdCall +
+                               "<br>Time for discarded users processing (normal):" + lunchedin.timeForDiscardedUsers_normal +
+                               "<br>Time for discarded users processing (speedrun):" + lunchedin.timeForDiscardedUsers_speedrun + 
+                               "<br>Time for mailing matches (speedrun):" + lunchedin.timeForDiscardedUsers_speedrun +
+                               "<br>Time for mailing matches (normal):" + lunchedin.timeForDiscardedUsers_speedrun );
     }
     else
       res.send('not authenticated');     
