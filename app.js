@@ -313,12 +313,12 @@ lunchedin.confirmationMail = function( user ){
     var middle_paraOpts = [
                             'It will be lunch soon. How about a great lunch while meeting some awesome'
                             + ' colleagues? All you have to do is simple click the green button to confirm'
-                            + ' your availability. You have until 12.00 PM to do so. If you are caught up'
+                            + ' your availability. You have until 11.30 AM to do so. If you are caught up'
                             + ' with other things and cannot make it today, no worries, ignore this email :-)', 
                             
                             'Will you be interested to join your colleagues for lunch over your favourite'
                             + ' cuisine at a nearby restaurant? Then, it\'s very simple. Just click the'
-                            + ' green button before 12.00 PM and confirm your availability. But if you cannot'
+                            + ' green button before 11.30 PM and confirm your availability. But if you cannot'
                             + ' make it today, it\'s alright, just ignore this email :-)' , 
                             
                             'Already feeling hungry? Me too :-) How about I arrange an awesome lunch'
@@ -326,7 +326,7 @@ lunchedin.confirmationMail = function( user ){
                             + ' green button to confirm your availability. If you are not in the mood today, it\'s OK,' 
                             + ' simply ignore this email and I will understand :-)',
 
-                            'Game for an awesome lunch? You have until 12.00 PM to confirm your'
+                            'Game for an awesome lunch? You have until 11.30 PM to confirm your'
                             + ' availability for today\'s lunch rendezvous. You can do so by simply'
                             + ' clicking the green button. If you cannot make it, ignore this email'
                             + ' and I will understand.'
@@ -741,7 +741,10 @@ lunchedin.secondCall = function(){
 
   // deal with pool
   console.log("-------------- Run ", lunchedin.run, "-----------------");
-  User.find({ inPool : true })
+  User.find({ 
+            inPool : true, 
+            cuisine: { $exists: true, $ne: [] }
+        })
         .sort({ blockedCount: -1, lunchCount: 1, knownCount: 1,  })
         .exec( function(err, userPool) {
 
