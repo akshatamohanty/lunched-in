@@ -790,7 +790,7 @@ lunchedin.secondCall = function(){
 
                 // no suitable matches found - discard user
                 if(err || matches.length == 0){
-                  console.log("No match found for discarded user");
+                  console.log("No compatible match found for discarded user to join", d_user.name);
                 }
                 else{
                   
@@ -1471,6 +1471,7 @@ lunchedin.thirdCall = function(){
 
 
           lunchedin.discardedUsers = [];
+          console.log("User pool length:", userPool.length);
           
           while(userPool.length > 0){
 
@@ -1485,7 +1486,7 @@ lunchedin.thirdCall = function(){
                 //console.log("UserPool Length at", userPool.length);
                 var currUser = userPool.splice(0, 1)[0]; // removes from the userPool also
                 
-                //console.log("Starting with", currUser.name, currUser.known);
+                console.log("Starting with", currUser.name, currUser.known);
 
                 // create a pool for second mate - which should be a close person to the current user
                 var pairMatePool = regroup( userPool, currUser, false ); 
@@ -1506,6 +1507,7 @@ lunchedin.thirdCall = function(){
                 // in this case, better to discard the first user and continue
                 if(pairMate == undefined){
                     console.log("Match not found for", currUser.name);
+                    lunchedin.discardedUsers.push(currUser);
                     continue;
                 }
                   
