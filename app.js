@@ -768,7 +768,7 @@ lunchedin.secondCall = function(){
           if(userPool.length == 0)
             console.log("No users!");
           else{
-              console.log("-----------Running Match Algorithm---------------")
+              console.log("-----------Running Match Algorithm (user count):", userPool.length, "---------------")
               matchingAlgorithm(userPool);            
             }
   });
