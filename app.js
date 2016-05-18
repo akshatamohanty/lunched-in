@@ -769,12 +769,14 @@ lunchedin.secondCall = function(){
             console.log("No users!");
           else{
               console.log("-----------Running Match Algorithm (user count):", userPool.length, "---------------")
+              console.log(userPool);
               matchingAlgorithm(userPool);            
             }
   });
 
   function discarded(){
    // Find suitable party for discarded users to join
+   console.log("discarded", lunchedin.discardedUsers);
     for( var k=0; k < lunchedin.discardedUsers.length; k++){
 
       var d_user = lunchedin.discardedUsers[k];  
