@@ -1359,7 +1359,8 @@ lunchedin.thirdCall = function(){
 
       if(ObjectId.isValid(objectID) && ObjectId.isValid(matchID)){
          Match.find({
-                _id : ObjectId(matchID)
+                _id : ObjectId(matchID),
+                run : lunchedin.run
               }, function(err, matches){
 
               if(err || matches.length == 0) console.log("match not found");
@@ -1371,12 +1372,16 @@ lunchedin.thirdCall = function(){
                   match.dropouts.push( match.participants.splice(match.participants.indexOf(objectID), 1) );
                   match.save();
                   console.log("Dropped-out");
+                  res.send("<h1>Your lunch mates will miss you!</h1>")
                 }
               }
         })       
       }
-      else
+      else{
         console.log("Invalid query");
+        res.send("<h1>Invalid query</h1>")
+      }
+
   });
 
   app.get('/api/blockUser', function(req, res){
@@ -1399,11 +1404,11 @@ lunchedin.thirdCall = function(){
                                   var user2 = user2[0];
                                   if( user.blocked.indexOf( user2._id ) == -1){
                                     user.blocked.push(user2._id);
-                                    res.send(user.name, ", ", user2.name, "has been blocked.")
+                                    res.send(user.name + ", " + user2.name+ "has been blocked.")
                                     user.save();
                                   }
                                   else
-                                    res.send(user.name, ", ", user2.name, "was already blocked.");                         
+                                    res.send(user.name+ ", "+ user2.name+ "was already blocked.");                         
                             }
 
                       })
@@ -1435,11 +1440,11 @@ lunchedin.thirdCall = function(){
                                 var restaurant = restaurants[0]; console.log("Found", restaurant);
                                 if( user.blockedRestaurants.indexOf( restaurant._id ) == -1){
                                   user.blockedRestaurants.push(restaurant._id);
-                                  res.send(user.name, ", ", restaurant.name, "has been blocked.")
+                                  res.send(user.name+ ", "+ restaurant.name+ "has been blocked.")
                                   user.save();
                                 }
                                 else
-                                  res.send(user.name, ", ", restaurant.name, "was already blocked.");                         
+                                  res.send(user.name + ", "+ restaurant.name+ "was already blocked.");                         
                           }
 
                     })
