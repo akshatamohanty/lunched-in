@@ -119,7 +119,7 @@
                 <textarea id='pref' ng-model="active_user.tagline" md-maxlength="50" rows="1"></textarea>
               </md-input-container> -->
               <md-input-container>
-                <label>LinkediIn Profile Link</label>
+                <label>LinkedIn Profile Link</label>
                 <textarea id='pref' ng-model="active_user.linkedin" md-maxlength="50" rows="1"></textarea>
               </md-input-container>
             </div>
@@ -142,13 +142,13 @@
             <md-checkbox ng-model='active_user.halal'> Do you prefer restaurants that serve Halal meat?</md-checkbox>
               <br>
               <div class='row'>
-                <div class='col-sm-4 col-xs-6' ng-repeat='cuisine in cuisines'>
+                <div class='col-sm-2 col-xs-6' ng-repeat='cuisine in cuisines'>
                         <div class='cuisine-card card panel panel-default' ng-model='active_user' ng-click='toggle(cuisine, active_user.cuisine)'>
                             <div class='panel-heading card-heading'>
                               <h6 class='text-center'>{{cuisine}}</h6> 
                             </div>           
                             <div class='panel-body card-body zero-padding'>                        
-                              <img src='assets/images/cuisines/{{cuisine.toLowerCase()}}.jpg' class='img-responsive cuisine-photo' style='height:200px'/>
+                              <img src='assets/images/cuisines/{{cuisine.toLowerCase()}}.jpg' class='img-responsive cuisine-photo' style='height:120px; width: inherit;'/>
                               <i style='position: absolute; top:40%; left: 40%; color: white' class='fa fa-check-circle-o fa-4x'
                               ng-show='exists(cuisine, active_user.cuisine)'/>
                             </div>
@@ -193,7 +193,7 @@
                 <div class='col-sm-4' ng-repeat="user in usersAlpha[letter]" ng-model='user'>
                   <br>
                   
-                  <div class='card panel panel-default'>
+                  <div class='card panel panel-default' style='min-height: 300px;'>
                     <div class='panel-body card-body' style='padding: 20px;'>
                                              
                       <img ng-src="{{user.picture}}" class='img-responsive' style='width: 200px; height:200px; border-radius: 50%'> </img>

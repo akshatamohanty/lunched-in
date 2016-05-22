@@ -474,7 +474,7 @@ lunchedin.canceledMail = function( match, user ){
                               pObj.phone = dropOut.phone; 
                               pObj.picture = dropOut.picture; 
                               pObj.linkedin = dropOut.linkedin;
-                              //pObj.blockString = "http://trylunchedin.herokuapp.com/api/blockUser?user=" 
+                              pObj.blockString = "http://trylunchedin.herokuapp.com/api/blockUser?user=" 
                                                         + user._id 
                                                         + "&block=" + dropOut.email;
 
@@ -517,9 +517,9 @@ lunchedin.noMatchMail = function( user ){
                         template.where.address = restaurants[0].address; 
                         template.where.cuisine = restaurants[0].cuisine; 
                         template.where.website = restaurants[0].website; 
-                        
-                        if(restaurants[0].zip.length == 5)
-                            restaurants[0].zip = '0' + restaurants[0].zip;
+                        template.where.blockString = "http://www.trylunchedin.com/api/blockRestaurant?user=" 
+                              + user._id 
+                              + "&block=" + restaurants[0]._id;
 
                         //https://www.google.com/maps/dir/Singapore+zipcode/
                         template.where.directionURL = "https://www.google.com.sg/maps/dir/Singapore+" 
