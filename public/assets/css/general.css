@@ -325,7 +325,7 @@ body {
   transition: all 0.2s ease-in-out;
   border: none;
   padding: 20px;
-  margin-top: 5px;
+  margin-top: 1px;
 }
 
 .card-heading{

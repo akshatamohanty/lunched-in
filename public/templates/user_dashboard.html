@@ -1,215 +1,273 @@
-  <div class='container-fluid user-dashboard-body'>
+<style>
+.header {
+  padding: 10px;
+  background-color: #FFCE54;
+  border-bottom: 1px solid #F6BB42;
+  height: 55px;
+}
 
-    <div class='row'>
+.header img{
+  height: 35px;
+  position: absolute;
+  left: 45%;
+}
 
-      <!---borders-->
-      <div class='col-sm-2 col-xs-1'></div>
-      
+.header #logout{
+  background-color: #FFCE54;
+  border-bottom: 1px solid #F6BB42;
+}
 
-      <!---mainsection-->
-      <div class='col-sm-8 col-xs-10 dashboard-content'>
- 
-        <div class='row'>
-            <img class='logo' src='../assets/images/logo.png'/>
+</style>
 
-            <button class='btn btn-primary pull-right' ng-click="updateUser(active_user)">Save
-                <i class="fa fa-check-square-o" aria-hidden="true"></i>
-            </button>
-            <button class='btn btn-primary pull-right'><a href='/logout'>Logout</a></button>
-        </div>
+<div class='header'>
+  <img class='logo' src='../assets/images/logo.png'/>
+  <button class='btn pull-right'><a href='/logout'>Logout</a></button>
+</div>
 
-        <div class='jumbotron simple-card' id='dashboard-header'>
-            <div class='row text-center text-white'>
-              <h3>{{ active_user.name }}'s Dashboard </h3>
-            </div>
-        </div>
+<div class='container-fluid user-dashboard-body'>
 
+  <div class='row'>
+
+    <!---borders-->
+    <div class='col-sm-2 col-xs-1'></div>
     
-        <!--beginning of card-->
-        <div class='simple-card'>              
-       
-        <h3><i class="fa fa-info-circle" aria-hidden="true"></i> About You </h3>
-        <div class='row'>
-          
-          <!-- user card display! -->
-          <div class='col-sm-4'>
-            
-            <div class='simple-card zero-padding panel panel-default' id='user_card'>
-                <div class='panel-heading card-heading'>
-                  <h4 style='margin-bottom:0'>{{ active_user.name }}</h4>
-                  <em>{{ active_user.title }}</em>
-                </div>           
-                  <div class='panel-body card-body'>
-                    <div class='file-upload'></div>
-                    <img ng-src="{{active_user.picture}}" class='img-responsive'> </img>
-                    <p class='text-center bottom-align'><i class="fa fa-quote-left"></i> {{ active_user.tagline }} 
-                    <hr style='padding:0; margin:0'>
-                    </p>
-                    <p class='text-center bottom-align'><span class="glyphicon glyphicon-phone"></span> {{ active_user.phone }} 
-                    </p>
-                  </div>
-            </div>
-          </div>
 
-          <div class='col-sm-8'>
-              <div class='row'>
-                <div class='col-sm-6'>
-                  <md-input-container>
-                    <label>Name</label>
-                    <input ng-model="active_user.name" disabled>
-                  </md-input-container>
-                  <md-input-container>
-                    <label>Email</label>
-                    <input ng-model="active_user.email" disabled>
-                  </md-input-container>
-                  <md-input-container>
-                    <label>Phone</label>
-                    <input ng-model="active_user.phone">
-                  </md-input-container>
-                </div>
-                <div class='col-sm-6'>
-                  <md-input-container>
-                    <label>Title</label>
-                    <input ng-model="active_user.title">
-                  </md-input-container>
-                  <md-input-container>
-                    <label>Password</label>
-                    <input ng-model="active_user.password">
-                  </md-input-container>
-                  <md-input-container>
-                    <label>Nationality</label>
-                    <input ng-model="active_user.nationality">
-                  </md-input-container>
-                </div>
+    <!---mainsection-->
+    <div class='col-sm-8 col-xs-10 dashboard-content'>
+
+
+  
+      <!--beginning of card-->
+      <div class='row simple-card' style="padding: 0px; margin-bottom: 0px;">   
+        <div class='header' style='padding : 10px'>
+          <h4> About You </h4>
+        </div> 
+      </div>
+
+      <div class='simple-card'>   
+      
+      <div class='row' style='padding: 0;'>
+        
+        <!-- user card display! -->
+        <div class='col-sm-4'>
+          
+          <div class='simple-card zero-padding panel panel-default' id='user_card'>
+
+
+              <div class='panel-body card-body' style='padding: 20px;'>
+                <div class='file-upload'> </div>
+                <img ng-src="{{active_user.picture}}" class='img-responsive' style='border-radius: 50%'> </img>
+
+<!--                 <p class='text-center bottom-align'>{{ active_user.tagline }} 
+                <hr style='padding:0; margin:0'>
+                </p> -->
+<!--                 <p class='text-center bottom-align'><span class="glyphicon glyphicon-phone"></span> {{ active_user.phone }} 
+                </p> -->
+              
+              <hr style='margin:20px'/>
+
+              <h4 style='margin-bottom:4px'>{{ active_user.name }}</h4>
+              <h6>{{ active_user.title }}</h6>
+              <h6>{{ active_user.email }}</h6>
               </div>
-              <div class='row' style='margin:1%;'>  
+
+          </div>
+        
+        </div>
+
+        <div class='col-sm-8'>
+            <div class='row'>
+              <div class='col-sm-6'>
                 <md-input-container>
-                  <label>You, in 50 characters!</label>
-                  <textarea id='pref' ng-model="active_user.tagline" md-maxlength="50" rows="1"></textarea>
+                  <label>Name</label>
+                  <input ng-model="active_user.name" disabled>
+                </md-input-container>
+                <md-input-container>
+                  <label>Email</label>
+                  <input ng-model="active_user.email" disabled>
+                </md-input-container>
+                <md-input-container>
+                  <label>Phone</label>
+                  <input ng-model="active_user.phone">
                 </md-input-container>
               </div>
-          </div>
+              <div class='col-sm-6'>
+                <md-input-container>
+                  <label>Designation</label>
+                  <input ng-model="active_user.title">
+                </md-input-container>
+                <md-input-container>
+                  <label>Password</label>
+                  <input ng-model="active_user.password">
+                </md-input-container>
+<!--                 <md-input-container>
+                  <label>Nationality</label>
+                  <input ng-model="active_user.nationality">
+                </md-input-container> -->
+              </div>
+            </div>
+            <div class='row' style='margin:1%;'>  
+<!--               <md-input-container>
+                <label>You, in 50 characters!</label>
+                <textarea id='pref' ng-model="active_user.tagline" md-maxlength="50" rows="1"></textarea>
+              </md-input-container> -->
+              <md-input-container>
+                <label>LinkediIn Profile Link</label>
+                <textarea id='pref' ng-model="active_user.linkedin" md-maxlength="50" rows="1"></textarea>
+              </md-input-container>
+            </div>
+        </div>
 
         </div>
-        <hr>
-        
-        <!--beginning of preferences-->
-   
+      </div>
+      
+      <!--beginning of preferences-->
+      <div class='row simple-card' style="padding: 0px; margin-bottom: 0px; margin-top: 20px">   
+        <div class='header' style='padding : 10px'>
+          <h4> Cuisine  </h4>
+        </div> 
+      </div>
+      <div class='simple-card' style='padding: 30px;'> 
         <div class='row'>
-          <div class='col-sm-4'><h3><i class="fa fa-bell" aria-hidden="true"></i> Preferences </h3></div>
-          <div class='col-sm-8'>
+          <md-chips ng-model="active_user.cuisine"></md-chips>
+             <br>
             <md-checkbox ng-model='active_user.veg'> Are you Vegeterian?</md-checkbox>
             <md-checkbox ng-model='active_user.halal'> Do you prefer restaurants that serve Halal meat?</md-checkbox>
-          </div>
-        </div>
-
-        <hr>
-
-        <div class='row'>
-          <div class='col-sm-4'><h3><i class="fa fa-coffee" aria-hidden="true"></i> Cuisines </h3></div>
-          <div class='col-sm-8'>
-              <md-chips ng-model="active_user.cuisine"></md-chips>
               <br>
               <div class='row'>
-                <div class='col-sm-2 col-xs-6' ng-repeat='cuisine in cuisines'>
+                <div class='col-sm-4 col-xs-6' ng-repeat='cuisine in cuisines'>
                         <div class='cuisine-card card panel panel-default' ng-model='active_user' ng-click='toggle(cuisine, active_user.cuisine)'>
                             <div class='panel-heading card-heading'>
-                              <h6 class='text-center'>{{cuisine}}<h6> 
+                              <h6 class='text-center'>{{cuisine}}</h6> 
                             </div>           
                             <div class='panel-body card-body zero-padding'>                        
-                              <img src='http://placehold.it/300x150' class='img-responsive cuisine-photo'/>
+                              <img src='assets/images/cuisines/{{cuisine.toLowerCase()}}.jpg' class='img-responsive cuisine-photo'/>
+                              <i style='position: absolute; top:40%; left: 40%; color: white' class='fa fa-check-circle-o fa-4x'
+                              ng-show='exists(cuisine, active_user.cuisine)'/>
                             </div>
 
                         </div>
                 </div>
               </div>
-          </div>
+            
         </div>
+      </div>
 
-        <hr>
 
-        <div class='row'>
-          <div class='col-sm-4'><h3><i class="fa fa-clock-o" aria-hidden="true"></i> Good days? </h3></div>
-          <div class='col-sm-8'>
-            <div class='row'>
-              <div class='col-sm-4' >
-                <md-checkbox ng-repeat='day in days' ng-checked="exists(day, active_user.available)" ng-click="toggle(day, active_user.available)" ng-disabled="active_user.available.indexOf('All') > -1">{{day}}</md-checkbox> 
-              </div>
-              <div class='col-sm-2'><em class='text-center'>Or</em></div>
-              <div class='col-sm-6'>
-                <md-checkbox ng-checked="exists('All', active_user.available)" ng-click="active_user.available.indexOf('All')>-1?active_user.available=[]:active_user.available=['All']"> Ask me everyday </md-checkbox>
-              </div>
+
+<!--       <div class='row'>
+        <div class='col-sm-4'><h3><i class="fa fa-clock-o" aria-hidden="true"></i> Good days? </h3></div>
+        <div class='col-sm-8'>
+          <div class='row'>
+            <div class='col-sm-4' >
+              <md-checkbox ng-repeat='day in days' ng-checked="exists(day, active_user.available)" ng-click="toggle(day, active_user.available)" ng-disabled="active_user.available.indexOf('All') > -1">{{day}}</md-checkbox> 
+            </div>
+            <div class='col-sm-2'><em class='text-center'>Or</em></div>
+            <div class='col-sm-6'>
+              <md-checkbox ng-checked="exists('All', active_user.available)" ng-click="active_user.available.indexOf('All')>-1?active_user.available=[]:active_user.available=['All']"> Ask me everyday </md-checkbox>
             </div>
           </div>
         </div>
+      </div> -->
 
-        <!--end of preferences-->        
-        <hr>
-        <!--beginning of mates--> 
+      <!--end of preferences-->        
 
-        <h3><i class="fa fa-group" aria-hidden="true"></i> Lunch Mates </h3>
-            <md-tabs md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink>
-                <md-tab ng-repeat="letter in letters" label="{{letter}}">
-                    <div class='row'>
-                      <div class='col-sm-4' ng-repeat="user in usersAlpha[letter]" ng-model='user'>
-                        <br>
-                        <div class='card panel panel-default'>
-                            <div class='panel-heading card-heading'>
-                              <h4 style='margin-bottom:0'>{{ user.name }}
-                                <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, active_user.known)'
-                                ng-disabled='exists(user._id, active_user.blocked)'><i class="fa fa-heart"></i></button>
-                                <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, active_user.blocked)'
-                                ng-disabled='exists(user._id, active_user.known)'><i class="fa fa-circle"></i></button>
-                              </h4>
-                              <em>{{ user.title }}</em>
-                            </div>           
-                            <div class='panel-body card-body'>
-                              <img src='http://placehold.it/300x150' class='img-responsive'>
-       
-                              <p class='text-center'><i class="fa fa-quote-left"></i> {{ user.tagline }} 
-                              
-                              </p>
-                            </div>
-                            <div class='panel-footer'>
-                              <p class='text-center' style='padding:0'>
-                                <span class="glyphicon glyphicon-phone"></span> {{ user.phone }} 
-                              </p>
-                            </div>
+      <!--beginning of mates--> 
+      <div class='row simple-card' style="padding: 0px; margin-bottom: 0px; margin-top: 20px;">   
+        <div class='header' style='padding : 10px'>
+          <h4> Lunchmates </h4>
+        </div> 
+      </div>
+     <div class='simple-card'> 
 
+      <h3><i class="fa fa-group" aria-hidden="true"></i> Lunch Mates </h3>
+          <md-tabs md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink style='min-height: 400px;'>
+              <md-tab ng-repeat="letter in letters" label="{{letter}}">
+                  <div class='row'>
+                    <div class='col-sm-4' ng-repeat="user in usersAlpha[letter]" ng-model='user'>
+                      <br>
+                      
+                      <div class='card panel panel-default'>
+                        <div class='panel-body card-body' style='padding: 20px;'>
+                          
+                          <button class='btn btn-info pull-left' ng-model='user' ng-click='toggle(user._id, active_user.known)'
+                              ng-disabled='exists(user._id, active_user.blocked)'><i class="fa fa-heart"></i></button>
+                          <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, active_user.blocked)'
+                              ng-disabled='exists(user._id, active_user.known)'><i class="fa fa-circle"></i></button>
+                          
+                          <img ng-src="{{user.picture}}" class='img-responsive' style='border-radius: 50%'> </img>
 
+                        
+                          <hr style='margin:20px'/>
+
+                          <h4 style='margin-bottom:4px'>{{ user.name }}</h4>
+                          <h6>{{ user.title }}</h6>
+                          <h6>{{ user.email }}</h6>
                         </div>
 
+                      
+<!--                           <div class='panel-heading card-heading'>
+                            <h4 style='margin-bottom:0'>{{ user.name }}
+                              <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, active_user.known)'
+                              ng-disabled='exists(user._id, active_user.blocked)'><i class="fa fa-heart"></i></button>
+                              <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, active_user.blocked)'
+                              ng-disabled='exists(user._id, active_user.known)'><i class="fa fa-circle"></i></button>
+                            </h4>
+                            <em>{{ user.title }}</em>
+                          </div>           
+                          <div class='panel-body card-body'>
+                            <img src='http://placehold.it/300x150' class='img-responsive'>
+     
+                            <p class='text-center'><i class="fa fa-quote-left"></i> {{ user.tagline }} 
+                            
+                            </p>
+                          </div>
+                          <div class='panel-footer'>
+                            <p class='text-center' style='padding:0'>
+                              <span class="glyphicon glyphicon-phone"></span> {{ user.phone }} 
+                            </p>
+                          </div> -->
+
+
                       </div>
-                    </div>    
-              </md-tab>                     
-            </md-tabs> 
 
-        </div>
-      </div><!---- end of dashboard content -->
-      
-      <!--border-->
-      <div class='col-sm-2 col-xs-1'></div>
+                    </div>
+                  </div>    
+            </md-tab>                     
+          </md-tabs> 
 
-    </div><!-- row end-->
-  
-  </div><!--container end-->
+      </div>
+
+
+      <div class='row text-center'>
+          <button class='btn btn-success' style='margin: 20px' ng-click="updateUser(active_user)">Save</button>
+      </div>
+
+    </div><!---- end of dashboard content -->
+    
+    <!--border-->
+    <div class='col-sm-2 col-xs-1'></div>
+
+  </div><!-- row end-->
+
+</div><!--container end-->
 
 <script type="text/javascript">
 $(document).ready(function(){  
 
-  var element = angular.element($('#user_card'));
-  var controller = element.controller();
-  var scope = element.scope(); 
+var element = angular.element($('#user_card'));
+var controller = element.controller();
+var scope = element.scope(); 
 
-  
-  $('.file-upload').append(
-    $.cloudinary.unsigned_upload_tag("lunchedin_user", 
-        { cloud_name: 'hzif3kbk7' }).bind('cloudinarydone', function(e, data) {
 
-          scope.$apply(function(){
-             scope.$parent.updateUserPicture(data.result.secure_url);
-          });
+$('.file-upload').append(
+  $.cloudinary.unsigned_upload_tag("lunchedin_user", 
+      { cloud_name: 'hzif3kbk7' }).bind('cloudinarydone', function(e, data) {
 
-        }));
+        scope.$apply(function(){
+           scope.$parent.updateUserPicture(data.result.secure_url);
+        });
+
+      }));
 })
 </script>
