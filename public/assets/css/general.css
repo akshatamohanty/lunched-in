@@ -210,8 +210,9 @@ body {
 }
 
 .panel-heading {
-    color: #fff !important;
-    background-color: #2f6596 !important;
+    background-color: #FFCE54;
+    border-bottom: 1px solid #F6BB42;
+    color: white;
     padding: 25px;
     border-bottom: 1px solid transparent;
     border-top-left-radius: 0px;
@@ -303,8 +304,8 @@ body {
 .dashboard-content{
   background: #e5e5e5;
   margin: 0;
-  padding-right: 4%;
-  padding-left: 4%;
+  padding-right: 0;
+  padding-left: 0;
   padding-top: 2%;
 }
 
@@ -316,7 +317,7 @@ body {
 }
 
 .card:hover {
-  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.19), 0 3px 3px rgba(0,0,0,0.23);
 }
 
 .simple-card{

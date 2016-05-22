@@ -17,11 +17,17 @@
   border-bottom: 1px solid #F6BB42;
 }
 
+.btn, .panel-heading{
+  background-color: #FFCE54;
+  border: 1px solid #F6BB42;
+  color: white;
+}
+
 </style>
 
 <div class='header'>
   <img class='logo' src='../assets/images/logo.png'/>
-  <button class='btn pull-right'><a href='/logout'>Logout</a></button>
+  <button class='btn pull-right' onclick='location.replace("/logout");window.reload();'><i class='fa fa-sign-out'/></a>
 </div>
 
 <div class='container-fluid user-dashboard-body'>
@@ -55,8 +61,9 @@
 
 
               <div class='panel-body card-body' style='padding: 20px;'>
+                
+                <img ng-src="{{active_user.picture}}" class='img-responsive' style='width: 200px; height:200px; border-radius: 50%'> </img>
                 <div class='file-upload'> </div>
-                <img ng-src="{{active_user.picture}}" class='img-responsive' style='border-radius: 50%'> </img>
 
 <!--                 <p class='text-center bottom-align'>{{ active_user.tagline }} 
                 <hr style='padding:0; margin:0'>
@@ -141,7 +148,7 @@
                               <h6 class='text-center'>{{cuisine}}</h6> 
                             </div>           
                             <div class='panel-body card-body zero-padding'>                        
-                              <img src='assets/images/cuisines/{{cuisine.toLowerCase()}}.jpg' class='img-responsive cuisine-photo'/>
+                              <img src='assets/images/cuisines/{{cuisine.toLowerCase()}}.jpg' class='img-responsive cuisine-photo' style='height:200px'/>
                               <i style='position: absolute; top:40%; left: 40%; color: white' class='fa fa-check-circle-o fa-4x'
                               ng-show='exists(cuisine, active_user.cuisine)'/>
                             </div>
@@ -180,67 +187,69 @@
       </div>
      <div class='simple-card'> 
 
-      <h3><i class="fa fa-group" aria-hidden="true"></i> Lunch Mates </h3>
-          <md-tabs md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink style='min-height: 400px;'>
-              <md-tab ng-repeat="letter in letters" label="{{letter}}">
-                  <div class='row'>
-                    <div class='col-sm-4' ng-repeat="user in usersAlpha[letter]" ng-model='user'>
-                      <br>
-                      
-                      <div class='card panel panel-default'>
-                        <div class='panel-body card-body' style='padding: 20px;'>
-                          
-                          <button class='btn btn-info pull-left' ng-model='user' ng-click='toggle(user._id, active_user.known)'
-                              ng-disabled='exists(user._id, active_user.blocked)'><i class="fa fa-heart"></i></button>
-                          <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, active_user.blocked)'
-                              ng-disabled='exists(user._id, active_user.known)'><i class="fa fa-circle"></i></button>
-                          
-                          <img ng-src="{{user.picture}}" class='img-responsive' style='border-radius: 50%'> </img>
+      <md-tabs md-border-bottom md-autoselect md-dynamic-height md-border-bottom md-no-ink style='min-height: 400px;'>
+          <md-tab ng-repeat="letter in letters" label="{{letter}}">
+              <div class='row'>
+                <div class='col-sm-4' ng-repeat="user in usersAlpha[letter]" ng-model='user'>
+                  <br>
+                  
+                  <div class='card panel panel-default'>
+                    <div class='panel-body card-body' style='padding: 20px;'>
+                                             
+                      <img ng-src="{{user.picture}}" class='img-responsive' style='width: 200px; height:200px; border-radius: 50%'> </img>
 
-                        
-                          <hr style='margin:20px'/>
+                      <button class='btn btn-info' ng-model='user' ng-click='addToKnown(user._id)'>
+                        <i ng-class='isKnown(user._id) ? "fa fa-star" : "fa fa-star-o"'/> 
+                      </button>
+                      <button class='btn btn-info pull-right' ng-model='user' ng-click='addToBlocked(user._id)'>
+                        <i ng-class='isBlocked(user._id) ? "fa fa-circle" : "fa fa-circle-o"'/> 
+                      </button>
+                    
+                      <hr style='margin:20px'/>
 
-                          <h4 style='margin-bottom:4px'>{{ user.name }}</h4>
-                          <h6>{{ user.title }}</h6>
-                          <h6>{{ user.email }}</h6>
-                        </div>
-
-                      
-<!--                           <div class='panel-heading card-heading'>
-                            <h4 style='margin-bottom:0'>{{ user.name }}
-                              <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, active_user.known)'
-                              ng-disabled='exists(user._id, active_user.blocked)'><i class="fa fa-heart"></i></button>
-                              <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, active_user.blocked)'
-                              ng-disabled='exists(user._id, active_user.known)'><i class="fa fa-circle"></i></button>
-                            </h4>
-                            <em>{{ user.title }}</em>
-                          </div>           
-                          <div class='panel-body card-body'>
-                            <img src='http://placehold.it/300x150' class='img-responsive'>
-     
-                            <p class='text-center'><i class="fa fa-quote-left"></i> {{ user.tagline }} 
-                            
-                            </p>
-                          </div>
-                          <div class='panel-footer'>
-                            <p class='text-center' style='padding:0'>
-                              <span class="glyphicon glyphicon-phone"></span> {{ user.phone }} 
-                            </p>
-                          </div> -->
-
-
-                      </div>
-
+                      <h4 style='margin-bottom:4px'>{{ user.name }}</h4>
+                      <h6>{{ user.title }}</h6>
+                      <h6>{{ user.email }}</h6>
                     </div>
-                  </div>    
-            </md-tab>                     
-          </md-tabs> 
+
+                  
+<!--                           <div class='panel-heading card-heading'>
+                        <h4 style='margin-bottom:0'>{{ user.name }}
+                          <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, active_user.known)'
+                          ng-disabled='exists(user._id, active_user.blocked)'><i class="fa fa-heart"></i></button>
+                          <button class='btn btn-info pull-right' ng-model='user' ng-click='toggle(user._id, active_user.blocked)'
+                          ng-disabled='exists(user._id, active_user.known)'><i class="fa fa-circle"></i></button>
+                        </h4>
+                        <em>{{ user.title }}</em>
+                      </div>           
+                      <div class='panel-body card-body'>
+                        <img src='http://placehold.it/300x150' class='img-responsive'>
+ 
+                        <p class='text-center'><i class="fa fa-quote-left"></i> {{ user.tagline }} 
+                        
+                        </p>
+                      </div>
+                      <div class='panel-footer'>
+                        <p class='text-center' style='padding:0'>
+                          <span class="glyphicon glyphicon-phone"></span> {{ user.phone }} 
+                        </p>
+                      </div> -->
+
+
+                  </div>
+
+                </div>
+              </div>    
+        </md-tab>                     
+      </md-tabs> 
 
       </div>
 
 
       <div class='row text-center'>
-          <button class='btn btn-success' style='margin: 20px' ng-click="updateUser(active_user)">Save</button>
+          <button class='btn btn-success' style='margin: 20px' ng-click="updateUser(active_user)">Save
+          <i id='spinner' class="fa fa-refresh fa-spin fa-fw" aria-hidden="true" style='display:none;'></i>
+          </button>
       </div>
 
     </div><!---- end of dashboard content -->

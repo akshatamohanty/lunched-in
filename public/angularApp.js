@@ -66,7 +66,9 @@ app.controller("MainCtrl", [
 app.controller("user", [
       "$scope", "$http",
       function($scope, $http){
-
+        
+        $('#spinner').hide();
+        
         $scope.active_user = null;
 
         $scope.cuisines = [];
@@ -148,6 +150,42 @@ app.controller("user", [
             return false;
         };
 
+        $scope.addToKnown = function( uid ){
+
+          if($scope.exists(uid, $scope.active_user.blocked))
+            $scope.toggle(uid, $scope.active_user.blocked);
+          
+          $scope.toggle(uid, $scope.active_user.known);
+          
+        };
+
+        $scope.addToBlocked = function( uid ){
+
+          if($scope.exists(uid, $scope.active_user.known))
+            $scope.toggle(uid, $scope.active_user.known);
+          
+          $scope.toggle(uid, $scope.active_user.blocked);
+          
+        };
+
+        $scope.isBlocked = function( uid ){
+
+          if($scope.exists(uid, $scope.active_user.blocked))
+            return true;
+          else
+            return false;
+          
+        };
+
+        $scope.isKnown = function( uid ){
+
+          if($scope.exists(uid, $scope.active_user.known))
+            return true;
+          else
+            return false;
+          
+        };
+
         $scope.updateUserPicture = function(new_url){
             $scope.active_user.picture = new_url;
             $scope.$parent.loggedInUser.picture = new_url;
@@ -166,10 +204,13 @@ app.controller("user", [
                 $scope.active_user.available = [];
             
             console.log($scope.active_user);
+            $('#spinner').show();
             
             $.post('/api/editUser', $scope.active_user, function(data,status,xhr){
 
-                  console.log($scope.active_user, status); alert("Updated");
+                  console.log($scope.active_user, status); 
+                  alert("Updated");
+                  $('#spinner').hide();
             })
         };
 
