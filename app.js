@@ -396,8 +396,7 @@ lunchedin.matchedMail = function( match, user ){
     template.where.address = match.location.address; 
     template.where.cuisine = match.location.cuisine; 
     template.where.website = match.location.website;
-    if(restaurants[0].zip.length == 5)
-      restaurants[0].zip = '0' + restaurants[0].zip;
+
     template.where.directionURL = "https://www.google.com.sg/maps/dir/Singapore+" + match.location.zip + "/";  
     // api / blockRestaurant?user=objectid&block=email
     // TODO - make these into functions to construct the string
