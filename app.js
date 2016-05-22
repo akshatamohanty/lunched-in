@@ -140,19 +140,19 @@ lunchedin.mails = false;
 //- Second Call : 
 //    Runs matching algorithm
 //    Sends mails to matches
-lunchedin.timeToSecondCall = 10000; // 2 minutes - FirstCall to SecondCall Gap
+lunchedin.timeToSecondCall = 20000; // 2 minutes - FirstCall to SecondCall Gap
 
 //- Third Call : 
 //    Goes through the matches for today and incase of dropouts, mails the concerned people
 //    Increases lunchedCount of people
 //    Increases restaurantCount of restaurant
 //    AddsToKnown 
-lunchedin.timeToThirdCall = 10000; // 3 minutes - SecondCall to ThirdCall Gap
+lunchedin.timeToThirdCall = 30000; // 3 minutes - SecondCall to ThirdCall Gap
 
-lunchedin.timeForDiscardedUsers_speedrun = 10000; 
+lunchedin.timeForDiscardedUsers_speedrun = 20000; 
 lunchedin.timeForDiscardedUsers_normal = 900000;
 
-lunchedin.timeToMail_speedrun = 10000; 
+lunchedin.timeToMail_speedrun = 20000; 
 lunchedin.timeToMail_normal = 1200000;
  
 
