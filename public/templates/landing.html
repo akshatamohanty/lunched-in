@@ -1,129 +1,137 @@
-<div class='row page-section' id='home'>
+<div class='container-fluid'>
+  <div class='row page-section' id='home'>
 
-    <div class='col-sm-2 col-xs-hidden'></div>
-    
-    <div class='col-sm-8 col-xs-12'>
-
-      <div class='fade-in one'><img id='lunchedin' src='../assets/images/logo.png'></img></div>
+      <div class='col-sm-1 col-xs-hidden'></div>
       
-      <div class='fade-in two' id='tagline'>Connecting Colleagues with Cuisines...</div>
+      <div class='col-sm-10'>
 
-      <div class='fade-in three' id="loginForm">
-        <button id='enter' class="btn btn-info btn-block"> Enter </button>
-        <script>  
-            $('#enter').click(function(){
-              $('#logininBlk').slideToggle(500);
-            });
-        </script>
-        <form id='logininBlk' role="form" method="post" action="/login" style='display:none'>
-            <div class=" form-group">
-              <input type="email" class=" form-control" name="username" placeholder="Enter Email">
-            </div>
-            <div class=" form-group">
-              <input type="password" class=" form-control" name="password" placeholder="Enter Password">
-            </div>         
-            <button type="submit" class="btn btn-info btn-lg btn-block btn-danger"> Log In </button>
-        </form>
+        <div class='row'>
+          <img id='lunchedin' src='../assets/images/lunchedin-white.png'></img>
+        </div>
+        
+
+        
+        <div  class='row' id='tagline'>Connecting Colleagues with Cuisines. Automagically.</div>
+        
+
+        
+        <div  class='row' id="loginForm">
+          <form id='logininBlk' class="form-inline" role="form" method="post" action="/login">
+              <div class="form-group">
+                <input type="email" class="form-control" name="username" placeholder="Enter your Email">
+              </div>
+              <div class="form-group">
+                <input type="password" class="form-control" name="password" placeholder="Enter your Password">
+              </div>         
+              <button type="submit" class="btn btn-default"> Sign In </button>
+          </form>
+          <div  class='row' id='terms'>By clicking "Sign In", you agree to our <a>Terms & Conditions</a>.</div>
+        </div>
+
       </div>
+      
+      <div class='col-sm-1 col-xs-hidden'></div>
 
-    </div>
+  </div>
+
+  <div class='row' id='clients'></div>
+
+  <div class="row page-section" id='intro'>
     
-    <div class='col-sm-2 col-xs-hidden'></div>
+    <div>
+      <h1>Hi, I'm Eva</h1>   
+      <p>Your personal assistant bot to help you build your network over lunch. You tell me your preferences and I'll 
+         help you meet new people over lunch at restaurant near you that serves your favourite food.</p>
+      <p>No sign-in, no password, no download, all you do is - </p>
+      <p> Email <span class='text-primary'> eva@trylunchedin.com </span> when you are ready! </li>
+      <p> Show up! </li>
 
-</div>
+    </div> 
 
-<div id='clients'>AEDAS</div>
+  </div>
 
-<div class="row page-section" id='intro'>
-  
-  <div>
-    <h1>Hi, I'm Eva</h1>   
-    <p>Your personal assistant bot to help you build your network over lunch. You tell me your preferences and I'll 
-       help you meet new people over lunch at restaurant near you that serves your favourite food.</p>
-    <p>No sign-in, no password, no download, all you do is - </p>
-    <p> Email <span class='text-primary'> eva@trylunchedin.com </span> when you are ready! </li>
-    <p> Show up! </li>
+  <div class="row page-section" id='howitworks' style='padding-top: 0; margin-top: 0'>
 
-  </div> 
+      <h1 style='margin: 20px;margin-top:-10px; margin-bottom: 30px;'>How It Works</h1>   
 
-</div>
-
-<div class="row page-section" id='howitworks'>
-
-    <h1>How It Works</h1>   
-
-    <div class='row'>
-      <div class='col-md-4'>
-        <h1><span class=" glyphicon glyphicon-link"></h1>
-      </div>
-      <div class='col-md-8' style='padding-top: 2%'>
-        <p>You want to meet new people and grow your network over lunch hour, but don't know when where and how?</p>
-      </div>
-    </div>
-
-    <div class='row'>
-      <div class='col-md-4'>
-        <h1><span class=" glyphicon glyphicon-check"></h1>
-      </div>
-      <div class='col-md-8' style='padding-top: 2%'>
-        <p>Enter Eva. You tell her your preferences and let her know if you are available for lunch that day.</p>
-      </div>
-    </div>
-
-    <div class='row'>
-      <div class='col-md-4'>
-        <h1><span class=" glyphicon glyphicon-random"></h1>
-      </div>
-      <div class='col-md-8' style='padding-top: 2%'>
-        <p>Knowing your preferences, Eva finds you suitable people with whom  you can lunch at a restaurant near you.</p>
-      </div>
-    </div>
-
-    <div class='row'>
-      <div class='col-md-4'>
-        <h1><span class=" glyphicon glyphicon-envelope"></h1>
-      </div>
-      <div class='col-md-8' style='padding-top: 2%'>
-        <p>Like magic, the invitation arrives in your inbox before lunch.</p>
-      </div>
-    </div>
-
-</div>
-
-
-<div class="row" id='footer' style='margin-top: 20px;'>
-    <h1>About Us</h1>
-
-    <div class="col-sm-3 people">
-        <div class='row'>
-          <div class='col-sm-6'><img src='http://placehold.it/80x80'/></div>
-          <div class='col-sm-6' style='padding-top: 30px'>Hello!</div>
+      <div class='row'>
+        <div class='col-sm-4'>
+          <h1><span class=" glyphicon glyphicon-link"></h1>
         </div>
-        <p>  Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem  Lorem Lorem Lorem </p>
-    </div>
-
-    <div class="col-sm-3 people">
-        <div class='row'>
-          <div class='col-sm-6'><img src='http://placehold.it/80x80'/></div>
-          <div class='col-sm-6' style='padding-top: 30px'>Hello!</div>
+        <div class='col-sm-8' style='padding-top: 2%;'>
+          <p>You want to meet new people and grow your network over lunch hour, but don't know when where and how?</p>
         </div>
-        <p>  Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem  Lorem Lorem Lorem </p>
-    </div>
+      </div>
+
+      <div class='row'>
+        <div class='col-sm-4'>
+          <h1><span class=" glyphicon glyphicon-check"></h1>
+        </div>
+        <div class='col-sm-8' style='padding-top: 2%;'>
+          <p>Enter Eva. You tell her your preferences and let her know if you are available for lunch that day.</p>
+        </div>
+      </div>
+
+      <div class='row'>
+        <div class='col-sm-4'>
+          <h1><span class=" glyphicon glyphicon-random"></h1>
+        </div>
+        <div class='col-sm-8' style='padding-top: 2%;'>
+          <p>Knowing your preferences, Eva finds you suitable people with whom  you can lunch at a restaurant near you.</p>
+        </div>
+      </div>
+
+      <div class='row'>
+        <div class='col-sm-4'>
+          <h1><span class="glyphicon glyphicon-envelope"></h1>
+        </div>
+        <div class='col-sm-8' style='padding-top: 3%;'>
+          <p>Like magic, the invitation arrives in your inbox before lunch.</p>
+        </div>
+      </div>
+
+  </div>
+
+
+  <div class="row" id='footer' style='margin-top: 20px;'>
+      
+      <h1>About Us</h1>
+
+      <div class="col-sm-4 people">
+          <div class='row'>
+            <div class='col-sm-6'><img src='http://placehold.it/80x80'/></div>
+            <div class='col-sm-6' style='padding-top: 30px'>Hello!</div>
+          </div>
+          <p>  Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem  Lorem Lorem Lorem </p>
+      </div>
+
+      <div class="col-sm-4 people">
+          <div class='row'>
+            <div class='col-sm-6'><img src='http://placehold.it/80x80'/></div>
+            <div class='col-sm-6' style='padding-top: 30px'>Hello!</div>
+          </div>
+          <p>  Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem  Lorem Lorem Lorem </p>
+      </div>
+      
+      <div class="col-sm-4 people">
+          <div class='row'>
+            <div class='col-sm-6'><img src='http://placehold.it/80x80'/></div>
+            <div class='col-sm-6' style='padding-top: 30px'>Hello!</div>
+          </div>
+          <p>  Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem  Lorem Lorem Lorem </p>
+      </div>
+
+
+  </div>
+
+  <div class="row" id='links'>
     
-    <div class="col-sm-3 people">
-        <div class='row'>
-          <div class='col-sm-6'><img src='http://placehold.it/80x80'/></div>
-          <div class='col-sm-6' style='padding-top: 30px'>Hello!</div>
-        </div>
-        <p>  Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem  Lorem Lorem Lorem </p>
-    </div>
+    <span><a href='/'>Home</a></span>
+    <span><a href='/'>How it works</a></span>
+    <span><a href='/'>About</a></span>
+    <span><a href='/'>Feedback</a></span>
+    <span><a href='/'>Privacy Policy</a></span>
 
-    <div class="col-sm-3 text-uppercase">
-      <p>Home</p>
-      <p>How it works</p>
-      <p>About</p>
-      <p>Feedback</p>
-      <p>Privacy Policy</p>
-    </div>
+  </div>
 </div>
 

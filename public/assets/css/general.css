@@ -1,46 +1,3 @@
-@font-face {
-    font-family: Variane;
-    src: url(Variane.ttf);
-}
-
-/* make keyframes that tell the start state and the end state of our object */
-@-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-@-moz-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-
-.fade-in {
-  opacity:0;  /* make things invisible upon start */
-  -webkit-animation:fadeIn ease-in 1;  /* call our keyframe named fadeIn, use animattion ease-in and repeat it only 1 time */
-  -moz-animation:fadeIn ease-in 1;
-  animation:fadeIn ease-in 1;
-
-  -webkit-animation-fill-mode:forwards;  /* this makes sure that after animation is done we remain at the last keyframe value (opacity: 1)*/
-  -moz-animation-fill-mode:forwards;
-  animation-fill-mode:forwards;
-
-  -webkit-animation-duration:1s;
-  -moz-animation-duration:1s;
-  animation-duration:1s;
-}
-
-.fade-in.one {
-  -webkit-animation-delay: 1s;
-  -moz-animation-delay: 1s;
-  animation-delay: 1s;
-}
-
-.fade-in.two {
-  -webkit-animation-delay: 2s;
-  -moz-animation-delay:2s;
-  animation-delay: 2s;
-}
-
-.fade-in.three {
-  -webkit-animation-delay: 3s;
-  -moz-animation-delay:3s;
-  animation-delay: 3s;
-}
-
 html {
   font-family: sans-serif;
 }
@@ -50,11 +7,11 @@ body {
 }
 
 #home{
-  background-image: url('..//images//picture2.jpg');
+  background-image: url('..//images//BackgroundImage.jpg');
   background-size: cover;
   background-position: top-left;
-  padding-top: 20%;
-  font-family: sans-serif;
+  padding: 5%;
+  font-family: 'Open Sans', sans-serif;
   font-size: 24px;
   line-height: 150%;
   text-align: center;
@@ -62,27 +19,66 @@ body {
 
 /* Logo */
 #lunchedin{
-  margin-top: -30px;
-  height: 60px;
+  position: absolute;
+  top: 0;
+  left: 37%;
+  right: 37%;
+  height: 80px;
+  width: 26%;
+  padding-bottom: 20px;
+  border-bottom: 4px solid white;
 }
 
 
 #tagline{
-  font-family: Variane, sans-serif;
   font-size: 40px;
-  color: #222;
-  vertical-align: text-center;
-  margin-top: 50px;
-  margin-bottom: 50px;
+  color: #fff;
+  margin-top: 15%;
+  margin-bottom: 8%; 
+  text-align: centre;  
+  font-family: 'Open Sans', sans-serif;
 }
 
-#loginForm{
-  width:400px; 
-  margin-right:auto;
-  margin-left:auto; 
-  margin-top: 20px;
-  margin-bottom: 20px;
+#logininBlk .form-control{
+  height: 56px;
+  min-width: 300px;
+  color: #5F594B;
+  font-size: 16px;
+  border-radius: 0;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin: 10px;
 }
+
+#logininBlk .btn{
+  height: 56px;
+  font-size: 16px;
+  border-radius: 0;
+  padding-top: 18px;
+  padding-bottom: 20px;
+  background-color: #FFCE54;
+  border: 1px solid #F6BB42;
+  border-bottom: 3px solid #F6BB42;
+  color: #5F594B;
+  text-transform: uppercase;
+  border-shadow: 2px 2px #222;
+  margin: 10px;
+}
+
+#terms{
+  font-size: 12px;
+  color: #fff;
+  margin-top: 0;
+  margin-bottom: 10%; 
+  text-align: centre;  
+  font-family: 'Open Sans', sans-serif;
+}
+
+#terms a{
+  color: #fff;
+  border-bottom: 1px solid #fff;
+}
+
 
 #clients{
   height: 75px;
@@ -99,7 +95,7 @@ body {
 }
 
 #intro{
-  padding-top: 20%;
+  padding-top: 15%;
   text-align: center;
   font-family: Arial, sans-serif;
   color: #777776;
@@ -122,7 +118,7 @@ body {
 }
 
 #howitworks{
-  padding-top: 8%;
+  padding-top: 5%;
   text-align: center;
   font-family: Arial, sans-serif;
   color: #777776;
@@ -172,6 +168,27 @@ body {
 #footer .people p{
   margin-top: 20px;
   text-align: left;
+}
+
+#links{
+  height: 45px;
+  margin-top: 25px;
+  margin-bottom: 15px;
+  font-size: 15px;
+  margin-left: 30px;
+  text-transform: uppercase;
+}
+
+#links span{
+  margin-right: 15px;
+  font-size: 15px;
+  margin-left: 45px;
+  text-transform: uppercase;
+  color: #bbb;
+}
+
+#links span a{
+  color: #bbb;
 }
 
 

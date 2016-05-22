@@ -224,8 +224,9 @@ app.controller("admin", [
         $scope.restaurants = [];
         $scope.users = [];
         $scope.newuser = { 'name': 'UserName', 
-                           'email': 'user@example.com'
-                         }
+                           'email': 'user@example.com',
+                           'gender': 1
+                         };
 
         $scope.addUser = function(){
 
