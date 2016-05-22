@@ -1112,10 +1112,12 @@ lunchedin.thirdCall = function(){
         for(var i=0; i<allRestaurants.length; i++){
             var restaurant = allRestaurants[i]; 
 
-            if(restaurant.zip.length == 5)
-              restaurant.zip = '0' + restaurant.zip;
+            if(restaurant.zip.toString().length == 5)
+              restaurant.zip = '0' + restaurant.zip.toString();
 
-            restaurant.cuisine = restaurant.cuisine.replace(/\s/g, '').split(',');
+            if(restaurant.cuisine.replace)
+              restaurant.cuisine = restaurant.cuisine.replace(/\s/g, '').split(',');
+            
             restaurant.total = 0;
 
             addToDatabase( Restaurant, restaurant, "Restaurant", null);

@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var restaurantSchema = {
 	name: { type: String, required: true}, 
 	address: { type: String },
-	zip: Number,
+	zip: { type: String },
 	price: Number,
 	phone: { type: String },
 	cuisine: [ String ],
