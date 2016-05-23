@@ -29,6 +29,8 @@ var querystring = require("querystring");
 
 var schedule = require('node-schedule'); 
 
+var RSVP = require('rsvp');
+
 
 // configuration ==============================
 /* 
@@ -93,18 +95,25 @@ var clearDatabase = function( database, stringName, callback ){
 };
 
 var addToDatabase = function( database, jsonObject, stringName, callback ){
+
+  return new RSVP.Promise(function(resolve, reject) {
     
     database.create( jsonObject, 
                   function(err, user){
 
-                      if(err)
+                      if(err){
                         console.log("Error: Unable to add to ", stringName, err);
-
-                      console.log("Added ", stringName);
+                        //reject(jsonObject);
+                      }
+                      else{
+                        //resolve(user[0]._id);
+                        console.log("Added ", stringName);
+                      }
 
                       if(callback)
                         callback;   
                   });
+  });
 };
 
 
@@ -1626,7 +1635,7 @@ lunchedin.thirdCall = function(){
 
 
   // ============================================================================
-  function matchingAlgorithm( userPool ){
+  /*function matchingAlgorithm( userPool ){
 
 
           lunchedin.discardedUsers = [];
@@ -1660,7 +1669,7 @@ lunchedin.thirdCall = function(){
                 }
 
 
-                // picks the first mate in the given pool with compatible cuisine - or just picks the first person
+                // picks the first mate in the given pool with compatible cuisine
                 var pairMate = pickNextMate( pairMatePool, currUser, false );
                 
                 // this will happen when no user can be selected such that a third user can be selected -
@@ -1717,7 +1726,7 @@ lunchedin.thirdCall = function(){
                 //console.log("pool length before removal", userPool.length);
                 removeFromPool( userPool, [pairMate, thirdMate, fourthMate]  )
           })
-          /*
+          
           while(userPool.length > 0){
 
                 if(userPool.length < 3){
@@ -1801,7 +1810,7 @@ lunchedin.thirdCall = function(){
                 removeFromPool( userPool, [pairMate, thirdMate, fourthMate]  )
                 
                       
-          }*/ //while end
+          } //while end
 
           // takes in two users 
           // returns true if either of the users have blocked each other
@@ -1897,13 +1906,13 @@ lunchedin.thirdCall = function(){
                 // if the from the mate pool is cuisine compatible and the next pool with both these has length > 0
                 if( userCuisineCompatible( currUser, matePool[i] ) == true
                       && ( poolLengthOFF || regroup( matePool, matePool[i], true ) ) ){ 
-                  pairMate = matePool.splice(i, 1)[0]; // removes pairmate at the same time                     
+                  //pairMate = matePool.splice(i, 1)[0]; // removes pairmate at the same time                     
                   break;
                 }
             }
            
             // if no one is cuisine compatible, just pick best friend
-/*            if(pairMate == undefined){
+            if(pairMate == undefined){
               var i=0;
               while(i < matePool.length){
                 if(poolLengthOFF || regroup( matePool, matePool[i], true )){ 
@@ -1913,7 +1922,7 @@ lunchedin.thirdCall = function(){
                 }
                 i++;               
               }
-            }*/
+            }
 
             return pairMate;
           }
@@ -1924,7 +1933,7 @@ lunchedin.thirdCall = function(){
                 /*
                  * Dynamically constructing the criteria for the query
                  */
-                var criteria = []; 
+          /*      var criteria = []; 
                 var pids = [];
                 vegValue = false; 
                 halalValue = false;
@@ -1984,7 +1993,7 @@ lunchedin.thirdCall = function(){
           }    
 
   } // matchingAlgo end
-
+*/
 
 //  Initialization Function
 //      Runs only once when dynos are reset
@@ -1996,7 +2005,8 @@ var initialize = function() {
 
       //lunchedin.autorun = true; 
       // TODO: set to true for actual production
-      lunchedin.mails = true;
+      lunchedin.mails = false;
+      lunchedin.speedrun = true;
 
       //lunchedin.timeToSecondCall = 10800000;  // After 7.30am, run after 3 hours - 3*60*60s - 10.30am - mails go at 11.00am
       //lunchedin.timeToThirdCall = 7200000; //  After 10.30am, run after 2 hours - 2*60*60s - 12.30pm - dropout mails
@@ -2033,3 +2043,382 @@ var initialize = function() {
 
 }
 initialize(); // runs everytime dynos are set
+
+
+
+function matchingAlgorithm( userPool ){
+
+    lunchedin.discardedUsers = [];
+    console.log("User pool length:", userPool.length);
+
+    function userMutualBlock( user1, user2 ){
+
+      // check if user1.id is present in user2 block list
+      if( user2.blocked.indexOf(user1._id) > -1 ||  user1.blocked.indexOf(user2._id) > -1 )
+        return true;
+
+      return false; 
+    }
+
+    // returns the connection between two users
+    // in 0, 1, 2 form
+    function userMutualFriends( user1, user2){
+      // check if user1.id is present in user2 block list
+      return (user2.known.indexOf(user1._id)>-1) + (user1.known.indexOf(user2._id)>-1) +0; 
+    }
+
+    function regroup( pool, currUser, length ){
+      
+      var oneWayPool = [];
+      var twoWayPool = [];
+      var compatible = [];
+
+      for(var i=0; i<pool.length; i++){
+          // if either of the people have blocked, skip the user
+          if( userMutualBlock( currUser, pool[i] ))
+            continue;
+
+          if( currUser._id == pool[i]._id )
+            continue;
+
+          // categorize according to compatibility
+          switch( userMutualFriends( currUser, pool[i] ) ) {
+              case 0:
+                  compatible.push( pool[i] )
+                  break;
+              case 1:
+                  oneWayPool.push( pool[i] )
+                  break;
+              case 2:
+                  twoWayPool.push( pool[i] )
+          } // switch end
+      } // for-compatibility end
+
+      if(!length)
+        return [twoWayPool, oneWayPool, compatible]
+      else
+        return twoWayPool.length + oneWayPool.length + compatible.length;                         
+    }
+
+    function getUser() {
+
+      //console.log("getUser");
+
+      if(userPool.length < 3){
+        console.log("User pool is less than 3");
+        return undefined;
+      }
+      else 
+        return userPool.splice(0, 1)[0];  
+    }
+
+    function startProcess() {
+
+      return new RSVP.Promise(function(resolve, reject) {
+        var n = getUser(); 
+        if (n != undefined) {
+          console.log("Starting with", n.name);
+          resolve({pool: userPool, currUser: n, group: []});
+        } else {
+          reject({users: [n]});
+        }
+      });
+    }
+
+    // removes the users from the pool
+    function discard( object ){
+
+      var participants = object.users;
+      console.log("Discarding ", participants.length, "users.");
+
+      if(participants.length == 1){
+        console.log("Discarded user received ", participants[0].name);
+        lunchedin.discardedUsers.push(participants[0]);        
+      }
+
+     
+      for(var i=0; i<userPool.length; i++){
+        for(var g=0; g<participants.length; g++){
+          var userFromPool = userPool[i];
+          var groupMember = participants[g];
+          
+          if(userFromPool._id == groupMember._id){
+              lunchedin.discardedUsers.push(userPool.splice(i, 1))
+              console.log(userFromPool.name, " discarded. Userpool length: ", userPool.length);
+          }
+        }
+      }
+
+      if(userPool.length>0){
+        console.log("Processing for next user");
+        nextUser();
+      }
+    }  
+
+    function addMatch(object){
+
+      return new RSVP.Promise(function(resolve, reject) {
+
+            var pool = object.pool;
+            var currUser = object.currUser; 
+            var group = object.group;
+
+            var flag = false;
+            console.log("Group length for match", group.length);
+            for(var i=0; i<group.length; i++){
+              if(currUser._id == group[i]._id)
+                flag = true; 
+            }
+
+            if(flag == false){
+              group.push(currUser);
+            }
+
+
+            for(var i=0; i<userPool.length; i++){
+              for(var g=0; g<group.length; g++){
+                var userFromPool = userPool[i];
+                var groupMember = group[g];
+                
+                if(userFromPool._id == groupMember._id){
+                    userPool.splice(i, 1);
+                    console.log(userFromPool.name, " matched and removed from userpool. Userpool length: ", userPool.length);
+                }
+              }
+            }
+
+            //TODO:Fix!
+
+
+            console.log("----Matching----");        
+            var criteria = []; 
+            var pids = [];
+            vegValue = false; 
+            halalValue = false;
+            for( var p = 0; p < group.length; p++ ){
+
+                var participant = group[p];
+
+                if(participant == undefined)
+                  continue;
+
+                console.log(participant.name);
+                
+                if(participant.veg)
+                  vegValue = true;
+                
+                if(participant.halal)
+                  halalValue = true;
+
+                criteria.push( { cuisine: { $in: participant.cuisine } } );
+                criteria.push( { _id: { $nin: participant.blockedRestaurants } } );
+                pids.push(participant._id);
+
+                
+            }
+
+            criteria.push( { veg: vegValue } )
+            criteria.push( { halal: halalValue } )
+
+            // Find a restaurant and add the match
+            Restaurant.find({
+                 $and: criteria
+              }).sort({ price: 1, total: 1 })
+                .exec(function(err, res){
+                        
+                        if(err || res.length==0){
+                          console.log("Error(2165):", err);
+                        } 
+                        else {
+
+                              var newMatch =                                           
+                                {
+                                  'run': lunchedin.run,
+                                  'date': Date(),
+                                  'participants': pids,
+                                  'location': res[0],
+                                  'dropouts' : []
+                                };
+                              console.log("Match made at", res[0].name); 
+
+                              console.log("-------------------");
+
+                              addToDatabase( Match, newMatch, "Match", null);
+
+                              resolve();
+                        }
+                });
+        });
+    }
+
+    function userCuisineCompatible( object ){
+
+      return new RSVP.Promise(function(resolve, reject) {
+            var user = object.user; 
+            var group = object.group;
+
+            for(var g=0; g<group.length; g++){
+              if(group[g]._id == user._id)
+                reject();
+            }
+            
+
+            var criteria = []; 
+            var vegValue = false; 
+            var halalValue = false;
+            for( var p = 0; p < group.length; p++ ){
+
+                var participant = group[p];
+
+                if(participant == undefined)
+                  continue;
+                
+                if(participant.veg)
+                  vegValue = true;
+                
+                if(participant.halal)
+                  halalValue = true;
+
+                criteria.push( { cuisine: { $in: participant.cuisine } } );
+                criteria.push( { _id: { $nin: participant.blockedRestaurants } } );
+               
+            }
+
+            criteria.push( { veg: vegValue } )
+            criteria.push( { halal: halalValue } )
+
+            //console.log(criteria);
+
+            // Find a restaurant and add the match
+            Restaurant.find({
+                 $and: criteria
+              }, function(err, restaurants){
+                 
+                if(err || restaurants.length == 0){
+                   //console.log("No one cuisine compatible");
+                   reject();
+                } 
+                else{
+                   resolve(true);
+                }
+            });
+
+        });
+
+    }
+
+    function pickNextMate(object){
+
+      return new RSVP.Promise(function(resolve, reject) {
+        var pool = object.pool;
+        var currUser = object.currUser; 
+        var group = object.group; 
+
+        //console.log("pickNextMate:", "Pool-length:", pool.length, "User:", currUser.name, "Group Length:", group.length);
+
+
+        // pick the first that has compatible cuisine
+        var count = -1;
+        var groupOfThree = [];
+        function check(){
+
+          count++; 
+
+          if(count == pool.length){
+            if(group.length == 3){
+              console.log("No one is cuisine compatible but group length is 3, hence forming group");
+              resolve({'pool': pool, 'currUser': currUser, 'group': group});
+            }
+            else if(groupOfThree.length == 0 && group.length<=2){
+              reject({'users': [group[0]] });
+              console.log("No one is cuisine compatible. Discarding first user ", group[0].name );
+              return;  
+            }
+            else if(groupOfThree.length == 0 && group.length<=2){
+               console.log(pool[groupOfThree[0]], " compatible with group to form group of three");
+               //group.push(pool[groupOfThree[0]]);
+               resolve({'pool': pool, 'currUser': pool[groupOfThree[0]], 'group': group});             
+            } 
+          }
+          else{
+            
+            userCuisineCompatible( { 'user': pool[count], 'group': group })
+              .then(function(cuisineCompatibility){
+                   // if the from the mate pool is cuisine compatible and the next pool with both these has length > 0
+                  if( cuisineCompatibility ){
+
+                    if(regroup(pool, pool[count], true)>0){
+                      //group.push(pool[count]);
+                      resolve({'pool': pool, 'currUser': pool[count], 'group': group});                  
+                    }
+                    else{
+                      if(group.length == 3){
+                          groupOfThree.push(count);
+                      }                     
+                    }               
+                  }         
+              }, check);        
+          }
+        }
+
+        check();
+
+      });
+    }
+
+    function findMatePool(object){
+
+        return new RSVP.Promise(function(resolve, reject) {
+          
+          
+          var pool = object.pool;
+          var currUser = object.currUser; 
+          var group = object.group;
+
+          //console.log("Find Mate Pool:", "Pool-length:", pool.length, "User:", currUser.name, "Group Length:", group.length);
+
+          // create a pool for second mate - which should be a close person to the current user
+          var pool = regroup( pool, currUser, false ); 
+          if(group.length % 2 != 0 || group.length == 0)
+            pool = pool[0].concat(pool[1]).concat(pool[2]); 
+          else
+            pool = pool[2].concat(pool[1]).concat(pool[0]);
+
+          if(pool.length == 0){
+            if(group.length==3){
+              group.push(currUser);
+              resolve({'pool': pool, 'currUser': currUser, 'group': group});
+            }
+            else{
+                console.log("No compatible person found. Discarding user ", group[0].name);
+                group.push(currUser) // for the first user
+                reject({'users': [group[0].name]});  
+            }            
+          }
+          else{
+            group.push(currUser);
+            resolve({'pool': pool, 'currUser': currUser, 'group': group});
+          }
+      });
+
+    }
+
+    function nextUser(){
+
+      console.log("NextUser");
+
+      startProcess()
+        .then(findMatePool, null)   //Roll first time
+        .then(pickNextMate, null)   //Roll second time
+        .then(findMatePool, null)   //Roll second time
+        .then(pickNextMate, null)   //Roll second time
+        .then(findMatePool, null)   //Roll second time
+        .then(pickNextMate, null)   //Roll second time
+        .then(addMatch, null)
+        .then(nextUser, discard); 
+    }
+
+    nextUser();
+}
+setTimeout(lunchedin.firstCall, 3000);
+setInterval(lunchedin.firstCall, 60000);
