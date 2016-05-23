@@ -257,13 +257,13 @@ lunchedin.addToPool = function( runCount, userID ){
   Match.find({ run: runCount }, function(err, matches){
 
       if(matches != undefined && matches.length>0){
-        console.log("Matches found for run ", runCount);
+        console.log("User not added into pool since matches found for run ", runCount);
         // - Means the algorithm has already run for that time - can't add to pool - what if there were no matches for that run?
         return false; 
       }
       else{
         
-        console.log("Matches not found for run ", runCount);
+        //console.log("Matches not found for run ", runCount);
         User.find({ _id: ObjectId(userID) }, function(err, users){
 
             if(users.length){
@@ -511,6 +511,8 @@ lunchedin.noMatchMail = function( user ){
                     
                       if(restaurants.length > 0 && restaurants != undefined){
 
+
+
                         template.where = {}
                         template.where.rest_name = restaurants[0].name;
                         template.where.address = restaurants[0].address; 
@@ -525,7 +527,11 @@ lunchedin.noMatchMail = function( user ){
                                                       + restaurants[0].zip + "/";  
 
                         lunchedin.sendMail( templateID, template, user.email)
-                        console.log("Mailing ", user.name, "restaurant", restaurants[0].name);
+                        console.log("Mailing solo user ", user.name, "restaurant", restaurants[0].name);
+
+                        restaurants[0].total = restaurants[0].total + 1;
+                        //console.log("Restaurant counter incremented ", restaurants[0].total);
+                        restaurants[0].save();
                       }
                 });
 };
@@ -554,7 +560,7 @@ lunchedin.updateStatistics = function( runCount ){
                 Restaurant.find( { _id: matches[i].location._id }, function(err, rest){
 
                       if(!err && rest.length != 0){
-                        rest[0].total++; //= rest[0].total + matches[i].participants.length;
+                        rest[0].total = rest[0].total + 1; //= rest[0].total + matches[i].participants.length;
                         rest[0].save();
                       }
                 });
@@ -695,7 +701,7 @@ lunchedin.setPool = function(){
       console.log("-------------- Refreshing pool-----------------");
       User.update({}, {inPool: false} , {multi: true}, function(err, users){
             
-            if(err) console.log(err, "error");
+            if(err) console.log("Error(704):", err);
             else{
 /*                  var today = new Date();
                   var day = today.getDay();
@@ -817,14 +823,14 @@ lunchedin.secondCall = function(){
             console.log("No users!");
           else{
               console.log("-----------Running Match Algorithm (user count):", userPool.length, "---------------")
-              console.log(userPool);
+              //console.log(userPool);
               matchingAlgorithm(userPool);            
             }
   });
 
   function discarded(){
    // Find suitable party for discarded users to join
-    console.log("discarded", lunchedin.discardedUsers);
+    console.log("Number of users in discarded pool: ", lunchedin.discardedUsers.length);
 
     lunchedin.discardedUsers.map( function(d_user){
       Match.find( { 
@@ -1048,7 +1054,7 @@ lunchedin.thirdCall = function(){
   app.get('/api/getLoggedInUser', function(req, res){
 
       if(req.isAuthenticated()){
-        console.log("Sending active user details",req.session.passport.user[0]);
+        console.log("Sending active user details ",req.session.passport.user[0].name);
         res.json(req.session.passport.user[0]);       
       }
       else
@@ -1361,11 +1367,11 @@ lunchedin.thirdCall = function(){
                     else{
                        // if user is admin - send all information 
                       if( req.session.passport.user[0].adminStatus ){
-                            console.log("Admin Request Approved: Sending complete data");
+                            //console.log("Admin Request Approved: Sending complete data");
                             res.json(users);
                       }
                       else{
-                            console.log("Compressing Data");
+                            //console.log("Compressing Data");
                             var compressedUserData = users.map( function(user){
                                  return {
                                         _id: user._id,
@@ -1431,7 +1437,7 @@ lunchedin.thirdCall = function(){
                   User.find({ 
                                  "_id": ObjectId(req.body._id)
                               }, function(err, users){
-                                  if (err || users.length==0 ) console.log(err);
+                                  if (err || users.length==0 ) console.log("Error(1440):", err);
                                   else{
                                           var user = users[0];
 
@@ -1454,7 +1460,7 @@ lunchedin.thirdCall = function(){
                                           console.log("User update from User-Dashboard"); 
 
                                           req.login(users, function(err) {
-                                              if (err) console.log(err)
+                                              if (err) console.log("Error(1463):", err)
 
                                               setTimeout( function(){ res.sendStatus(200) }, 1500);
                                           })
@@ -1500,7 +1506,7 @@ lunchedin.thirdCall = function(){
                 run : lunchedin.run
               }, function(err, matches){
 
-              if(err || matches.length == 0) console.log("match not found");
+              if(err || matches.length == 0) res.status(200).send("<h1>Error! Invalid Match Id</h1>")
               else{
                 var match = matches[0];
 
@@ -1532,12 +1538,12 @@ lunchedin.thirdCall = function(){
       if(ObjectId.isValid(userID)){
           User.find( { _id: ObjectId(userID) }, function(err, user){
 
-              if(err || user.length == 0) console.log(err);  
+              if(err || user.length == 0) console.log("Error(1541):", err);  
               else{
                       var user = user[0];
                       User.find({ email: blockedMail }, function(err, user2){
 
-                            if(err || user2.length==0 ) console.log(err);
+                            if(err || user2.length==0 ) console.log("Error(1546):", err);
                             else{
                                   var user2 = user2[0];
                                   if( user.blocked.indexOf( user2._id ) == -1){
@@ -1572,19 +1578,21 @@ lunchedin.thirdCall = function(){
       if(ObjectId.isValid(userID) && ObjectId.isValid(blockedRId)){
          User.find( { _id: ObjectId(userID) }, function(err, user){
 
-            if(err || user.length == 0) console.log(err);  
+            if(err || user.length == 0) console.log("Error(1581):", err);  
             else{
                     var user = user[0];
                     Restaurant.find({ _id: ObjectId(blockedRId)}, function(err, restaurants){
 
-                          if(err || restaurants.length==0 ) console.log(err);
+                          if(err || restaurants.length==0 ) console.log("Error(1586):", err);
                           else{
-                                var restaurant = restaurants[0]; console.log("Found", restaurant);
+                                var restaurant = restaurants[0]; 
+                                //console.log("Found", restaurant);
                                 if( user.blockedRestaurants.indexOf( restaurant._id ) == -1){
                                   user.blockedRestaurants.push(restaurant._id);
                                   
                                   user.save();
-                                  res.status(200).send('<h1>Noted</h1>')
+                                  res.status(200).send('<h1>Noted</h1>');
+                                  console.log("Restaurant has been blocked for user.");
                                   //res.status(200).(user.name+ ", "+ restaurant.name+ "has been blocked.")
                                 }
                                 else
@@ -1623,7 +1631,93 @@ lunchedin.thirdCall = function(){
 
           lunchedin.discardedUsers = [];
           console.log("User pool length:", userPool.length);
-          
+
+          userPool.map( function(){
+
+                if(userPool.length < 3){
+                  console.log("Pool length is less than 3. Number of discarded users: ", userPool.length);
+                  lunchedin.discardedUsers = lunchedin.discardedUsers.concat(userPool);
+                  userPool = [];
+                  return;
+                  //continue;      
+                }
+
+                //always at index 0 - because the first user is always removed; remove the first user
+                //console.log("UserPool Length at", userPool.length);
+                var currUser = userPool.splice(0, 1)[0]; // removes from the userPool also
+                
+                console.log("Starting with", currUser.name);
+
+                // create a pool for second mate - which should be a close person to the current user
+                var pairMatePool = regroup( userPool, currUser, false ); 
+                var pairMatePool = pairMatePool[0].concat(pairMatePool[1]).concat(pairMatePool [2]); // ordered by priority
+                //console.log("Found pairmate pool of length", pairMatePool.length);
+                // if pairMatePool.length == 0 - no pair available - can't do anything - user has already been removed from the pool
+                if(pairMatePool.length == 0){
+                    console.log("No compatible person found. Discarding user ", currUser.name);
+                    lunchedin.discardedUsers.push(currUser);
+                    return;//continue;                            
+                }
+
+
+                // picks the first mate in the given pool with compatible cuisine - or just picks the first person
+                var pairMate = pickNextMate( pairMatePool, currUser, false );
+                
+                // this will happen when no user can be selected such that a third user can be selected -
+                // in this case, better to discard the first user and continue
+                if(pairMate == undefined){
+                    console.log("No person with compatible cuisine found. Discarding user ", currUser.name);
+                    lunchedin.discardedUsers.push(currUser);
+                    return;//continue;
+                }
+                  
+
+                // this regrouping will give users compatible with both the selected users
+                // pairMatePool has to be reordered according to new user
+                // ordering of the pool is done to keep compatible people first
+                var thirdMatePool = regroup( pairMatePool, pairMate, false );
+                var thirdMatePool = thirdMatePool[2].concat(thirdMatePool[1]).concat(thirdMatePool[0]);
+                //console.log("Pool of third mate for", currUser.name, "and", pairMate.name, "of length", thirdMatePool.length);
+
+                // pick a third person compatible with the second person - and matching his cuisine
+                // if no user with matching cuisine is found, pick first person who gives next pool length > 0
+                var thirdMate = pickNextMate( thirdMatePool, pairMate, false );
+                //console.log("Found mate for", currUser.name, "and", pairMate.name, "in", thirdMate.name || 'none');
+
+                // this happens when no third user can give the next pool greater than 0 
+                // in this case, switch off pool length condition - pick a person with compatible cuisine
+                if(thirdMate == undefined){
+                  thirdMate = pickNextMate( thirdMatePool, pairMate, true );
+                  // create match of three people
+                  if(thirdMate == undefined){
+                    console.log("No third mate found. Discarding user ", currUser.name);
+                    lunchedin.discardedUsers.push(currUser);
+                    return;//continue;
+                  }
+
+                  console.log(currUser.name, pairMate.name, thirdMate.name, " have been matched");
+                  addMatch( [currUser, pairMate, thirdMate] );
+                  // remove the three people from the userpool
+                  removeFromPool( userPool, [currUser, pairMate, thirdMate]  )
+
+                  return;//continue;
+                }
+
+                // third mate pool is acceptable to both first and second user - fourth mate pool removes
+                // blocked users for third mate also - ordered with best friend for third mate first
+                var fourthMatePool = regroup( thirdMatePool, thirdMate, false );
+                var fourthMatePool = fourthMatePool[0].concat(fourthMatePool[1]).concat(fourthMatePool[2]);
+                var fourthMate = pickNextMate( fourthMatePool, thirdMate, true );  // switch off next pool length
+
+                // make match of four people
+                console.log(currUser.name, pairMate.name, thirdMate.name, fourthMate.name, " have been matched");
+                addMatch( [currUser, pairMate, thirdMate, fourthMate] );                        
+                
+                // remove the four people from the user pool
+                //console.log("pool length before removal", userPool.length);
+                removeFromPool( userPool, [pairMate, thirdMate, fourthMate]  )
+          })
+          /*
           while(userPool.length > 0){
 
                 if(userPool.length < 3){
@@ -1707,7 +1801,7 @@ lunchedin.thirdCall = function(){
                 removeFromPool( userPool, [pairMate, thirdMate, fourthMate]  )
                 
                       
-          } //while end
+          }*/ //while end
 
           // takes in two users 
           // returns true if either of the users have blocked each other
@@ -1742,11 +1836,14 @@ lunchedin.thirdCall = function(){
                       ]  
               }, function(err, restaurant){
                  if(err || restaurant.length == 0){
-                   console.log(err);
+                   //console.log("Error(1839):", err);
+                   //console.log("Error(1839):", err);
                    return false;
                  } 
-                 
-                 return true;
+                 else{
+                  console.log("Cuisine compatible", user1.name, user2.name);
+                  return true;
+                 }
               })
               //console.log("cuisine compatible", returnValue)
               //return returnValue;
@@ -1798,7 +1895,7 @@ lunchedin.thirdCall = function(){
             for(var i=0; i<matePool.length; i++){
 
                 // if the from the mate pool is cuisine compatible and the next pool with both these has length > 0
-                if( userCuisineCompatible( currUser, matePool[i] ) 
+                if( userCuisineCompatible( currUser, matePool[i] ) == true
                       && ( poolLengthOFF || regroup( matePool, matePool[i], true ) ) ){ 
                   pairMate = matePool.splice(i, 1)[0]; // removes pairmate at the same time                     
                   break;
@@ -1806,7 +1903,7 @@ lunchedin.thirdCall = function(){
             }
            
             // if no one is cuisine compatible, just pick best friend
-            if(pairMate == undefined){
+/*            if(pairMate == undefined){
               var i=0;
               while(i < matePool.length){
                 if(poolLengthOFF || regroup( matePool, matePool[i], true )){ 
@@ -1816,14 +1913,14 @@ lunchedin.thirdCall = function(){
                 }
                 i++;               
               }
-            }
+            }*/
 
             return pairMate;
           }
 
           // adds the required match
           function addMatch( participants ){
-                console.log("-------------Matching--------------");
+                console.log("-------------Made a match--------------");
                 /*
                  * Dynamically constructing the criteria for the query
                  */
@@ -1848,7 +1945,7 @@ lunchedin.thirdCall = function(){
                     criteria.push( { _id: { $nin: participant.blockedRestaurants } } );
                     pids.push(participant._id);
 
-                    console.log(participant.name, ": Been on ", participant.lunchCount, " lunches and knows ", participant.knownCount);
+                    //console.log(participant.name, ": Been on ", participant.lunchCount, " lunches and knows ", participant.knownCount);
                 }
 
                 criteria.push( { veg: vegValue } )
@@ -1860,7 +1957,7 @@ lunchedin.thirdCall = function(){
                   })
                 .sort({ price: 1, total: 1 })
                 .exec(function(err, res){
-                     if(err || res.length==0) console.log(err);
+                     if(err || res.length==0) console.log("Error(1957):", err);
                      else {
 
                           var newMatch =                                           
