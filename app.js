@@ -2005,8 +2005,8 @@ var initialize = function() {
 
       //lunchedin.autorun = true; 
       // TODO: set to true for actual production
-      lunchedin.mails = false;
-      lunchedin.speedrun = true;
+      lunchedin.mails = true;
+      //lunchedin.speedrun = true;
 
       //lunchedin.timeToSecondCall = 10800000;  // After 7.30am, run after 3 hours - 3*60*60s - 10.30am - mails go at 11.00am
       //lunchedin.timeToThirdCall = 7200000; //  After 10.30am, run after 2 hours - 2*60*60s - 12.30pm - dropout mails
