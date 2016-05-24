@@ -906,7 +906,7 @@ lunchedin.secondCall = function(){
 
     });
   }
-  
+
   lunchedin.refreshAndMail = function(){
           lunchedin.discardedUsers = []; // safety net - redundant
           lunchedin.mailMatches( lunchedin.run )
@@ -1720,7 +1720,7 @@ function matchingAlgorithm( userPool ){
         lunchedin.discardedUsers = lunchedin.discardedUsers.concat(participants);
         console.log("Discarded Users count:", lunchedin.discardedUsers.length);
         userPool = [];
-        lunchein.discarded();
+        lunchedin.discarded();
       }
       else{
         console.log("Discarded user received ", participants[0].name);
