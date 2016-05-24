@@ -1944,7 +1944,7 @@ function matchingAlgorithm( userPool ){
           var currUser = object.currUser; 
           var group = object.group;
 
-          //console.log("Find Mate Pool:", "Pool-length:", pool.length, "User:", currUser.name, "Group Length:", group.length);
+          console.log("Find Mate Pool:", "Pool-length:", pool.length, "User:", currUser.name, "Group Length:", group.length);
 
           // create a pool for second mate - which should be a close person to the current user
           var pool = regroup( pool, currUser, false ); 
@@ -1954,8 +1954,9 @@ function matchingAlgorithm( userPool ){
             pool = pool[2].concat(pool[1]).concat(pool[0]);
 
           //console.log(pool.length, "hello");
-          if(pool.length + group.length < 2)
-            reject({'users': [group[0].name]});
+          if(pool.length + group.length < 2){
+            reject({'users': [group[0]]});
+          }
           else{
               group.push(currUser);
               resolve({'pool': pool, 'currUser': currUser, 'group': group});            
