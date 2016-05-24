@@ -1954,7 +1954,7 @@ function matchingAlgorithm( userPool ){
             pool = pool[2].concat(pool[1]).concat(pool[0]);
 
           //console.log(pool.length, "hello");
-          if(pool.length + group.length < 2){
+          if((pool.length + group.length) < 2){
             reject({'users': [group[0]]});
           }
           else{
