@@ -867,7 +867,10 @@ lunchedin.secondCall = function(){
                       console.log("Restaurant mailed to ", d_user.name);
                       lunchedin.noMatchMail(d_user);
 
-                      resolve();
+                      if(lunchedin.discardedUsers.length == 0)
+                        reject();
+                      else
+                        resolve();
                     }
                     else{
                       
@@ -893,7 +896,10 @@ lunchedin.secondCall = function(){
                                 console.log("No match found for discarded user", d_user.name);
                                 console.log("Restaurant mailed to ", d_user.name);
                                 lunchedin.noMatchMail(d_user);
-                                resolve();
+                                if(lunchedin.discardedUsers.length == 0)
+                                  reject();
+                                else
+                                  resolve();
                               }
 
                           });                                  
