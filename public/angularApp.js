@@ -18,18 +18,19 @@ var app = angular
  *  Routing
  */
 app.config(["$routeProvider", "$locationProvider", function($routeProvider, $locationProvider) {
-   $routeProvider.
     
-    when("/logout", {
-      templateUrl: "templates/logout.html", 
+/*  $routeProvider.
+   when("terms", {
+      templateUrl: "templates/terms.html",
    }).
-
+   when("privacypolicy", {
+      templateUrl: "templates/privacy.html",
+   }).
     otherwise({
-      templateUrl: "templates/user_dashboard.html", 
-      controller: "user"
+      templateUrl: "templates/body.html"
     });
 
-	 $locationProvider.html5Mode(true);
+	 $locationProvider.html5Mode(true);*/
    
 }]);
 
@@ -41,7 +42,7 @@ app.controller("MainCtrl", [
 
         $scope.loggedInUser = null;
 
-
+        window.history.replaceState(null, null, "/");
          
         $http.get("/api/getLoggedInUser")
                          .success( function(data){
@@ -66,6 +67,8 @@ app.controller("MainCtrl", [
 app.controller("user", [
       "$scope", "$http",
       function($scope, $http){
+
+        window.location = '#account';
         
         $('#spinner').hide();
         
