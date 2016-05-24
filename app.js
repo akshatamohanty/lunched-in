@@ -924,8 +924,8 @@ lunchedin.secondCall = function(){
 
         }
 
-  console.log("----------- Discarded--------------")
-  console.log("Number of users in discarded pool: ", lunchedin.discardedUsers.length);
+/*  console.log("----------- Discarded--------------")
+  console.log("Number of users in discarded pool: ", lunchedin.discardedUsers.length);*/
   lunchedin.discarded = function(){
    // Find suitable party for discarded users to join
     placeDiscardedUser()
@@ -1548,7 +1548,7 @@ lunchedin.thirdCall = function(){
                                   
                                   user.save();
                                   console.log("Restaurant has been blocked for user.");
-                                  res.status(200).('<h1>Confirm?'+ restaurant.name+ ' will not be suggested to you again.</h1>')
+                                  res.status(200).send("<h1>Confirm? " + restaurant.nam + " will not be suggested to you again.</h1>");
                                 }
                                 else
                                   res.status(200).send('<h1>Error</h1>')
@@ -1684,7 +1684,7 @@ function matchingAlgorithm( userPool ){
       }
         
       
-      if(userPool.length<3){
+      if(participants.length == 0 && userPool.length < 3/*userPool.length<3*/){
         console.log("Pool less than 3")
         lunchedin.discardedUsers = lunchedin.discardedUsers.concat(userPool);
         console.log("Discarded Users count:", lunchedin.discardedUsers.length);
