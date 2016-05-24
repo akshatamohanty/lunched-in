@@ -1648,7 +1648,7 @@ function matchingAlgorithm( userPool ){
           if( userMutualBlock( currUser, pool[i] ))
             continue;
 
-          if( currUser._id == currUser._id )
+          if( currUser._id == pool[i]._id )
             continue;
 
           // categorize according to compatibility
@@ -1915,17 +1915,19 @@ function matchingAlgorithm( userPool ){
               .then(function(cuisineCompatibility){
                    // if the from the mate pool is cuisine compatible and the next pool with both these has length > 0
                   if( cuisineCompatibility ){
-
+                    console.log("Found cuisine compatible user with group");
                     if(regroup(pool, pool[count], true)>0){
                       //group.push(pool[count]);
-                      console.log("Found cuisine compatible user with group:", pool[count].name );
+                      console.log("User has next pool greater than 0:", pool[count].name );
                       resolve({'pool': pool, 'currUser': pool[count], 'group': group});                  
                     }
                     else{
-                      //if(group.length == 3)
-                        //resolve({'pool': pool, 'currUser': pool[count], 'group': group});   
+                      if(group.length == 3){
+                        console.log("User completes group of 4", pool[count].name );
+                        resolve({'pool': pool, 'currUser': pool[count], 'group': group});
+                      }
+                           
                       if(group.length == 2){
-
                           groupOfThree.push(count);
                           check();
                       }                     
