@@ -906,26 +906,8 @@ lunchedin.secondCall = function(){
 
     });
   }
-
-  function discarded(){
-   // Find suitable party for discarded users to join
-    console.log("----------- Discarded--------------")
-    console.log("Number of users in discarded pool: ", lunchedin.discardedUsers.length);
-
-    placeDiscardedUser()
-      .then(placeDiscardedUser, function(){
-        console.log("Finished with the discarded pool");
-      })
-
-  }
-
-  // for discarded users
-  setTimeout( discarded, (lunchedin.speedrun? lunchedin.timeForDiscardedUsers_speedrun : lunchedin.timeForDiscardedUsers_normal) );
-
-  // match and mail
-  // TODO: wait for 30s for matches to be made - wait 10 minutes
-  // ATTENTION: MODIFY IN PRODUCTION
-  setTimeout( function(){
+  
+  lunchedin.refreshAndMail = function(){
           lunchedin.discardedUsers = []; // safety net - redundant
           lunchedin.mailMatches( lunchedin.run )
 
@@ -934,7 +916,39 @@ lunchedin.secondCall = function(){
             if(!err) console.log("Pool refreshed after running algorithm");
           });
 
-        }, (lunchedin.speedrun ? lunchedin.timeToMail_speedrun : lunchedin.timeToMail_normal) );
+        }
+
+  lunchedin.discarded = function(){
+   // Find suitable party for discarded users to join
+    console.log("----------- Discarded--------------")
+    console.log("Number of users in discarded pool: ", lunchedin.discardedUsers.length);
+
+    placeDiscardedUser()
+      .then(placeDiscardedUser, function(){
+        console.log("Finished with the discarded pool");
+        lunchedin.refreshAndMail();
+      })
+
+  }
+
+  // for discarded users
+  //setTimeout( lunchedin.discarded, (lunchedin.speedrun? lunchedin.timeForDiscardedUsers_speedrun : lunchedin.timeForDiscardedUsers_normal) );
+
+  // match and mail
+  // TODO: wait for 30s for matches to be made - wait 10 minutes
+  // ATTENTION: MODIFY IN PRODUCTION
+/*  setTimeout( function(){
+          lunchedin.discardedUsers = []; // safety net - redundant
+          lunchedin.mailMatches( lunchedin.run )
+
+          //console.log("---- Pool refresh after running algorithm in second call -----");
+          User.update({}, {inPool: false} , {multi: true}, function(err, users){
+            if(!err) console.log("Pool refreshed after running algorithm");
+          });
+
+        }, (lunchedin.speedrun ? lunchedin.timeToMail_speedrun : lunchedin.timeToMail_normal) );*/
+
+
 };
 
 lunchedin.thirdCall = function(){
@@ -1706,6 +1720,7 @@ function matchingAlgorithm( userPool ){
         lunchedin.discardedUsers = lunchedin.discardedUsers.concat(participants);
         console.log("Discarded Users count:", lunchedin.discardedUsers.length);
         userPool = [];
+        lunchein.discarded();
       }
       else{
         console.log("Discarded user received ", participants[0].name);
