@@ -1648,7 +1648,7 @@ function matchingAlgorithm( userPool ){
           if( userMutualBlock( currUser, pool[i] ))
             continue;
 
-          if( currUser._id == pool[i]._id )
+          if( currUser._id == currUser._id )
             continue;
 
           // categorize according to compatibility
