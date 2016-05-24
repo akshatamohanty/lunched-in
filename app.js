@@ -1704,7 +1704,7 @@ function matchingAlgorithm( userPool ){
       if(userPool.length<3){
         console.log("Pool less than 3")
         lunchedin.discardedUsers = lunchedin.discardedUsers.concat(participants);
-        //console.log("Discarded Users count:", lunchedin.discardedUsers.length);
+        console.log("Discarded Users count:", lunchedin.discardedUsers.length);
         userPool = [];
       }
       else{
@@ -1734,7 +1734,7 @@ function matchingAlgorithm( userPool ){
               group.push(currUser);
             }
 
-            //console.log("Group length for match", group.length);
+            console.log("Group length for match", group.length);
             for(var i=0; i<userPool.length; i++){
               for(var g=0; g<group.length; g++){
                 var userFromPool = userPool[i];
@@ -1742,7 +1742,7 @@ function matchingAlgorithm( userPool ){
                 
                 if(userFromPool._id == groupMember._id){
                     userPool.splice(i, 1);
-                    //console.log(userFromPool.name, " matched and removed from userpool. Userpool length: ", userPool.length);
+                    console.log(userFromPool.name, " matched and removed from userpool. Userpool length: ", userPool.length);
                 }
               }
             }
@@ -1809,7 +1809,7 @@ function matchingAlgorithm( userPool ){
                                     }
                                     else{
                                       //resolve(user[0]._id);
-                                      console.log("Added real match");
+                                      console.log("Added match");
                                       console.log("-------------------");
                                       resolve(true)
                                     }
@@ -1918,6 +1918,7 @@ function matchingAlgorithm( userPool ){
 
                     if(regroup(pool, pool[count], true)>0){
                       //group.push(pool[count]);
+                      console.log("Found cuisine compatible user with group:", pool[count].name );
                       resolve({'pool': pool, 'currUser': pool[count], 'group': group});                  
                     }
                     else{
@@ -1948,7 +1949,7 @@ function matchingAlgorithm( userPool ){
           var currUser = object.currUser; 
           var group = object.group;
 
-          //console.log("Find Mate Pool:", "Pool-length:", pool.length, "User:", currUser.name, "Group Length:", group.length);
+          console.log("Find Mate Pool:", "Pool-length:", pool.length, "User:", currUser.name, "Group Length:", group.length);
 
           // create a pool for second mate - which should be a close person to the current user
           var pool = regroup( pool, currUser, false ); 
