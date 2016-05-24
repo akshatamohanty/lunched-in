@@ -841,7 +841,7 @@ lunchedin.secondCall = function(){
             }
   });
 
-  function placeDiscardedUser(d_user){
+  function placeDiscardedUser(){
     return new RSVP.Promise(function(resolve, reject) {
         
         var d_user = lunchedin.discardedUsers.splice(0, 1)[0];
@@ -928,6 +928,7 @@ lunchedin.secondCall = function(){
   console.log("Number of users in discarded pool: ", lunchedin.discardedUsers.length);*/
   lunchedin.discarded = function(){
    // Find suitable party for discarded users to join
+   console.log("Number of users in discarded pool: ", lunchedin.discardedUsers.length);
     placeDiscardedUser()
       .then(lunchedin.discarded, function(){
         console.log("Finished with the discarded pool");
