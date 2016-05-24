@@ -1471,7 +1471,7 @@ lunchedin.thirdCall = function(){
                   match.dropouts.push( match.participants.splice(match.participants.indexOf(objectID), 1) );
                   match.save();
                   console.log("Dropped-out");
-                  res.status(200).send("<h1>Your lunch mates will miss you!</h1>")
+                  res.status(200).send('<h1>Confirm? Oops. Don\'t worry, I will inform your other colleagues. You will be missed! </h1>')
                   //res.send("<h1>Your lunch mates will miss you!</h1>")
                 }
               }
@@ -1506,7 +1506,7 @@ lunchedin.thirdCall = function(){
                                     user.blocked.push(user2._id);
                                     //res.send(user.name + ", " + user2.name+ "has been blocked.")
                                     user.save();
-                                    res.status(200).send('<h1>Confirm? You have blocked', user2.name, ' from lunching with you again.</h1>')
+                                    res.status(200).send('<h1>Confirm? You have blocked'+ user2.name+ ' from lunching with you again.</h1>')
                                     //res.status(200).send(user.name + ", " + user2.name+ " has been blocked.");
                                   }
                                   else
@@ -1547,9 +1547,8 @@ lunchedin.thirdCall = function(){
                                   user.blockedRestaurants.push(restaurant._id);
                                   
                                   user.save();
-                                  res.status(200).send('<h1>Confirm? Oops. Don\'t worry, I will inform your other colleagues. You will be missed! </h1>');
                                   console.log("Restaurant has been blocked for user.");
-                                  //res.status(200).(user.name+ ", "+ restaurant.name+ "has been blocked.")
+                                  res.status(200).('<h1>Confirm?'+ restaurant.name+ ' will not be suggested to you again.</h1>')
                                 }
                                 else
                                   res.status(200).send('<h1>Error</h1>')
@@ -1893,7 +1892,7 @@ function matchingAlgorithm( userPool ){
             }
             if(groupOfThree.length && group.length==2){
                console.log(pool[groupOfThree[0]].name, " compatible with group to form group of three");
-               //group.push(pool[groupOfThree[0]]);
+               group.push(pool[groupOfThree[0]]);
                resolve({'pool': pool, 'currUser': pool[groupOfThree[0]], 'group': group});             
             } 
           }
@@ -1903,15 +1902,15 @@ function matchingAlgorithm( userPool ){
               .then(function(cuisineCompatibility){
                    // if the from the mate pool is cuisine compatible and the next pool with both these has length > 0
                   if( cuisineCompatibility ){
-                    //console.log("Found cuisine compatible user with group");
+                    console.log("Found cuisine compatible user with group");
                     if(regroup(pool, pool[count], true)>0){
                       //group.push(pool[count]);
-                      //console.log("User has next pool greater than 0:", pool[count].name );
+                      console.log("User has next pool greater than 0:", pool[count].name );
                       resolve({'pool': pool, 'currUser': pool[count], 'group': group});                  
                     }
                     else{
                       if(group.length == 3){
-                        //console.log("User completes group of 4", pool[count].name );
+                        console.log("User completes group of 4", pool[count].name );
                         resolve({'pool': pool, 'currUser': pool[count], 'group': group});
                       }
                            
