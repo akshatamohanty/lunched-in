@@ -845,12 +845,12 @@ lunchedin.secondCall = function(){
     return new RSVP.Promise(function(resolve, reject) {
         
         var d_user = lunchedin.discardedUsers.splice(0, 1)[0];
-        
+        console.log("Trying to place", d_user.name);
         if(d_user == undefined){
           reject();
         }
         else{
-          console.log("Trying to place", d_user.name);
+          
           Match.find( { 
                    run : lunchedin.run,
                    location: {$exists:true},
@@ -1777,7 +1777,7 @@ function matchingAlgorithm( userPool ){
             criteria.push( { veg: vegValue } )
             criteria.push( { halal: halalValue } )
 
-            // Find a restaurant and add the match
+            console.log("--------------Finding restaurant---------------");        
             Restaurant.find({
                  $and: criteria
               }).sort({ price: 1, total: 1 })
@@ -1797,8 +1797,6 @@ function matchingAlgorithm( userPool ){
                                   'dropouts' : []
                                 };
                               console.log("Match made at", res[0].name); 
-
-                              
 
                               Match.create( newMatch, 
                                 function(err, match){
@@ -1930,6 +1928,10 @@ function matchingAlgorithm( userPool ){
                       if(group.length == 2){
                           groupOfThree.push(count);
                           check();
+                      }
+
+                      if(group.length == 1){
+                        reject({'users': [group[0]] });
                       }                     
                     }               
                   }         
