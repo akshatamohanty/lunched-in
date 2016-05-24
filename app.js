@@ -1969,9 +1969,9 @@ var initialize = function() {
 
       //lunchedin.autorun = true; 
       // TODO: set to true for actual production
-      lunchedin.mails = false;
+      lunchedin.mails = true;
 
-      lunchedin.testing = true;
+      lunchedin.testing = false;
 
       //lunchedin.timeToSecondCall = 10800000;  // After 7.30am, run after 3 hours - 3*60*60s - 10.30am - mails go at 11.00am
       //lunchedin.timeToThirdCall = 7200000; //  After 10.30am, run after 2 hours - 2*60*60s - 12.30pm - dropout mails
@@ -2407,13 +2407,13 @@ function matchingAlgorithm( userPool ){
 }
 
 
-
+/*
 //Testing
 if(lunchedin.testing){
   setTimeout(lunchedin.firstCall, 3000);
   setInterval(lunchedin.firstCall, 120000);
   lunchedin.speedrun = true;
-/*  clearDatabase( User, "Users", null ); 
+  clearDatabase( User, "Users", null ); 
 
   var user1 = {'name': 'Kajol', 'email':'kajol@example.com'};
   var user2 = {'name': 'Ajay', 'email':'k.ajol@example.com'};
@@ -2429,5 +2429,6 @@ if(lunchedin.testing){
   lunchedin.addUser(user4);
   lunchedin.addUser(user5);
   lunchedin.addUser(user6);
-  lunchedin.addUser(user7);*/
+  lunchedin.addUser(user7);
 }
+*/
