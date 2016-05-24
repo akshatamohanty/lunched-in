@@ -149,14 +149,14 @@ lunchedin.mails = false;
 //- Second Call : 
 //    Runs matching algorithm
 //    Sends mails to matches
-lunchedin.timeToSecondCall = 120000; // 2 minutes - FirstCall to SecondCall Gap
+lunchedin.timeToSecondCall = 10000; // 2 minutes - FirstCall to SecondCall Gap
 
 //- Third Call : 
 //    Goes through the matches for today and incase of dropouts, mails the concerned people
 //    Increases lunchedCount of people
 //    Increases restaurantCount of restaurant
 //    AddsToKnown 
-lunchedin.timeToThirdCall = 180000; // 3 minutes - SecondCall to ThirdCall Gap
+lunchedin.timeToThirdCall = 300000; // 3 minutes - SecondCall to ThirdCall Gap
 
 lunchedin.timeForDiscardedUsers_speedrun = 60000; 
 lunchedin.timeForDiscardedUsers_normal = 900000;
@@ -924,13 +924,12 @@ lunchedin.secondCall = function(){
 
         }
 
+  console.log("----------- Discarded--------------")
+  console.log("Number of users in discarded pool: ", lunchedin.discardedUsers.length);
   lunchedin.discarded = function(){
    // Find suitable party for discarded users to join
-    console.log("----------- Discarded--------------")
-    console.log("Number of users in discarded pool: ", lunchedin.discardedUsers.length);
-
     placeDiscardedUser()
-      .then(placeDiscardedUser, function(){
+      .then(lunchedin.discarded, function(){
         console.log("Finished with the discarded pool");
         lunchedin.refreshAndMail();
       })
@@ -1584,58 +1583,6 @@ lunchedin.thirdCall = function(){
 
   // ============================================================================
 
-//  Initialization Function
-//      Runs only once when dynos are reset
-//      Adds the restaurants
-var initialize = function() {   
-
-    // Production settings
-    if(lunchedin.production == true){
-
-      //lunchedin.autorun = true; 
-      // TODO: set to true for actual production
-      lunchedin.mails = true;
-
-      lunchedin.testing = false;
-
-      //lunchedin.timeToSecondCall = 10800000;  // After 7.30am, run after 3 hours - 3*60*60s - 10.30am - mails go at 11.00am
-      //lunchedin.timeToThirdCall = 7200000; //  After 10.30am, run after 2 hours - 2*60*60s - 12.30pm - dropout mails
-
-      // TODO: chron jon
-      // schedule firstcall to be run everyday
-      var rule = new schedule.RecurrenceRule();
-      rule.hour = 1;
-      rule.minute = 30;
-      schedule.scheduleJob(rule, function(){
-          console.log(new Date(), 'Waka Waka! First Call - Invite them!');
-          lunchedin.firstCall();
-      });
-
-      var rule2 = new schedule.RecurrenceRule();
-      rule2.hour = 4;
-      rule2.minute = 30;
-      schedule.scheduleJob(rule2, function(){
-          console.log(new Date(), 'Waka Waka! Second Call - Match them!');
-          lunchedin.secondCall();
-      });
-
-      var rule3 = new schedule.RecurrenceRule();
-      rule3.hour = 5;
-      rule3.minute = 0;
-      schedule.scheduleJob(rule3, function(){
-          console.log(new Date(), 'Waka Waka! Third Call - Spoiler Alert');
-          lunchedin.thirdCall();
-      });
-
-      console.log("In production. Mails: ", lunchedin.mails, lunchedin.speedrun, ".Scheduled Jobs.")
-
-    }
-
-}
-initialize(); // runs everytime dynos are set
-
-
-
 function matchingAlgorithm( userPool ){
 
     lunchedin.discardedUsers = [];
@@ -1664,12 +1611,19 @@ function matchingAlgorithm( userPool ){
       var compatible = [];
 
       for(var i=0; i<pool.length; i++){
+        //console.log("judging relationship with", pool[i].name);
           // if either of the people have blocked, skip the user
-          if( userMutualBlock( currUser, pool[i] ))
-            continue;
+          if( userMutualBlock( currUser, pool[i] )){
+            //console.log("removed blocked user from pool")
+            continue;            
+          }
 
-          if( currUser._id == pool[i]._id )
+
+          if( currUser._id == pool[i]._id ){
+            //console.log("removed self from pool")
             continue;
+          }
+
 
           // categorize according to compatibility
           switch( userMutualFriends( currUser, pool[i] ) ) {
@@ -1711,7 +1665,7 @@ function matchingAlgorithm( userPool ){
           resolve({pool: userPool, currUser: n, group: []});
         } else {
           // means userPool is less than 3
-          reject({users: userPool});
+          reject({users: []});
         }
       });
     }
@@ -1720,17 +1674,30 @@ function matchingAlgorithm( userPool ){
     function discard( object ){
 
       var participants = object.users;
+      //console.log(lunchedin.discardedUsers.length);
+      //console.log("Discard received", participants[0].name, participants.length);
+      if(participants != undefined)
+      {
+        if(participants.length == 1)
+          lunchedin.discardedUsers.push(participants[0]);
+        else
+          lunchedin.discardedUsers = lunchedin.discardedUsers.concat(participants); 
+      }
+        
       
       if(userPool.length<3){
         console.log("Pool less than 3")
-        lunchedin.discardedUsers = lunchedin.discardedUsers.concat(participants);
+        lunchedin.discardedUsers = lunchedin.discardedUsers.concat(userPool);
         console.log("Discarded Users count:", lunchedin.discardedUsers.length);
+        //console.log(lunchedin.discardedUsers);
         userPool = [];
+
         lunchedin.discarded();
       }
       else{
-        console.log("Discarded user received ", participants[0].name);
-        lunchedin.discardedUsers.push(participants[0]); 
+        //console.log("Discarded users received ", participants.length);
+        //lunchedin.discardedUsers = lunchedin.discardedUsers.concat(participants); 
+        //console.log("Discarded users received ",lunchedin.discardedUsers.length);
         nextUser();      
       }
 
@@ -1805,7 +1772,8 @@ function matchingAlgorithm( userPool ){
                 .exec(function(err, res){
                         
                         if(err || res.length==0){
-                          console.log("Error(1787):", err);
+                          console.log("Error(1787): Not able to find a restaurant", err);
+                          //reject({'users': group });
                         } 
                         else {
 
@@ -1850,13 +1818,13 @@ function matchingAlgorithm( userPool ){
                 reject();
             }*/
             
-
+            var newgroup = group.concat(user);
             var criteria = []; 
             var vegValue = false; 
             var halalValue = false;
-            for( var p = 0; p < group.length; p++ ){
+            for( var p = 0; p < newgroup.length; p++ ){
 
-                var participant = group[p];
+                var participant = newgroup[p];
 
                 if(participant == undefined)
                   continue;
@@ -1883,10 +1851,12 @@ function matchingAlgorithm( userPool ){
               }, function(err, restaurants){
                  
                 if(err || restaurants.length == 0){
-                   //console.log("No one cuisine compatible");
+                   //console.log(user.name, "is not cuisine compatible")
                    reject();
                 } 
                 else{
+                   //console.log(restaurants[0].name, criteria)
+                   //console.log(user.name, "is cuisine compatible")
                    resolve(true);
                 }
             });
@@ -1912,15 +1882,14 @@ function matchingAlgorithm( userPool ){
 
           count++; 
 
-          if(count == pool.length){ 
-            if(group.length == 3){
-              console.log("No one is cuisine compatible but group length is 3, hence forming group");
+          if(count >= pool.length){ 
+            if(group.length >= 3){
+              console.log("No one is cuisine compatible but group length is more than 3, hence forming group");
               resolve({'pool': pool, 'currUser': currUser, 'group': group});
             }
-            if(groupOfThree.length == 0 && group.length<=2){
-              reject({'users': [group[0]] });
+            if(groupOfThree.length == 0 && group.length<=2){   
               console.log("No one is cuisine compatible. Discarding first user ", group[0].name );
-              return;  
+              reject({'users': [group[0]] });
             }
             if(groupOfThree.length && group.length==2){
                console.log(pool[groupOfThree[0]].name, " compatible with group to form group of three");
@@ -1929,20 +1898,20 @@ function matchingAlgorithm( userPool ){
             } 
           }
           else{
-            
+            //console.log(count);
             userCuisineCompatible( { 'user': pool[count], 'group': group })
               .then(function(cuisineCompatibility){
                    // if the from the mate pool is cuisine compatible and the next pool with both these has length > 0
                   if( cuisineCompatibility ){
-                    console.log("Found cuisine compatible user with group");
+                    //console.log("Found cuisine compatible user with group");
                     if(regroup(pool, pool[count], true)>0){
                       //group.push(pool[count]);
-                      console.log("User has next pool greater than 0:", pool[count].name );
+                      //console.log("User has next pool greater than 0:", pool[count].name );
                       resolve({'pool': pool, 'currUser': pool[count], 'group': group});                  
                     }
                     else{
                       if(group.length == 3){
-                        console.log("User completes group of 4", pool[count].name );
+                        //console.log("User completes group of 4", pool[count].name );
                         resolve({'pool': pool, 'currUser': pool[count], 'group': group});
                       }
                            
@@ -1950,9 +1919,11 @@ function matchingAlgorithm( userPool ){
                           groupOfThree.push(count);
                           check();
                       }
-
                       if(group.length == 1){
-                        reject({'users': [group[0]] });
+                        //console.log("Calling check");
+                         check();
+/*                        console.log("Discarding user", group[0].name);
+                        reject({'users': [group[0]] });*/
                       }                     
                     }               
                   }         
@@ -1974,7 +1945,7 @@ function matchingAlgorithm( userPool ){
           var currUser = object.currUser; 
           var group = object.group;
 
-          console.log("Find Mate Pool:", "Pool-length:", pool.length, "User:", currUser.name, "Group Length:", group.length);
+          //console.log("Find Mate Pool:", "Pool-length:", pool.length, "User:", currUser.name, "Group Length:", group.length);
 
           // create a pool for second mate - which should be a close person to the current user
           var pool = regroup( pool, currUser, false ); 
@@ -1983,21 +1954,13 @@ function matchingAlgorithm( userPool ){
           else
             pool = pool[2].concat(pool[1]).concat(pool[0]);
 
-          if(pool.length == 0){
-            if(group.length==2 || group.length == 3){
-              group.push(currUser);
-              resolve({'pool': pool, 'currUser': currUser, 'group': group});
-            }
-            else{
-                console.log("No compatible person found. Discarding user ", group[0].name);
-                group.push(currUser) // for the first user
-                reject({'users': [group[0].name]});  
-            }            
-          }
+          //console.log(pool.length, "hello");
+          if(pool.length + group.length < 2)
+            reject({'users': [group[0].name]});
           else{
-            group.push(currUser);
-            resolve({'pool': pool, 'currUser': currUser, 'group': group});
-          }
+              group.push(currUser);
+              resolve({'pool': pool, 'currUser': currUser, 'group': group});            
+          }  
       });
 
     }
@@ -2023,9 +1986,63 @@ function matchingAlgorithm( userPool ){
 
 
 
-//Testing
-if(lunchedin.testing){
-  setTimeout(lunchedin.firstCall, 3000);
-  setInterval(lunchedin.firstCall, 60000);
-  lunchedin.speedrun = true;
+
+
+
+//  Initialization Function
+//      Runs only once when dynos are reset
+//      Adds the restaurants
+var initialize = function() {   
+
+    // Production settings
+    if(lunchedin.production == true){
+
+      //lunchedin.autorun = true; 
+      // TODO: set to true for actual production
+      lunchedin.mails = true;
+
+      lunchedin.testing = false;
+
+      //lunchedin.timeToSecondCall = 10800000;  // After 7.30am, run after 3 hours - 3*60*60s - 10.30am - mails go at 11.00am
+      //lunchedin.timeToThirdCall = 7200000; //  After 10.30am, run after 2 hours - 2*60*60s - 12.30pm - dropout mails
+
+      // TODO: chron jon
+      // schedule firstcall to be run everyday
+      var rule = new schedule.RecurrenceRule();
+      rule.hour = 1;
+      rule.minute = 30;
+      schedule.scheduleJob(rule, function(){
+          console.log(new Date(), 'Waka Waka! First Call - Invite them!');
+          lunchedin.firstCall();
+      });
+
+      var rule2 = new schedule.RecurrenceRule();
+      rule2.hour = 4;
+      rule2.minute = 30;
+      schedule.scheduleJob(rule2, function(){
+          console.log(new Date(), 'Waka Waka! Second Call - Match them!');
+          lunchedin.secondCall();
+      });
+
+      var rule3 = new schedule.RecurrenceRule();
+      rule3.hour = 5;
+      rule3.minute = 0;
+      schedule.scheduleJob(rule3, function(){
+          console.log(new Date(), 'Waka Waka! Third Call - Spoiler Alert');
+          lunchedin.thirdCall();
+      });
+
+      console.log("In production. Mails: ", lunchedin.mails, lunchedin.speedrun, ".Scheduled Jobs.")
+
+    }
+
 }
+initialize(); // runs everytime dynos are set
+
+//Testing
+/*if(lunchedin.testing){
+  setTimeout(lunchedin.firstCall, 3000);
+  setInterval(lunchedin.firstCall, 20000);
+  lunchedin.speedrun = true;
+  lunchedin.mails = false;
+}*/
