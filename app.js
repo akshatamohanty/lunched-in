@@ -788,11 +788,12 @@ lunchedin.firstCall = function(){
      *  Initialize run based on Matches
      *  Run starts from 1 
      */
+      console.log("-----------FIRST CALL---------------")
       Match.find({})
         .sort({ run: -1 })
         .exec( function(err, matches) {
 
-          console.log("-----------Getting last run count---------------")
+          console.log("Getting last run count...")
           if(matches.length == 0 || matches == undefined){
             console.log("No matches in database. First run!");
             lunchedin.run = 1; 
@@ -822,7 +823,8 @@ lunchedin.secondCall = function(){
   addToDatabase( Match, { run: lunchedin.run, date: Date() } , "Match", null)
 
   // deal with pool
-  console.log("-------------- Run ", lunchedin.run, "-----------------");
+  console.log("-------------- SECOND CALL -----------------");
+  console.log("---- Run ", lunchedin.run, " ----");
   User.find({ 
             inPool : true, 
             cuisine: { $exists: true, $ne: [] }
@@ -943,7 +945,7 @@ lunchedin.thirdCall = function(){
   if( lunchedin.checkHoliday() ==  true && lunchedin.speedrun == false )
     return;
 
-  console.log("-------------- Checking for clean pool in third call-----------------");
+  console.log("-------------- THIRD CALL -----------------");
   User.find({ 
             inPool : true
         }, function( err, users ){
@@ -1706,7 +1708,7 @@ function matchingAlgorithm( userPool ){
         userPool = [];
       }
       else{
-        //console.log("Discarded user received ", participants[0].name);
+        console.log("Discarded user received ", participants[0].name);
         lunchedin.discardedUsers.push(participants[0]); 
         nextUser();      
       }
@@ -1782,7 +1784,7 @@ function matchingAlgorithm( userPool ){
                 .exec(function(err, res){
                         
                         if(err || res.length==0){
-                          console.log("Error(2165):", err);
+                          console.log("Error(1787):", err);
                         } 
                         else {
 
@@ -1802,7 +1804,7 @@ function matchingAlgorithm( userPool ){
                                 function(err, match){
 
                                     if(err){
-                                      console.log("Error(2250): Unable to create match");
+                                      console.log("Error(1807): Unable to create match");
                                       //reject(jsonObject);
                                     }
                                     else{
@@ -1881,7 +1883,7 @@ function matchingAlgorithm( userPool ){
         var currUser = object.currUser; 
         var group = object.group; 
 
-        //console.log("pickNextMate:", "Pool-length:", pool.length, "User:", currUser.name, "Group Length:", group.length);
+        console.log("pickNextMate:", "Pool-length:", pool.length, "User:", currUser.name, "Group Length:", group.length);
 
 
         // pick the first that has compatible cuisine
