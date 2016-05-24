@@ -520,8 +520,6 @@ lunchedin.noMatchMail = function( user ){
                     
                       if(restaurants.length > 0 && restaurants != undefined){
 
-
-
                         template.where = {}
                         template.where.rest_name = restaurants[0].name;
                         template.where.address = restaurants[0].address; 
@@ -837,117 +835,82 @@ lunchedin.secondCall = function(){
             }
   });
 
+  function placeDiscardedUser(d_user){
+    return new RSVP.Promise(function(resolve, reject) {
+        
+        var d_user = lunchedin.discardedUsers.splice(0, 1)[0];
+        
+        if(d_user == undefined){
+          reject();
+        }
+        else{
+          console.log("Trying to place", d_user.name);
+          Match.find( { 
+                   run : lunchedin.run,
+                   location: {$exists:true},
+                  'location._id' : {$nin: d_user.blockedRestaurants},
+                  'location.veg' : d_user.veg, 
+                  'location.halal' : d_user.halal, 
+                  'location.cuisine' :{$in: d_user.cuisine}, 
+                   participants : {$nin: d_user.blocked}
+                  }, function(err, matches){
+
+                    // no suitable matches found - discard user
+                    if(err || matches.length == 0){
+                      console.log("No compatible match found for discarded user to join", d_user.name);
+                      console.log("Restaurant mailed to ", d_user.name);
+                      lunchedin.noMatchMail(d_user);
+
+                      resolve();
+                    }
+                    else{
+                      
+                      for(var m=0; m < matches.length; m++){
+
+                          var match = matches[m]; 
+
+                          if(match.participants.length == 0 || match.participants.length > 4)
+                            continue;
+
+                          //console.log("Trying for a match for discarded user", match, d_user);
+                          User.find({
+                            _id: {$in: match.participants},
+                            blocked : { $ne: ObjectId(d_user._id) } 
+                          }, function(err, users){
+
+                              if( !err && users != undefined && users.length > 0){
+                                match.participants.push(d_user);
+                                match.save();
+                                console.log("Discarded user placed!", d_user.name);
+                                resolve();
+                              }else{
+                                console.log("No match found for discarded user", d_user.name);
+                                console.log("Restaurant mailed to ", d_user.name);
+                                lunchedin.noMatchMail(d_user);
+                                resolve();
+                              }
+
+                          });                                  
+                      }
+
+                    }                    
+
+          });           
+        }
+
+    });
+  }
+
   function discarded(){
    // Find suitable party for discarded users to join
     console.log("----------- Discarded--------------")
     console.log("Number of users in discarded pool: ", lunchedin.discardedUsers.length);
 
-    lunchedin.discardedUsers.map( function(d_user){
-      Match.find( { 
-               run : lunchedin.run,
-               location: {$exists:true},
-              'location._id' : {$nin: d_user.blockedRestaurants},
-              'location.veg' : d_user.veg, 
-              'location.halal' : d_user.halal, 
-              'location.cuisine' :{$in: d_user.cuisine}, 
-               participants : {$nin: d_user.blocked}
-              }, function(err, matches){
+    placeDiscardedUser()
+      .then(placeDiscardedUser, function(){
+        console.log("Finished with the discarded pool");
+      })
 
-                // no suitable matches found - discard user
-                if(err || matches.length == 0){
-                  console.log("No compatible match found for discarded user to join", d_user.name);
-                  console.log("Restaurant mailed to ", d_user.name);
-                  lunchedin.noMatchMail(d_user);
-                }
-                else{
-                  
-                  for(var m=0; m < matches.length; m++){
-
-                      var match = matches[m]; 
-
-                      if(match.participants.length == 0 || match.participants.length > 4)
-                        continue;
-
-                      //console.log("Trying for a match for discarded user", match, d_user);
-                      User.find({
-                        _id: {$in: match.participants},
-                        blocked : { $ne: ObjectId(d_user._id) } 
-                      }, function(err, users){
-
-                          if( !err && users != undefined && users.length > 0){
-                            match.participants.push(d_user);
-                            match.save();
-                            console.log("Discarded user placed!");
-                          }else{
-                            console.log("No match found for discarded user", d_user.name);
-                            console.log("Restaurant mailed to ", d_user.name);
-                            lunchedin.noMatchMail(d_user);
-                          }
-
-                      });                                  
-                  }
-
-                }                    
-
-      }); 
-
-    });
-    
-/*    for( var k=0; k < lunchedin.discardedUsers.length; k++){
-
-      var d_user = lunchedin.discardedUsers[k];  
-      //TODO: fix
-
-      Match.find( { 
-               run : lunchedin.run,
-               location: {$exists:true},
-              'location._id' : {$nin: d_user.blockedRestaurants},
-              'location.veg' : d_user.veg, 
-              'location.halal' : d_user.halal, 
-              'location.cuisine' :{$in: d_user.cuisine}, 
-               participants : {$nin: d_user.blocked}
-              }, function(err, matches){
-
-                // no suitable matches found - discard user
-                if(err || matches.length == 0){
-                  console.log("No compatible match found for discarded user to join", d_user.name);
-                  console.log("Restaurant mailed to ", d_user.name);
-                  lunchedin.noMatchMail(d_user);
-                }
-                else{
-                  
-                  for(var m=0; m < matches.length; m++){
-
-                      var match = matches[m]; 
-
-                      if(match.participants.length == 0 || match.participants.length > 4)
-                        continue;
-
-                      //console.log("Trying for a match for discarded user", match, d_user);
-                      User.find({
-                        _id: {$in: match.participants},
-                        blocked : { $ne: ObjectId(d_user._id) } 
-                      }, function(err, users){
-
-                          if( !err && users != undefined && users.length > 0){
-                            match.participants.push(d_user);
-                            match.save();
-                            console.log("Discarded user placed!");
-                          }else{
-                            console.log("No match found for discarded user", d_user.name);
-                            console.log("Restaurant mailed to ", d_user.name);
-                            lunchedin.noMatchMail(d_user);
-                          }
-
-                      });                                  
-                  }
-
-                }                    
-
-      }); 
-
-      setTimeout(function(){ console.log(d_user.name, " processing"), 1000});                    
-    }*/         
   }
 
   // for discarded users
@@ -1050,7 +1013,7 @@ lunchedin.thirdCall = function(){
   app.get('/logout', function(req, res){
     req.session.passport.user = undefined;
     //req.logout();
-    res.send('<h1>Logged out</h1>');
+    res.status(200);
   });
 
   passport.serializeUser(function(user, done) {
@@ -2007,7 +1970,8 @@ var initialize = function() {
       //lunchedin.autorun = true; 
       // TODO: set to true for actual production
       lunchedin.mails = false;
-      lunchedin.speedrun = true;
+
+      lunchedin.testing = true;
 
       //lunchedin.timeToSecondCall = 10800000;  // After 7.30am, run after 3 hours - 3*60*60s - 10.30am - mails go at 11.00am
       //lunchedin.timeToThirdCall = 7200000; //  After 10.30am, run after 2 hours - 2*60*60s - 12.30pm - dropout mails
@@ -2351,7 +2315,7 @@ function matchingAlgorithm( userPool ){
               return;  
             }
             if(groupOfThree.length && group.length==2){
-               console.log(pool[groupOfThree[0]], " compatible with group to form group of three");
+               console.log(pool[groupOfThree[0]].name, " compatible with group to form group of three");
                //group.push(pool[groupOfThree[0]]);
                resolve({'pool': pool, 'currUser': pool[groupOfThree[0]], 'group': group});             
             } 
@@ -2405,7 +2369,7 @@ function matchingAlgorithm( userPool ){
             pool = pool[2].concat(pool[1]).concat(pool[0]);
 
           if(pool.length == 0){
-            if(group.length==3){
+            if(group.length==2 || group.length == 3){
               group.push(currUser);
               resolve({'pool': pool, 'currUser': currUser, 'group': group});
             }
@@ -2441,5 +2405,29 @@ function matchingAlgorithm( userPool ){
 
     nextUser();
 }
-setTimeout(lunchedin.firstCall, 3000);
-setInterval(lunchedin.firstCall, 120000);
+
+
+
+//Testing
+if(lunchedin.testing){
+  setTimeout(lunchedin.firstCall, 3000);
+  setInterval(lunchedin.firstCall, 120000);
+  lunchedin.speedrun = true;
+/*  clearDatabase( User, "Users", null ); 
+
+  var user1 = {'name': 'Kajol', 'email':'kajol@example.com'};
+  var user2 = {'name': 'Ajay', 'email':'k.ajol@example.com'};
+  var user3 = {'name': 'Amitabh', 'email':'ka.jol@example.com'};
+  var user4 = {'name': 'Shahrukh', 'email':'kaj.ol@example.com'};
+  var user5 = {'name': 'Salman', 'email':'salman@example.com'};
+  var user6 = {'name': 'Aamir', 'email':'kajamir@example.com'};
+  var user7 = {'name': 'Rakhi', 'email':'rol@example.com'};
+
+  lunchedin.addUser(user1);
+  lunchedin.addUser(user2);
+  lunchedin.addUser(user3);
+  lunchedin.addUser(user4);
+  lunchedin.addUser(user5);
+  lunchedin.addUser(user6);
+  lunchedin.addUser(user7);*/
+}
