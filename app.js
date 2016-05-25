@@ -681,9 +681,13 @@ lunchedin.mailMatches = function( runCount ){
                   console.log("Mailed matches");
             }
 
-            processMatch({value:true}})
-              .then(matchInvite)
-              .then(processMatch)       
+            var a = function(){
+
+               processMatch({value:true})
+                .then(matchInvite)
+                .then(a)               
+            }
+     
       }
 
     });
