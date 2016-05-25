@@ -1663,17 +1663,6 @@ function matchingAlgorithm( userPool ){
             var currUser = object.currUser; 
             var group = object.group;
 
-            var flag = false;
-
-            for(var i=0; i<group.length; i++){
-              if(currUser._id == group[i]._id)
-                flag = true; 
-            }
-
-            if(flag == false){
-              group.push(currUser);
-            }
-
             console.log("Group length for match", group.length);
             for(var i=0; i<userPool.length; i++){
               for(var g=0; g<group.length; g++){
@@ -1865,6 +1854,7 @@ function matchingAlgorithm( userPool ){
                     else{
                       if(group.length == 3){
                         console.log("User completes group of 4", pool[count].name );
+                        group.push(pool[count]);
                         resolve({'pool': pool, 'currUser': pool[count], 'group': group});
                       }
                            
