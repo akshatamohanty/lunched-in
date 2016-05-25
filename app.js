@@ -253,7 +253,7 @@ lunchedin.addToPool = function( runCount, userID ){
             if(users.length){
               users[0].inPool = true; 
               users[0].save();
-              //console.log(users[0].name, " added to pool");
+              console.log(users[0].name, " added to pool");
             }
         })
         return true; 
@@ -292,7 +292,7 @@ lunchedin.firstMail = function( user ){
               "user_email": user.email,
               "user_password": user.password
             }
-    //console.log("Sending first mail to", user.name);
+    console.log("Sending first mail to", user.name);
     lunchedin.sendMail( templateID, templateModel, user.email)
 
 };
@@ -350,7 +350,7 @@ lunchedin.confirmationMail = function( user ){
               "image": imageOpts[Math.floor(Math.random() * imageOpts.length)]
             };
     
-    //console.log("Confirmation Mail sent to ", user.name);
+    console.log("Confirmation Mail sent to ", user.name);
     lunchedin.sendMail( templateID, templateModel, user.email)
 
 };
@@ -428,7 +428,7 @@ lunchedin.matchedMail = function( match, user ){
 
                       }
 
-                      //console.log("Matched Mail sent to ", user.name);
+                      console.log("Matched Mail sent to ", user.name);
                       lunchedin.sendMail( templateID, template, user.email)
                     }
 
@@ -473,7 +473,7 @@ lunchedin.canceledMail = function( match, user ){
 
                           }
 
-                          //console.log("Drop-out Alert Mail sent to ", user.name);
+                          console.log("Drop-out Alert Mail sent to ", user.name);
                           lunchedin.sendMail( templateID, template, user.email)                      
                     }
                 });
@@ -517,7 +517,7 @@ lunchedin.noMatchMail = function( user ){
                                                       + rest.zip + "/";  
 
                         lunchedin.sendMail( templateID, template, user.email)
-                        //console.log("Mailing solo user ", user.name, "restaurant", rest.name);
+                        console.log("Mailing solo user ", user.name, "restaurant", rest.name);
 
                         rest.total = rest.total + 1;
                         ////console.log("Restaurant counter incremented ", restaurants[0].total);
@@ -655,7 +655,7 @@ lunchedin.mailMatches = function( runCount ){
 
                     if(!err && participants.length!=0){
                         for(var p=0; p<participants.length; p++){
-                          console.log("Invite mailed to ", participants[p].name);
+                          //console.log("Invite mailed to ", participants[p].name);
                           lunchedin.matchedMail(match, participants[p]);
                         }
                         resolve(object);
@@ -681,7 +681,7 @@ lunchedin.mailMatches = function( runCount ){
                   console.log("Mailed matches");
             }
 
-            processMatch(object)
+            processMatch({value:true}})
               .then(matchInvite)
               .then(processMatch)       
       }
@@ -776,7 +776,7 @@ lunchedin.firstCall = function(){
      *  Initialize run based on Matches
      *  Run starts from 1 
      */
-      //console.log("-----------FIRST CALL---------------")
+      console.log("-----------FIRST CALL---------------")
       Match.find({})
         .sort({ run: -1 })
         .exec( function(err, matches) {
@@ -793,7 +793,7 @@ lunchedin.firstCall = function(){
 
           lunchedin.setPool();
           // call secondCall after some predetermined time
-          ////console.log("-------------- Processing after " + lunchedin.timeToSecondCall + "ms-----------------");
+          console.log("-------------- Processing after " + lunchedin.timeToSecondCall + "ms-----------------");
         }); 
   }
 };
@@ -813,7 +813,7 @@ lunchedin.secondCall = function(){
 
   var runAlgo = function(object){
     // deal with pool
-    //console.log("-------------- SECOND CALL -----------------");
+    console.log("-------------- SECOND CALL -----------------");
     //console.log("---- Run ", lunchedin.run, " ----");
     User.find({ 
               inPool : true, 
@@ -825,7 +825,7 @@ lunchedin.secondCall = function(){
             if(userPool.length == 0)
               console.log("No users!");
             else{
-                //console.log("-----------Running Match Algorithm (user count):", userPool.length, "---------------")
+                console.log("-----------Running Match Algorithm (user count):", userPool.length, "---------------")
                 ////console.log(userPool);
                 matchingAlgorithm(userPool);            
               }
@@ -852,10 +852,10 @@ lunchedin.thirdCall = function(){
 
             if(users.length == 0){
                 // check for dropOuts
-                //console.log("-------------- Checking for dropouts for Run ", lunchedin.run, "-----------------");
+                console.log("-------------- Checking for dropouts for Run ", lunchedin.run, "-----------------");
                 lunchedin.checkDropouts( lunchedin.run );
 
-                //console.log("-------------- Updating counters and known for Run ", lunchedin.run, "-----------------");
+                console.log("-------------- Updating counters and known for Run ", lunchedin.run, "-----------------");
                 lunchedin.updateStatistics( lunchedin.run );
             }
             if(users.length > 0 || err)
@@ -1561,7 +1561,7 @@ function matchingAlgorithm( userPool ){
                                   if( !err && users != undefined && users.length > 0){
                                     match.participants.push(d_user);
                                     match.save();
-                                    ////console.log("Discarded user placed!", d_user.name);
+                                    console.log("Discarded user placed!", d_user.name);
                                     placeDiscardedUser({value:"something"});
                                   }else{
                                     ////console.log("No match found for discarded user", d_user.name);
@@ -1592,7 +1592,7 @@ function matchingAlgorithm( userPool ){
       ////console.log("---- Pool refresh after running algorithm in second call -----");
       User.update({}, {$set: {inPool: false}} , {multi: true}, function(err, users){
         if(!err){
-          ////console.log("Pool refreshed after running algorithm");
+          console.log("Pool refreshed after running algorithm");
           lunchedin.mailMatches( lunchedin.run )
         } 
 
@@ -1664,25 +1664,25 @@ function matchingAlgorithm( userPool ){
 
       return new RSVP.Promise(function(resolve, reject) {
 
-            //console.log("addMatch")
+            console.log("addMatch")
 
             var pool = object.pool;
             var currUser = object.currUser; 
             var group = object.group;
 
-            //console.log("Group length for match", group.length);
+            console.log("Group length for match", group.length);
             for(var i=0; i<userPool.length; i++){
               for(var g=0; g<group.length; g++){
                 var userFromPool = userPool[i];
                 var groupMember = group[g];
                 
                 if(userFromPool._id == groupMember._id){
-                    //console.log(userPool.splice(i, 1)[0].name, " matched and removed from userpool. Userpool length: ", userPool.length);
+                    console.log(userPool.splice(i, 1)[0].name, " matched and removed from userpool. Userpool length: ", userPool.length);
                 }
               }
             }
 
-            //console.log("--------------Matching---------------");        
+            console.log("--------------Matching---------------");        
             var criteria = []; 
             var pids = [];
             vegValue = false; 
@@ -1694,7 +1694,7 @@ function matchingAlgorithm( userPool ){
                 if(participant == undefined)
                   continue;
 
-                //console.log(participant.name);
+                console.log(participant.name);
                 
                 if(participant.veg)
                   vegValue = true;
@@ -1738,7 +1738,7 @@ function matchingAlgorithm( userPool ){
                                   'location': rest,
                                   'dropouts' : []
                                 };
-                              //console.log("Match made at", rest.name); 
+                              console.log("Match made at", rest.name); 
 
                               Match.create( newMatch, 
                                 function(err, match){
@@ -1749,7 +1749,7 @@ function matchingAlgorithm( userPool ){
                                     }
                                     else{
                                       //resolve(user[0]._id);
-                                      //console.log("Added match");
+                                      console.log("Added match");
                                       //console.log("------------------------------------------------");
                                       resolve({'value':"Added match"});
                                     }
@@ -1961,7 +1961,7 @@ var initialize = function() {
       rule.hour = 1;
       rule.minute = 30;
       schedule.scheduleJob(rule, function(){
-          //console.log(new Date(), 'Waka Waka! First Call - Invite them!');
+          console.log(new Date(), 'Waka Waka! First Call - Invite them!');
           lunchedin.firstCall();
       });
 
@@ -1969,7 +1969,7 @@ var initialize = function() {
       rule2.hour = 4;
       rule2.minute = 30;
       schedule.scheduleJob(rule2, function(){
-          //console.log(new Date(), 'Waka Waka! Second Call - Match them!');
+          console.log(new Date(), 'Waka Waka! Second Call - Match them!');
           lunchedin.secondCall();
       });
 
@@ -1977,7 +1977,7 @@ var initialize = function() {
       rule3.hour = 5;
       rule3.minute = 0;
       schedule.scheduleJob(rule3, function(){
-          //console.log(new Date(), 'Waka Waka! Third Call - Spoiler Alert');
+          console.log(new Date(), 'Waka Waka! Third Call - Spoiler Alert');
           lunchedin.thirdCall();
       });
 
