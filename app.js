@@ -661,7 +661,7 @@ lunchedin.mailMatches = function( runCount ){
 
                 var match = matches[i];
 
-                if(match.participants.length != 0 && match.location != undefined){
+
                     User.find( { 
                         _id: {$in: match.participants}
                       }, function(err, participants){
@@ -672,7 +672,7 @@ lunchedin.mailMatches = function( runCount ){
                           }
 
                       });                  
-                }
+
 
                 
             }       
@@ -1584,6 +1584,7 @@ function matchingAlgorithm( userPool ){
         if(!err){
           console.log("Pool refreshed after running algorithm");
           lunchedin.mailMatches( lunchedin.run )
+          reject({value:true});
         } 
 
         
