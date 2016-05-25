@@ -803,7 +803,7 @@ lunchedin.secondCall = function(){
   addToDatabase( Match, { run: lunchedin.run, date: Date() } , "Match", null)
     .then(runAlgo)
 
-  var runAlgo = function(){
+  var runAlgo = function(object){
     // deal with pool
     console.log("-------------- SECOND CALL -----------------");
     console.log("---- Run ", lunchedin.run, " ----");
@@ -1583,7 +1583,7 @@ function matchingAlgorithm( userPool ){
       User.update({}, {$set: {inPool: false}} , {multi: true}, function(err, users){
         if(!err){
           console.log("Pool refreshed after running algorithm");
-          lunchedin.mailMatches( lunchedin.run )
+          //lunchedin.mailMatches( lunchedin.run )
           reject({value:true});
         } 
 
