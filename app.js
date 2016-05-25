@@ -148,14 +148,14 @@ lunchedin.mails = false;
 //- Second Call : 
 //    Runs matching algorithm
 //    Sends mails to matches
-lunchedin.timeToSecondCall = 120000; // 2 minutes - FirstCall to SecondCall Gap
+lunchedin.timeToSecondCall = 10000; // 2 minutes - FirstCall to SecondCall Gap
 
 //- Third Call : 
 //    Goes through the matches for today and incase of dropouts, mails the concerned people
 //    Increases lunchedCount of people
 //    Increases restaurantCount of restaurant
 //    AddsToKnown 
-lunchedin.timeToThirdCall = 240000; // 3 minutes - SecondCall to ThirdCall Gap
+lunchedin.timeToThirdCall = 40000; // 3 minutes - SecondCall to ThirdCall Gap
 
 lunchedin.timeForDiscardedUsers_speedrun = 60000; 
 lunchedin.timeForDiscardedUsers_normal = 900000;
@@ -361,8 +361,11 @@ lunchedin.confirmationMail = function( user ){
  */
 lunchedin.matchedMail = function( match, user ){
 
-    if(match==undefined || user == undefined)
-      return; 
+    if(match==undefined || user == undefined){
+      console.log("undefined match or user");
+      return;       
+    }
+
 
     var templateID = 610803;
 
