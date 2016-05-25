@@ -103,10 +103,10 @@ var addToDatabase = function( database, jsonObject, stringName, callback ){
 
                       if(err){
                         console.log("Error: Unable to add to ", stringName, err);
-                        //reject(jsonObject);
+                        reject({value:false});
                       }
                       else{
-                        //resolve(user[0]._id);
+                        resolve({value:true});
                         console.log("Added ", stringName);
                       }
 
@@ -800,7 +800,10 @@ lunchedin.secondCall = function(){
     setTimeout(lunchedin.thirdCall, lunchedin.timeToThirdCall);
 
   // add a dummy match for this run
-  addToDatabase( Match, { run: lunchedin.run, date: Date() } , "Match", function(){
+  addToDatabase( Match, { run: lunchedin.run, date: Date() } , "Match", null)
+    .then(runAlgo)
+
+  var runAlgo = function(){
     // deal with pool
     console.log("-------------- SECOND CALL -----------------");
     console.log("---- Run ", lunchedin.run, " ----");
@@ -819,7 +822,7 @@ lunchedin.secondCall = function(){
                 matchingAlgorithm(userPool);            
               }
     });    
-  })
+  }
 
 
 };
