@@ -801,7 +801,7 @@ lunchedin.secondCall = function(){
 
   // add a dummy match for this run
   addToDatabase( Match, { run: lunchedin.run, date: Date() } , "Match", null)
-    .then(runAlgo)
+  
 
   var runAlgo = function(object){
     // deal with pool
@@ -823,6 +823,8 @@ lunchedin.secondCall = function(){
               }
     });    
   }
+
+  runAlgo();
 
 
 };
