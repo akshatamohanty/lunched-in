@@ -668,6 +668,7 @@ lunchedin.mailMatches = function( runCount ){
 
                           if(!err){
                               for(var p=0; p<participants.length; p++)
+                                console.log("Invite mailed to ", participants[p].name);
                                 lunchedin.matchedMail(match, participants[p]);
                           }
 
@@ -1502,13 +1503,13 @@ function matchingAlgorithm( userPool ){
             console.log("placeDiscardedUser");
             
             if(discardedUsers.length==0)
-              resolve({'value':"Added match"});
+              refreshAndMail();
 
             var d_user = discardedUsers.splice(0, 1)[0];
             console.log("Trying to place", d_user.name);
             if(d_user == undefined){
               console.log("Undefined user received at 1497");
-              reject({value:"something"});
+              placeDiscardedUser({value:"something"});
             }
             else{
               
@@ -1533,7 +1534,7 @@ function matchingAlgorithm( userPool ){
                           console.log("Restaurant mailed to ", d_user.name);
                           lunchedin.noMatchMail(d_user);
 
-                          reject({value:"something"});
+                          placeDiscardedUser({value:"something"});
                         }
                         else{
                           
@@ -1554,13 +1555,13 @@ function matchingAlgorithm( userPool ){
                                     match.participants.push(d_user);
                                     match.save();
                                     console.log("Discarded user placed!", d_user.name);
-                                    reject({value:"something"});
+                                    placeDiscardedUser({value:"something"});
                                   }else{
                                     console.log("No match found for discarded user", d_user.name);
                                     console.log("Restaurant mailed to ", d_user.name);
                                     lunchedin.noMatchMail(d_user);
                                     
-                                    reject({value:"something"});
+                                    placeDiscardedUser({value:"something"});
                                   }
 
                               });                                  
@@ -1585,8 +1586,7 @@ function matchingAlgorithm( userPool ){
       User.update({}, {$set: {inPool: false}} , {multi: true}, function(err, users){
         if(!err){
           console.log("Pool refreshed after running algorithm");
-          //lunchedin.mailMatches( lunchedin.run )
-          reject({value:true});
+          lunchedin.mailMatches( lunchedin.run )
         } 
 
         
@@ -1935,8 +1935,7 @@ function matchingAlgorithm( userPool ){
         .then(pickNextMate, null)   //Roll second time
         .then(addMatch, discard)
         .then(nextUser, placeDiscardedUser)
-        .then(refreshAndMail, placeDiscardedUser)
-        .then(refreshAndMail);
+        .then(refreshAndMail)
       })
 
     }
