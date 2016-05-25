@@ -490,7 +490,8 @@ lunchedin.noMatchMail = function( user ){
     
     template.user_name = lunchedin.getFirstName(user.name);
 
-    Restaurant.find( { 
+    Restaurant.find( {
+                    price: { $not: { $gt: 45 } } , 
                    cuisine: { $in: user.cuisine } ,
                    _id: { $nin: user.blockedRestaurants } ,
                    veg: user.veg ,
@@ -498,26 +499,26 @@ lunchedin.noMatchMail = function( user ){
                 }).sort({ price: 1, total: 1 }).exec( function(err, restaurants){
                     
                       if(restaurants.length > 0 && restaurants != undefined){
-
+                        var rest = restaurants[Math.floor(Math.random() * restaurants.length)]
                         template.where = {}
-                        template.where.rest_name = restaurants[0].name;
-                        template.where.address = restaurants[0].address; 
-                        template.where.cuisine = restaurants[0].cuisine; 
-                        template.where.website = restaurants[0].website; 
+                        template.where.rest_name = rest.name;
+                        template.where.address = rest.address; 
+                        template.where.cuisine = rest.cuisine; 
+                        template.where.website = rest.website; 
                         template.where.blockString = "http://www.trylunchedin.com/api/blockRestaurant?user=" 
                               + user._id 
-                              + "&block=" + restaurants[0]._id;
+                              + "&block=" + rest._id;
 
                         //https://www.google.com/maps/dir/Singapore+zipcode/
                         template.where.directionURL = "https://www.google.com.sg/maps/dir/10+Hoe+Chiang+Rd,+Singapore+089315/" 
-                                                      + restaurants[0].zip + "/";  
+                                                      + rest.zip + "/";  
 
                         lunchedin.sendMail( templateID, template, user.email)
-                        console.log("Mailing solo user ", user.name, "restaurant", restaurants[0].name);
+                        console.log("Mailing solo user ", user.name, "restaurant", rest.name);
 
-                        restaurants[0].total = restaurants[0].total + 1;
+                        rest.total = rest.total + 1;
                         //console.log("Restaurant counter incremented ", restaurants[0].total);
-                        restaurants[0].save();
+                        rest.save();
                       }
                 });
 };
@@ -645,7 +646,8 @@ lunchedin.mailMatches = function( runCount ){
  
     Match.find(
       { run: runCount,
-        location: {$exists:true} 
+        location: {$exists:true},
+        participants: { $exists: true, $ne: [] } 
       }, function(err, matches){
 
       if(err) console.log("Error retriving matches");
@@ -795,26 +797,27 @@ lunchedin.secondCall = function(){
     setTimeout(lunchedin.thirdCall, lunchedin.timeToThirdCall);
 
   // add a dummy match for this run
-  addToDatabase( Match, { run: lunchedin.run, date: Date() } , "Match", null)
+  addToDatabase( Match, { run: lunchedin.run, date: Date() } , "Match", function(){
+    // deal with pool
+    console.log("-------------- SECOND CALL -----------------");
+    console.log("---- Run ", lunchedin.run, " ----");
+    User.find({ 
+              inPool : true, 
+              cuisine: { $exists: true, $ne: [] }
+          })
+          .sort({ blockedCount: 1, lunchCount: 1, knownCount: 1,  })
+          .exec( function(err, userPool) {
 
-  // deal with pool
-  console.log("-------------- SECOND CALL -----------------");
-  console.log("---- Run ", lunchedin.run, " ----");
-  User.find({ 
-            inPool : true, 
-            cuisine: { $exists: true, $ne: [] }
-        })
-        .sort({ blockedCount: 1, lunchCount: 1, knownCount: 1,  })
-        .exec( function(err, userPool) {
+            if(userPool.length == 0)
+              console.log("No users!");
+            else{
+                console.log("-----------Running Match Algorithm (user count):", userPool.length, "---------------")
+                //console.log(userPool);
+                matchingAlgorithm(userPool);            
+              }
+    });    
+  })
 
-          if(userPool.length == 0)
-            console.log("No users!");
-          else{
-              console.log("-----------Running Match Algorithm (user count):", userPool.length, "---------------")
-              //console.log(userPool);
-              matchingAlgorithm(userPool);            
-            }
-  });
 
 };
 
@@ -1703,8 +1706,10 @@ function matchingAlgorithm( userPool ){
 
             if(vegValue)
               criteria.push( { veg: vegValue } )
-            if(halalValue)
+            if(halalValue && vegValue == false)
               criteria.push( { halal: halalValue } )
+
+            criteria.push({ price: { $not: { $gt: 45 } } } )
 
             console.log("--------------Finding restaurant---------------");        
             Restaurant.find({
@@ -1719,30 +1724,28 @@ function matchingAlgorithm( userPool ){
                           //reject({'users': group });
                         } 
                         else {
-
+                              var rest = res[Math.floor(Math.random() * res.length)];
                               var newMatch =                                           
                                 {
                                   'run': lunchedin.run,
                                   'date': Date(),
                                   'participants': pids,
-                                  'location': res[0],
+                                  'location': rest,
                                   'dropouts' : []
                                 };
-                              console.log("Match made at", res[0].name); 
+                              console.log("Match made at", rest.name); 
 
                               Match.create( newMatch, 
                                 function(err, match){
 
                                     if(err){
                                       console.log("Error(1807): Unable to create match");
-                                      console.log("Resolved at 1736")
                                       resolve({'value':"Added match"});
                                     }
                                     else{
                                       //resolve(user[0]._id);
                                       console.log("Added match");
                                       console.log("------------------------------------------------");
-                                      console.log("Resolved at 1743")
                                       resolve({'value':"Added match"});
                                     }
  
@@ -1782,10 +1785,11 @@ function matchingAlgorithm( userPool ){
 
             if(vegValue)
               criteria.push( { veg: vegValue } )
-            if(halalValue)
+            if(halalValue && vegValue==false)
               criteria.push( { halal: halalValue } )
 
             //console.log(criteria);
+            criteria.push({ price: { $not: { $gt: 45 } } })
 
             // Find a restaurant and add the match
             Restaurant.find({
