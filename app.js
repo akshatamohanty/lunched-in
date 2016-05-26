@@ -1991,7 +1991,7 @@ var initialize = function() {
 
       lunchedin.mails = true;
 
-      lunchedin.testing = true;
+      lunchedin.testing = false;
 
       var rule = new schedule.RecurrenceRule();
       rule.hour = 1;
