@@ -148,14 +148,14 @@ lunchedin.mails = false;
 //- Second Call : 
 //    Runs matching algorithm
 //    Sends mails to matches
-lunchedin.timeToSecondCall = 120000; // 2 minutes - FirstCall to SecondCall Gap
+lunchedin.timeToSecondCall = 10000; // 2 minutes - FirstCall to SecondCall Gap
 
 //- Third Call : 
 //    Goes through the matches for today and incase of dropouts, mails the concerned people
 //    Increases lunchedCount of people
 //    Increases restaurantCount of restaurant
 //    AddsToKnown 
-lunchedin.timeToThirdCall = 120000; // 3 minutes - SecondCall to ThirdCall Gap
+lunchedin.timeToThirdCall = 40000; // 3 minutes - SecondCall to ThirdCall Gap
 
 lunchedin.timeForDiscardedUsers_speedrun = 60000; 
 lunchedin.timeForDiscardedUsers_normal = 900000;
@@ -1772,7 +1772,7 @@ function matchingAlgorithm( userPool ){
                 .exec(function(err, res){
                         
                         if(err || res.length==0){
-                          //console.log("Error(1787): Not able to find a restaurant", err);
+                          console.log("Error(1787): ", err);
                           //console.log("Resolved at 1714")
                           
                           if(userPool.length)
