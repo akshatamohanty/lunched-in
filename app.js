@@ -1668,7 +1668,8 @@ function matchingAlgorithm( userPool ){
               }
               else{
                 //console.log("Received undefined user: 1617. Going to next user");
-                resolve({value:"something"});              
+                resolve({value:"something"}); 
+                nextUser();             
               }
             }
 
@@ -1676,6 +1677,7 @@ function matchingAlgorithm( userPool ){
           }
           else{
             console.log("Invalid value passed to discarded. Bug:1630");
+            nextUser()
           } 
 
           resolve({'value':"Something"}); 
