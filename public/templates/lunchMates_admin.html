@@ -30,7 +30,8 @@
     <div class='col-sm-4'>{{ user.email }}</div>
     <div class='col-sm-1'>{{ user.known.length }}</div>
     <div class='col-sm-1'>{{ user.blocked.length }}</div>
-    <div class='col-sm-2'>{{ user.available }}</div>
-    <div class='col-sm-1'>{{ user.cuisine.length }}</div>
+    <div class='col-sm-1'>{{ user.dropCount }}</div>
+    <div class='col-sm-1'>{{ user.lunchCount }}</div>
+    <span>Cuisine: <ul><li ng-repeat=" cuisine in user.cuisine">{{ cuisine }}</li></ul></span>
   </div>
 </div>
