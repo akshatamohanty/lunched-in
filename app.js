@@ -148,14 +148,14 @@ lunchedin.mails = false;
 //- Second Call : 
 //    Runs matching algorithm
 //    Sends mails to matches
-lunchedin.timeToSecondCall = 30000; // 2 minutes - FirstCall to SecondCall Gap
+lunchedin.timeToSecondCall = 120000; // 2 minutes - FirstCall to SecondCall Gap
 
 //- Third Call : 
 //    Goes through the matches for today and incase of dropouts, mails the concerned people
 //    Increases lunchedCount of people
 //    Increases restaurantCount of restaurant
 //    AddsToKnown 
-lunchedin.timeToThirdCall = 80000; // 3 minutes - SecondCall to ThirdCall Gap
+lunchedin.timeToThirdCall = 120000; // 3 minutes - SecondCall to ThirdCall Gap
 
 lunchedin.timeForDiscardedUsers_speedrun = 60000; 
 lunchedin.timeForDiscardedUsers_normal = 900000;
@@ -2053,11 +2053,11 @@ var initialize = function() {
 initialize(); // runs everytime dynos are set
 
 //Testing
-if(lunchedin.testing){
+/*if(lunchedin.testing){
   setTimeout(lunchedin.firstCall, 3000);
   setInterval(lunchedin.firstCall, 70000);
   lunchedin.speedrun = true;
   lunchedin.mails = false;
   lunchedin.timeToSecondCall = 5000;
   lunchedin.timeToThirdCall = 20000;
-}
+}*/
