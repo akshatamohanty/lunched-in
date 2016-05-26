@@ -647,47 +647,44 @@ lunchedin.checkDropouts = function( runCount ){
  */
 lunchedin.mailMatches = function( runCount ){
 
+  var matches;
+
     function matchInvite(match){
-      new RSVP.Promise(function(resolve, reject){
-          User.find( { 
-                  _id: {$in: match.participants}
-                }, function(err, participants){
 
-                    if(!err && participants.length!=0){
-                        for(var p=0; p<participants.length; p++){
-                          //console.log("Invite mailed to ", participants[p].name);
-                          lunchedin.matchedMail(match, participants[p]);
-                        }
-                        resolve(object);
+      User.find( { 
+              _id: {$in: match.participants}
+            }, function(err, participants){
+
+                if(!err && participants.length!=0){
+                    for(var p=0; p<participants.length; p++){
+                      //console.log("Invite mailed to ", participants[p].name);
+                      lunchedin.matchedMail(match, participants[p]);
                     }
+                    processMatch();
+                }
 
-          }); 
-      });
+      }); 
+
+    }
+
+    function processMatch(object){
+        var match = matches.splice(0, 1)[0];
+        if(match != undefined)
+          matchInvite(match);
+        else
+          console.log("Mailed all matches");
     }
 
     Match.find(
       { run: runCount,
-        location: {$exists:true},
-        participants: { $exists: true, $ne: [] } 
-      }, function(err, matches){
+        location: {$exists:true}
+      }, function(err, glmatches){
 
-      if(err || matches.length == 0) console.log("Error retriving matches");
+      if(err || glmatches.length == 0) console.log("Error retriving matches");
       else{
-            function processMatch(object){
-                var match = matches.splice(0, 1)[0];
-                if(match != undefined)
-                  resolve(match);
-                else
-                  console.log("Mailed matches");
-            }
 
-            var a = function(){
-
-               processMatch({value:true})
-                .then(matchInvite)
-                .then(a)               
-            }
-     
+            matches = glmatches;
+            processMatch();
       }
 
     });
@@ -785,13 +782,13 @@ lunchedin.firstCall = function(){
         .sort({ run: -1 })
         .exec( function(err, matches) {
 
-          //console.log("Getting last run count...")
+          console.log("Getting last run count...")
           if(matches.length == 0 || matches == undefined){
-            //console.log("No matches in database. First run!");
+            console.log("No matches in database. First run!");
             lunchedin.run = 1; 
           }
           else{
-            //console.log("Found past matches for run ", matches[0].run)
+            console.log("Found past matches for run ", matches[0].run)
             lunchedin.run = matches[0].run + 1; 
           }
 
@@ -818,7 +815,7 @@ lunchedin.secondCall = function(){
   var runAlgo = function(object){
     // deal with pool
     console.log("-------------- SECOND CALL -----------------");
-    //console.log("---- Run ", lunchedin.run, " ----");
+    console.log("---- Run ", lunchedin.run, " ----");
     User.find({ 
               inPool : true, 
               cuisine: { $exists: true, $ne: [] }
@@ -1509,86 +1506,106 @@ function matchingAlgorithm( userPool ){
     }
 
     function placeDiscardedUser(object){
-        return new RSVP.Promise(function(resolve, reject) {
-            
-            //console.log("placeDiscardedUser");
-            
-            if(discardedUsers.length==0)
-              refreshAndMail();
+      
+      console.log("placeDiscardedUser");
 
-            var d_user = discardedUsers.splice(0, 1)[0];
-            //console.log("Trying to place", d_user.name);
-            if(d_user == undefined){
-              //console.log("Undefined user received at 1497");
-              placeDiscardedUser({value:"something"});
+
+      var matches;
+
+      function getMatches(d_user){
+        if(matches.length==0)
+          placeUser();
+
+        var match = matches.splice(0, 1)[0]
+        if(match != undefined && match.participants.length<=4){
+          
+                ////console.log("Trying for a match for discarded user", match, d_user);
+            User.find({
+              _id: {$in: match.participants},
+              blocked : { $ne: ObjectId(d_user._id) } 
+            }, function(err, users){
+
+                if( !err && users != undefined && users.length > 0){
+                  match.participants.push(d_user);
+                  match.save();
+                  console.log("Discarded user placed!", d_user.name);
+                  
+                  placeUser();
+                }else{
+                  ////console.log("No match found for discarded user", d_user.name);
+                  //console.log("Restaurant mailed to ", d_user.name);
+                  l//lunchedin.noMatchMail(d_user);
+                  getMatches(d_user);
+                }
+
+
+
+            });         
+
+        }
+
+      }
+
+
+
+      var placeUser = function(){   
+
+            if(discardedUsers.length==0){
+                console.log("Finished with discarded user pool");
+                refreshAndMail();
             }
             else{
-              
-              var criteria = { 
-                       run : lunchedin.run,
-                       location: {$exists:true},
-                       'location._id' : {$nin: d_user.blockedRestaurants},
-                       'location.cuisine' :{$in: d_user.cuisine}, 
-                       participants : {$nin: d_user.blocked}
-                      }
-
-              if(d_user.veg == true)
-                criteria.veg = true;
-              if(d_user.halal == true)
-                criteria.halal = true;
-
-              Match.find( criteria, function(err, matches){
-
-                        // no suitable matches found - discard user
-                        if(err || matches.length == 0){
-                          //console.log("No compatible match found for discarded user to join", d_user.name);
-                          //console.log("Restaurant mailed to ", d_user.name);
-                          lunchedin.noMatchMail(d_user);
-
-                          placeDiscardedUser({value:"something"});
+              var d_user = discardedUsers.splice(0, 1)[0];
+              console.log("Trying to place", d_user.name);
+              if(d_user == undefined){
+                console.log("Undefined user received at 1497");
+                //placeDiscardedUser({value:"something"});
+              }
+              else{
+                
+                var criteria = { 
+                         run : lunchedin.run,
+                         location: {$exists:true},
+                         'location._id' : {$nin: d_user.blockedRestaurants},
+                         'location.cuisine' :{$in: d_user.cuisine}, 
+                         participants : {$nin: d_user.blocked}
                         }
-                        else{
-                          
-                          for(var m=0; m < matches.length; m++){
 
-                              var match = matches[m]; 
+                if(d_user.veg == true)
+                  criteria.veg = true;
+                if(d_user.halal == true)
+                  criteria.halal = true;
 
-                              if(match.participants.length == 0 || match.participants.length > 4)
-                                continue;
+                Match.find( criteria, function(err, glmatches){
 
-                              ////console.log("Trying for a match for discarded user", match, d_user);
-                              User.find({
-                                _id: {$in: match.participants},
-                                blocked : { $ne: ObjectId(d_user._id) } 
-                              }, function(err, users){
+                          matches = glmatches;
 
-                                  if( !err && users != undefined && users.length > 0){
-                                    match.participants.push(d_user);
-                                    match.save();
-                                    console.log("Discarded user placed!", d_user.name);
-                                    placeDiscardedUser({value:"something"});
-                                  }else{
-                                    ////console.log("No match found for discarded user", d_user.name);
-                                    ////console.log("Restaurant mailed to ", d_user.name);
-                                    lunchedin.noMatchMail(d_user);
-                                    
-                                    placeDiscardedUser({value:"something"});
-                                  }
+                          // no suitable matches found - discard user
+                          if(err || matches.length == 0){
+                            console.log("No compatible match found for discarded user to join", d_user.name);
+                            console.log("Restaurant mailed to ", d_user.name);
+                            lunchedin.noMatchMail(d_user);
 
-                              });                                  
+                            placeUser();
                           }
+                          else{                            
+                            getMatches(d_user);
+                          }                    
 
-                        }                    
-
-              });           
+                });           
+              }
             }
 
-        });
-      }
+        }
+
+      placeUser();
+    }
 
     var refreshAndMail = function(object){
 
-      ////console.log("refreshAndMail");
+      console.log("refreshAndMail");
+      if(discardedUsers.length != 0 || userPool.length != 0)
+        return "not empty";
 
       discardedUsers = []; // safety net - redundant
       
@@ -1632,7 +1649,7 @@ function matchingAlgorithm( userPool ){
     function discard( object ){
       return new RSVP.Promise(function(resolve, reject){
 
-          //console.log("discard");
+          console.log("discard");
 
           var participants = object.users;
 
@@ -1644,8 +1661,10 @@ function matchingAlgorithm( userPool ){
               if(userPool.length < 3){
                   discardedUsers = discardedUsers.concat(userPool);
                   userPool = [];
-                  //console.log("Finished with user-pool");
+                  console.log("Finished with user-pool");
+                  placeDiscardedUser();
                   reject({value:"something"});
+
               }
               else{
                 //console.log("Received undefined user: 1617. Going to next user");
@@ -1656,7 +1675,7 @@ function matchingAlgorithm( userPool ){
             discardedUsers = discardedUsers.concat(participants); 
           }
           else{
-            //console.log("Invalid value passed to discarded. Bug:1630");
+            console.log("Invalid value passed to discarded. Bug:1630");
           } 
 
           resolve({'value':"Something"}); 
@@ -1729,8 +1748,11 @@ function matchingAlgorithm( userPool ){
                         if(err || res.length==0){
                           //console.log("Error(1787): Not able to find a restaurant", err);
                           //console.log("Resolved at 1714")
-                          resolve({'value':"Added match"});
-                          //reject({'users': group });
+                          
+                          if(userPool.length)
+                            resolve({'value':"Added match"});
+                          else
+                          reject({});
                         } 
                         else {
                               var rest = res[Math.floor(Math.random() * res.length)];
@@ -1749,18 +1771,26 @@ function matchingAlgorithm( userPool ){
 
                                     if(err){
                                       //console.log("Error(1807): Unable to create match");
-                                      resolve({'value':"Added match"});
+                                      if(userPool.length>0)
+                                        resolve({'value':"Added match"});
+                                      else
+                                        reject({});
                                     }
                                     else{
                                       //resolve(user[0]._id);
                                       console.log("Added match");
                                       //console.log("------------------------------------------------");
-                                      resolve({'value':"Added match"});
+                                      if(userPool.length>0)
+                                        resolve({'value':"Added match"});
+                                      else
+                                        reject({})
                                     }
  
                               });
                         }
                 });
+            
+            //resolve({value:true});
         });
     }
 
@@ -1923,9 +1953,10 @@ function matchingAlgorithm( userPool ){
 
     function nextUser(object){
       return new RSVP.Promise(function(resolve, reject) {
-      
+ 
+  
       //console.log("NextUser");
-      //console.log("User pool length: ", userPool.length);
+      console.log("User pool length: ", userPool.length);
 
       startProcess()
         .then(findMatePool, null)   //Roll first time
@@ -1934,14 +1965,15 @@ function matchingAlgorithm( userPool ){
         .then(pickNextMate, null)   //Roll second time
         .then(findMatePool, null)   //Roll second time
         .then(pickNextMate, null)   //Roll second time
-        .then(addMatch, discard)
-        .then(nextUser, placeDiscardedUser)
-        .then(refreshAndMail)
-      })
+        .then(addMatch, null)
+        .then(nextUser, discard)
+
+      });
 
     }
 
     nextUser();
+    
 }
 
 
@@ -1959,7 +1991,7 @@ var initialize = function() {
 
       lunchedin.mails = true;
 
-      lunchedin.testing = false;
+      lunchedin.testing = true;
 
       var rule = new schedule.RecurrenceRule();
       rule.hour = 1;
@@ -1992,7 +2024,7 @@ var initialize = function() {
 }
 initialize(); // runs everytime dynos are set
 
-/*//Testing
+//Testing
 if(lunchedin.testing){
   setTimeout(lunchedin.firstCall, 3000);
   setInterval(lunchedin.firstCall, 70000);
@@ -2000,4 +2032,4 @@ if(lunchedin.testing){
   lunchedin.mails = false;
   lunchedin.timeToSecondCall = 4000;
   lunchedin.timeToThirdCall = 20000;
-}*/
+}
