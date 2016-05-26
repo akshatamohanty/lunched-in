@@ -1771,8 +1771,8 @@ function matchingAlgorithm( userPool ){
                               Match.create( newMatch, 
                                 function(err, match){
 
-                                    if(err){
-                                      //console.log("Error(1807): Unable to create match");
+                                    if(err || match == undefined){
+                                      console.log("Error(1807): Unable to create match");
                                       if(userPool.length>0)
                                         resolve({'value':"Added match"});
                                       else
@@ -1784,8 +1784,10 @@ function matchingAlgorithm( userPool ){
                                       //console.log("------------------------------------------------");
                                       if(userPool.length>0)
                                         resolve({'value':"Added match"});
-                                      else
+                                      else{
                                         reject({})
+                                      }
+
                                     }
  
                               });
