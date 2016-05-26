@@ -403,7 +403,7 @@ lunchedin.matchedMail = function( match, user ){
                 }, function(err, participants){
 
                     if(participants != undefined && participants.length > 0){
-                      for( p in participants ){
+                      for( var p=0; p<participants.length; p++ ){
 
 
                           var pObj = {};
@@ -422,13 +422,13 @@ lunchedin.matchedMail = function( match, user ){
                                                     + user._id 
                                                     + "&block=" + participant.email;
 
-
-
-                          template.people.push(pObj);
+                          //console.log("***", JSON.stringify(pObj));
+                          template.people.push(pObj); 
 
                       }
 
                       console.log("Matched Mail sent to ", user.name);
+                      //console.log(template);
                       lunchedin.sendMail( templateID, template, user.email)
                     }
 
@@ -532,74 +532,80 @@ lunchedin.noMatchMail = function( user ){
  *  
  */
 lunchedin.updateStatistics = function( runCount ){
-    // for each participant of a match, check if all others are added - if not - add it
-    Match.find({ run: runCount }, function(err, matches){
 
-      if(err) console.log("Error retriving matches");
-      else{
+  var matches;
+  function updateMatch(){
+    var match = matches.splice(0,1)[0];
 
-            ////console.log(matches.length, "matches found for runCount", runCount );
-            for(var i=0; i < matches.length; i++){
+    if(match == undefined && matches.length == 0)
+      return;
+    else{
+          console.log("Updating statistics for match", match._id);
+          // increasing restaurant count by number of people who went there
+          Restaurant.find( { _id: match.location._id }, function(err, rest){
 
-                // skipping the dummy match
-                if(matches[i].participants.length == 0 && matches[i].dropouts.length == 0)
-                  continue;
+                if(!err && rest.length != 0){
+                  rest[0].total = rest[0].total + 1; //= rest[0].total + matches[i].participants.length;
+                  rest[0].save();
+                  console.log("Restaurant updated")
+                }
+          });
 
-                //console.log("Updating statistics for match", matches[i]._id);
-                // increasing restaurant count by number of people who went there
-                Restaurant.find( { _id: matches[i].location._id }, function(err, rest){
+          // increasing drop count for dropouts
+          User.find( { 
+              _id: {$in: match.dropouts}
+          }, function(err, users){
+              if(!err){
+                for(var i=0; i<users.length; i++){
+                   users[i].dropCount ++;
+                   users[i].save();
+                   console.log("Drop counts updated");
+                }
+              }
 
-                      if(!err && rest.length != 0){
-                        rest[0].total = rest[0].total + 1; //= rest[0].total + matches[i].participants.length;
-                        rest[0].save();
-                      }
-                });
+          });
 
-                // increasing drop count for dropouts
-                User.find( { 
-                    _id: {$in: matches[i].dropouts}
-                }, function(err, users){
-                    if(!err){
-                      for(var i=0; i<users.length; i++){
-                         users[i].dropCount ++;
-                         users[i].save();
-                      }
-                    }
+          // Adding to know and increasing lunch count for the user
+          User.find( { 
+              _id: {$in: match.participants}
+            }, function(err, participants){
 
-                });
+                  if(err) console.log("Error getting participants");
+                  else{
+                        
+                        for(var pCount=0; pCount< participants.length; pCount++){
+                            
+                            var p = participants[pCount]; ////console.log("Comparing", p.name);
+                            
+                            for(var qCount=0; qCount < participants.length; qCount++){
 
-                // Adding to know and increasing lunch count for the user
-                User.find( { 
-                    _id: {$in: matches[i].participants}
-                  }, function(err, participants){
+                                if(qCount == pCount)
+                                    continue; 
 
-                        if(err) console.log("Error getting participants");
-                        else{
-                              
-                              for(var pCount=0; pCount< participants.length; pCount++){
-                                  
-                                  var p = participants[pCount]; ////console.log("Comparing", p.name);
-                                  
-                                  for(var qCount=0; qCount < participants.length; qCount++){
+                                var q = participants[qCount];                                        
+                                
+                                if( p.known.indexOf(q._id) == -1)
+                                  p.known.push(q._id);
+                            }
 
-                                      if(qCount == pCount)
-                                          continue; 
-
-                                      var q = participants[qCount];                                        
-                                      
-                                      if( p.known.indexOf(q._id) == -1)
-                                        p.known.push(q._id);
-                                  }
-
-                                  p.lunchCount++ ;
-                                  p.save();
-                                  ////console.log(p.name, "knows", p.known.length);
-                              }
+                            p.lunchCount++ ;
+                            p.save();
+                            
                         }
+                        console.log("Knowns updated");
+                        updateMatch();
+                  }
 
-                });
-                
-            }       
+          });      
+    }
+  }
+    // for each participant of a match, check if all others are added - if not - add it
+    Match.find({ run: runCount, location: {$exists:true} }, function(err, glmatches){
+
+      if(err || glmatches.length==0) console.log("Error retriving matches");
+      else{
+         matches = glmatches;
+         updateMatch();
       }
 
     });
@@ -610,32 +616,50 @@ lunchedin.updateStatistics = function( runCount ){
  *  
  */
 lunchedin.checkDropouts = function( runCount ){
-    // for each participant of a match, check if all others are added - if not - add it
-    Match.find({ run: runCount, location: {$exists:true} }, function(err, matches){
 
-      if(err) console.log("Error retriving matches");
+    var matches;
+    function matchDropout(){
+      
+      var match = matches.splice(0,1)[0];
+
+      if(match == undefined && matches.length == 0)
+        return;
       else{
+        if(match == undefined){
+          console.log("Undefined match received(err:621)");      
+          matchDropout();    
+        }      
+        else{
 
-            //console.log("-------------- Alerting for dropouts -----------------"); 
-            for(var i=0; i < matches.length; i++){
-
-                var match = matches[i];
-
-                if(match.dropouts.length){
-                    User.find( { 
-                        _id: {$in: match.participants}
+            if(match.dropouts.length){
+              User.find( { 
+                  _id: {$in: match.participants}
                       }, function(err, participants){
 
-                          if(!err){
+                          if(!err && participants.length){
                               for(var p=0; p<participants.length; p++)
                                 lunchedin.canceledMail(match, participants[p]);
                           }
 
-                      });                  
-                }
+                          matchDropout();
+              }); 
+            } 
+            else
+              matchDropout(); 
+        }
+      }
 
-                
-            }       
+    }
+    // for each participant of a match, check if all others are added - if not - add it
+    Match.find({ run: runCount, location: {$exists:true} }, function(err, glmatches){
+
+      if(err || glmatches.length==0) console.log("Error retriving matches");
+      else{
+
+            matches = glmatches;
+            //console.log("-------------- Alerting for dropouts -----------------"); 
+            matchDropout();
+       
       }
 
     });
@@ -1754,7 +1778,7 @@ function matchingAlgorithm( userPool ){
                           if(userPool.length)
                             resolve({'value':"Added match"});
                           else
-                          reject({});
+                            reject({});
                         } 
                         else {
                               var rest = res[Math.floor(Math.random() * res.length)];
@@ -2034,6 +2058,6 @@ if(lunchedin.testing){
   setInterval(lunchedin.firstCall, 70000);
   lunchedin.speedrun = true;
   lunchedin.mails = false;
-  lunchedin.timeToSecondCall = 4000;
+  lunchedin.timeToSecondCall = 5000;
   lunchedin.timeToThirdCall = 20000;
 }
