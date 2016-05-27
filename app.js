@@ -131,7 +131,9 @@ var lunchedin = {};
 lunchedin.production = true; 
 lunchedin.speedrun = false;
 
-lunchedin.run;  
+lunchedin.run;
+
+lunchedin.poolActive = false;  
 
 //- If set to true, mailing functionality is activated
 lunchedin.mails = false; 
@@ -802,6 +804,7 @@ lunchedin.firstCall = function(){
      *  Run starts from 1 
      */
       console.log("-----------FIRST CALL---------------")
+      lunchedin.poolActive = true;
       Match.find({})
         .sort({ run: -1 })
         .exec( function(err, matches) {
@@ -835,11 +838,13 @@ lunchedin.secondCall = function(){
   // add a dummy match for this run
   addToDatabase( Match, { run: lunchedin.run, date: Date() } , "Match", null)
   
+  lunchedin.poolActive = false;  
 
   var runAlgo = function(object){
     // deal with pool
     console.log("-------------- SECOND CALL -----------------");
     console.log("---- Run ", lunchedin.run, " ----");
+
     User.find({ 
               inPool : true, 
               cuisine: { $exists: true, $ne: [] }
@@ -1327,11 +1332,17 @@ lunchedin.thirdCall = function(){
       var qs = querystring.parse(req.url.split("?")[1]),
       id = qs.id;
       // api / dropOut?id=object_id
-
-      if(ObjectId.isValid(id)){
-          lunchedin.addToPool( lunchedin.run, id );
-          res.send( "<h1>You have added yourself to the Lunch pool. You will receive your Lunch Invite by 12:30 PM.</h1>" );
+      if(lunchedin.poolActive){
+        if(ObjectId.isValid(id)){
+            lunchedin.addToPool( lunchedin.run, id );
+            res.send( "<h1>You have added yourself to the Lunch pool. You will receive your Lunch Invite by 12:30 PM.</h1>" );
+        }        
       }
+      else{
+        res.send( "<h1>Sorry! The pool is not active right now. </h1>" );
+      }
+
+
         
       
 
@@ -1720,16 +1731,6 @@ function matchingAlgorithm( userPool ){
             var group = object.group;
 
             console.log("Group length for match", group.length);
-            for(var i=0; i<userPool.length; i++){
-              for(var g=0; g<group.length; g++){
-                var userFromPool = userPool[i];
-                var groupMember = group[g];
-                
-                if(userFromPool._id == groupMember._id){
-                    console.log(userPool.splice(i, 1)[0].name, " matched and removed from userpool. Userpool length: ", userPool.length);
-                }
-              }
-            }
 
             console.log("--------------Matching---------------");        
             var criteria = []; 
@@ -1772,9 +1773,8 @@ function matchingAlgorithm( userPool ){
                 .exec(function(err, res){
                         
                         if(err || res.length==0){
-                          console.log("Error(1787): ", err);
-                          //console.log("Resolved at 1714")
-                          
+                          console.log("Error(1787): Not able to find restaurant", err);
+
                           if(userPool.length)
                             resolve({'value':"Added match"});
                           else
@@ -1803,7 +1803,20 @@ function matchingAlgorithm( userPool ){
                                         reject({});
                                     }
                                     else{
-                                      //resolve(user[0]._id);
+
+                                      //removing matched people from the pool
+                                      var count = 0;
+                                      for(var g=0; g<group.length; g++){
+                                        var groupMember = group[g];
+                                        for(var i=0; i<userPool.length; i++){ 
+                                          var userFromPool = userPool[i];              
+                                          if(userFromPool.email == groupMember.email){
+                                              console.log(userPool.splice(i, 1)[0].name, " matched and removed from userpool. Userpool length: ", userPool.length);
+                                              count++;
+                                          }
+                                        }
+                                      }
+
                                       console.log("Added match");
                                       //console.log("------------------------------------------------");
                                       if(userPool.length>0)
