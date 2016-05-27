@@ -710,7 +710,6 @@ lunchedin.mailMatches = function( runCount ){
           matchInvite(match);
         else{
           console.log("Mailed all matches");
-          lunchedin.optoutActive = true;
         }
           
     }
@@ -855,6 +854,7 @@ lunchedin.secondCall = function(){
   addToDatabase( Match, { run: lunchedin.run, date: Date() } , "Match", null)
   
   lunchedin.poolActive = false;  
+  lunchedin.optoutActive = true;
 
   var runAlgo = function(object){
     // deal with pool
@@ -891,12 +891,12 @@ lunchedin.thirdCall = function(){
   if( lunchedin.checkHoliday() ==  true && lunchedin.speedrun == false )
     return;
 
+  lunchedin.optoutActive = false;
+
   //console.log("-------------- THIRD CALL -----------------");
   User.find({ 
             inPool : true
         }, function( err, users ){
-
-            lunchedin.optoutActive = false;
 
             if(users.length == 0){
                 // check for dropOuts
@@ -1847,7 +1847,7 @@ function matchingAlgorithm( userPool ){
                                       }
 
                                       console.log("Added match");
-                                      //console.log("------------------------------------------------");
+                                      console.log("------------------------------------------------");
                                       if(userPool.length>0)
                                         resolve({'value':"Added match"});
                                       else{
