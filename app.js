@@ -142,7 +142,8 @@ lunchedin.speedrun = false;
 
 lunchedin.run;
 
-lunchedin.poolActive = false;  
+lunchedin.poolActive = false;
+lunchedin.optoutActive = false;  
 
 //- If set to true, mailing functionality is activated
 lunchedin.mails = false; 
@@ -181,7 +182,8 @@ lunchedin.timeToMail_normal = 1200000;
  */
 lunchedin.checkHoliday = function(date){
 
-  var today = date; 
+
+/*  var today = date; 
   // check for saturday - sunday
   if(date == null)
     today = new Date();
@@ -202,7 +204,7 @@ lunchedin.checkHoliday = function(date){
 
       if( holidays[holiday].date == today.getDate() && holidays[holiday].month == today.getMonth() )
         return true;
-  }
+  }*/
 
   return false;
 }
@@ -321,23 +323,23 @@ lunchedin.confirmationMail = function( user ){
                              'Good Morning! Hope you\'ve had a productive day so far' ];
     var middle_paraOpts = [
                             'It will be lunch soon. How about a great lunch while meeting some awesome'
-                            + ' colleagues? All you have to do is simple click the green button to confirm'
-                            + ' your availability. You have until 11.30 AM to do so. If you are caught up'
+                            + ' colleagues? All you have to do is simple click the button below to confirm'
+                            + ' your availability. You have until 12.30 PM to do so. If you are caught up'
                             + ' with other things and cannot make it today, no worries, ignore this email :-)', 
                             
                             'Will you be interested to join your colleagues for lunch over your favourite'
                             + ' cuisine at a nearby restaurant? Then, it\'s very simple. Just click the'
-                            + ' green button before 11.30 PM and confirm your availability. But if you cannot'
+                            + ' button below before 12.30 PM and confirm your availability. But if you cannot'
                             + ' make it today, it\'s alright, just ignore this email :-)' , 
                             
                             'Already feeling hungry? Me too :-) How about I arrange an awesome lunch'
                             + ' for you with your colleagues? If you like it, all you have to do is simple click the' 
-                            + ' green button to confirm your availability. If you are not in the mood today, it\'s OK,' 
+                            + ' button below to confirm your availability. If you are not in the mood today, it\'s OK,' 
                             + ' simply ignore this email and I will understand :-)',
 
-                            'Game for an awesome lunch? You have until 11.30 PM to confirm your'
+                            'Game for an awesome lunch? You have until 12.30 PM to confirm your'
                             + ' availability for today\'s lunch rendezvous. You can do so by simply'
-                            + ' clicking the green button. If you cannot make it, ignore this email'
+                            + ' clicking the button below. If you cannot make it, ignore this email'
                             + ' and I will understand.'
                           ];
 
@@ -706,8 +708,11 @@ lunchedin.mailMatches = function( runCount ){
         var match = matches.splice(0, 1)[0];
         if(match != undefined)
           matchInvite(match);
-        else
+        else{
           console.log("Mailed all matches");
+          lunchedin.optoutActive = true;
+        }
+          
     }
 
     Match.find(
@@ -715,7 +720,9 @@ lunchedin.mailMatches = function( runCount ){
         location: {$exists:true}
       }, function(err, glmatches){
 
-      if(err || glmatches.length == 0) console.log("Error retriving matches");
+      if(err || glmatches.length == 0) {
+        console.log("Error retriving matches");
+      }
       else{
 
             matches = glmatches;
@@ -888,6 +895,8 @@ lunchedin.thirdCall = function(){
   User.find({ 
             inPool : true
         }, function( err, users ){
+
+            lunchedin.optoutActive = false;
 
             if(users.length == 0){
                 // check for dropOuts
@@ -1354,7 +1363,11 @@ lunchedin.thirdCall = function(){
   });
 
   app.get('/api/dropOut', function(req, res){
-      
+
+    if(optoutActive == false){
+      res.status(200).send('<h1>Oops. You can\'t opt out now. </h1>');
+    }
+    else{
       var qs = querystring.parse(req.url.split("?")[1]),
       objectID = qs.participant;
       matchID = qs.match;
@@ -1384,8 +1397,8 @@ lunchedin.thirdCall = function(){
       else{
         //console.log("Invalid query");
         res.send("<h1>Invalid query</h1>")
-      }
-
+      }      
+    }  
   });
 
   app.get('/api/blockUser', function(req, res){
@@ -1403,18 +1416,29 @@ lunchedin.thirdCall = function(){
                       var user = user[0];
                       User.find({ email: blockedMail }, function(err, user2){
 
-                            if(err || user2.length==0 ) console.log("Error(1546):", err);
+                            if(err || user2.length==0 ) {
+                                console.log("Error(1546):", err);
+                                res.status(200).send('<h1>Error</h1>')
+                            }
                             else{
                                   var user2 = user2[0];
                                   if( user.blocked.indexOf( user2._id ) == -1){
+                                    
                                     user.blocked.push(user2._id);
+                                    
+                                    var knownId = user.known.indexOf(user2._id);
+                                    if(knownId>-1){
+                                      user.known.splice(knownId, 1);
+                                      console.log("User was known but has now been blocked");
+                                    }
+                                    
                                     //res.send(user.name + ", " + user2.name+ "has been blocked.")
                                     user.save();
                                     res.status(200).send('<h1>You have blocked '+ user2.name+ ' from lunching with you again.</h1>')
                                     //res.status(200).send(user.name + ", " + user2.name+ " has been blocked.");
                                   }
                                   else
-                                    res.status(200).send('<h1>Error</h1>')
+                                    res.status(200).send('<h1>This user was already blocked!</h1>')
                                     //res.status(200).send(user.name+ ", "+ user2.name+ " was already blocked.");
                                     //res.send(user.name+ ", "+ user2.name+ "was already blocked.");                         
                             }
@@ -2056,8 +2080,8 @@ var initialize = function() {
       });
 
       var rule3 = new schedule.RecurrenceRule();
-      rule3.hour = 5;
-      rule3.minute = 0;
+      rule3.hour = 4;
+      rule3.minute = 50;
       schedule.scheduleJob(rule3, function(){
           console.log(new Date(), 'Waka Waka! Third Call - Spoiler Alert');
           lunchedin.thirdCall();
