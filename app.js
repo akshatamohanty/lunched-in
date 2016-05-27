@@ -1364,7 +1364,7 @@ lunchedin.thirdCall = function(){
 
   app.get('/api/dropOut', function(req, res){
 
-    if(optoutActive == false){
+    if(lunchedin.optoutActive == false){
       res.status(200).send('<h1>Oops. You can\'t opt out now. </h1>');
     }
     else{
