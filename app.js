@@ -31,6 +31,8 @@ var schedule = require('node-schedule');
 
 var RSVP = require('rsvp');
 
+var cloudinary = require('cloudinary');
+
 
 // configuration ==============================
 /* 
@@ -43,6 +45,13 @@ var RSVP = require('rsvp');
 mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://127.0.0.1:27017/test', function (error) {
     if (error) console.error(error);
     else console.log('mongo connected');
+});
+
+
+cloudinary.config({ 
+  cloud_name: 'hzif3kbk7', 
+  api_key: '815583121548969', 
+  api_secret: 'W-gkpLsbgHBvrWPNpB6UGqyb120' 
 });
 
 
@@ -340,8 +349,8 @@ lunchedin.confirmationMail = function( user ){
                               'Looking forward to schedule your lunch meeting today.'
                           ];
 
-    var imageOpts = ['http://res.cloudinary.com/hzif3kbk7/image/upload/v1464093462/randompicture/2.jpg', 
-                      'http://res.cloudinary.com/hzif3kbk7/image/upload/v1464093478/randompicture/1.jpg'];
+    var number = Math.floor(Math.random() * 40 + 1);
+    var imageURL = "http://res.cloudinary.com/hzif3kbk7/image/upload/randompicture/" + number + ".jpg";
 
     var templateModel = {
               "user_name": lunchedin.getFirstName(user.name),
@@ -349,7 +358,7 @@ lunchedin.confirmationMail = function( user ){
               "opening_para": opening_paraOpts[Math.floor(Math.random() * opening_paraOpts.length)],
               "middle_para": middle_paraOpts[Math.floor(Math.random() * middle_paraOpts.length)], 
               "closing_para": closing_paraOpts[Math.floor(Math.random() * closing_paraOpts.length)],
-              "image": imageOpts[Math.floor(Math.random() * imageOpts.length)]
+              "image": imageURL
             };
     
     console.log("Confirmation Mail sent to ", user.name);
@@ -604,7 +613,7 @@ lunchedin.updateStatistics = function( runCount ){
     // for each participant of a match, check if all others are added - if not - add it
     Match.find({ run: runCount, location: {$exists:true} }, function(err, glmatches){
 
-      if(err || glmatches.length==0) console.log("Error retriving matches");
+      if(err || glmatches.length==0) console.log("Error retriving matches", err);
       else{
          matches = glmatches;
          updateMatch();
@@ -1340,11 +1349,7 @@ lunchedin.thirdCall = function(){
       }
       else{
         res.send( "<h1>Sorry! The pool is not active right now. </h1>" );
-      }
-
-
-        
-      
+      }    
 
   });
 
@@ -1405,7 +1410,7 @@ lunchedin.thirdCall = function(){
                                     user.blocked.push(user2._id);
                                     //res.send(user.name + ", " + user2.name+ "has been blocked.")
                                     user.save();
-                                    res.status(200).send('<h1>You have blocked'+ user2.name+ ' from lunching with you again.</h1>')
+                                    res.status(200).send('<h1>You have blocked '+ user2.name+ ' from lunching with you again.</h1>')
                                     //res.status(200).send(user.name + ", " + user2.name+ " has been blocked.");
                                   }
                                   else
@@ -1447,7 +1452,7 @@ lunchedin.thirdCall = function(){
                                   
                                   user.save();
                                   //console.log("Restaurant has been blocked for user.");
-                                  res.status(200).send("<h1>Confirm? " + restaurant.name + " will not be suggested to you again.</h1>");
+                                  res.status(200).send("<h1>" + restaurant.name + " will not be suggested to you again.</h1>");
                                 }
                                 else
                                   res.status(200).send('<h1>Error</h1>');                    
@@ -1796,7 +1801,7 @@ function matchingAlgorithm( userPool ){
                                 function(err, match){
 
                                     if(err || match == undefined){
-                                      console.log("Error(1807): Unable to create match");
+                                      console.log("Error(1807): Unable to create match", err);
                                       if(userPool.length>0)
                                         resolve({'value':"Added match"});
                                       else
