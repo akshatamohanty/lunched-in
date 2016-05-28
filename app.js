@@ -1731,21 +1731,20 @@ function matchingAlgorithm( userPool ){
 
               }
               else{
-                console.log("Received undefined user: 1617. Going to next user");
-                //resolve({value:"something"}); 
+                //console.log("Received undefined user: 1617. Going to next user");
+                resolve({value:"something"}); 
                 nextUser();             
               }
             }
 
             discardedUsers = discardedUsers.concat(participants); 
-
           }
           else{
             console.log("Invalid value passed to discarded. Bug:1630");
             nextUser()
           } 
 
-          
+          resolve({'value':"Something"}); 
       });
 
     }  
@@ -2012,10 +2011,10 @@ function matchingAlgorithm( userPool ){
 
           ////console.log(pool.length, "hello");
           if((pool.length + group.length) < 2){
-            if(group.length > 0)
-              reject({'users': [group[0]]});
-            else
+            if(group.length == 0)
               reject({'users': [currUser]});
+            else
+              reject({'users': [group[0]]});
           }
           else{
               group.push(currUser);
