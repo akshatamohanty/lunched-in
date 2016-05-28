@@ -1713,7 +1713,7 @@ function matchingAlgorithm( userPool ){
     function discard( object ){
       return new RSVP.Promise(function(resolve, reject){
 
-          console.log("discard", object);
+          console.log("discard", object); // object can be invalid value, single user, multiple users
 
           var participants = object.users;
 
@@ -1731,13 +1731,15 @@ function matchingAlgorithm( userPool ){
 
               }
               else{
-                //console.log("Received undefined user: 1617. Going to next user");
+                console.log("Received undefined user: 1617. Going to next user");
                 resolve({value:"something"}); 
                 nextUser();             
               }
             }
-
-            discardedUsers = discardedUsers.concat(participants); 
+            else{
+              discardedUsers = discardedUsers.concat(participants);    
+              nextUser();           
+            }
           }
           else{
             console.log("Invalid value passed to discarded. Bug:1630");
