@@ -2012,7 +2012,10 @@ function matchingAlgorithm( userPool ){
 
           ////console.log(pool.length, "hello");
           if((pool.length + group.length) < 2){
-            reject({'users': [group[0]]});
+            if(group.length > 0)
+              reject({'users': [group[0]]});
+            else
+              reject({'users': [currUser]});
           }
           else{
               group.push(currUser);
