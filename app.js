@@ -1738,7 +1738,7 @@ function matchingAlgorithm( userPool ){
             }
 
             discardedUsers = discardedUsers.concat(participants); 
-            nextUser();
+
           }
           else{
             console.log("Invalid value passed to discarded. Bug:1630");
