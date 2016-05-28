@@ -1701,7 +1701,7 @@ function matchingAlgorithm( userPool ){
               resolve({pool: userPool, currUser: n, group: []});
             }
             else{
-              //console.log("Bug in line: 1608");
+              console.log("Bug in line: 1608");
               reject({users:[]});   // this shouldn't happen
             }         
         }
@@ -1713,7 +1713,7 @@ function matchingAlgorithm( userPool ){
     function discard( object ){
       return new RSVP.Promise(function(resolve, reject){
 
-          console.log("discard");
+          console.log("discard", object);
 
           var participants = object.users;
 
@@ -1731,8 +1731,8 @@ function matchingAlgorithm( userPool ){
 
               }
               else{
-                //console.log("Received undefined user: 1617. Going to next user");
-                resolve({value:"something"}); 
+                console.log("Received undefined user: 1617. Going to next user");
+                //resolve({value:"something"}); 
                 nextUser();             
               }
             }
