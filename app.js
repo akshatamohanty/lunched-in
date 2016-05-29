@@ -868,13 +868,13 @@ lunchedin.secondCall = function(){
           .sort({ blockedCount: 1, lunchCount: 1, knownCount: 1,  })
           .exec( function(err, userPool) {
 
-            if(userPool.length == 0)
-              console.log("No users!");
+            if(err || userPool.length == 0 || userPool == undefined)
+              console.log("No users!", err);
             else{
                 console.log("-----------Running Match Algorithm (user count):", userPool.length, "---------------")
                 ////console.log(userPool);
                 matchingAlgorithm(userPool);            
-              }
+            }
     });    
   }
 
@@ -1692,7 +1692,7 @@ function matchingAlgorithm( userPool ){
 
         ////console.log("startProcess");
         
-        if(userPool.length < 3 || userPool == undefined)
+        if(userPool.length < 3)
           reject({users:[]})
         else{
             var n = userPool.splice(0, 1)[0];  
@@ -1701,7 +1701,7 @@ function matchingAlgorithm( userPool ){
               resolve({pool: userPool, currUser: n, group: []});
             }
             else{
-              console.log("Bug in line: 1608");
+              console.log("Bug in line: 1608; User pool greater than 3 but user is undefined.");
               reject({users:[]});   // this shouldn't happen
             }         
         }
@@ -1713,42 +1713,50 @@ function matchingAlgorithm( userPool ){
     function discard( object ){
       return new RSVP.Promise(function(resolve, reject){
 
-          console.log("discard", object); // object can be invalid value, single user, multiple users
+          console.log("discard"); // object can be invalid value, single user, multiple users
 
-          var participants = object.users;
+          if(object != undefined){
 
-          if(participants != undefined)
-          {
+                var participants = object.users;
 
-            // if participants.length == 0, userPool is less than 3 or there in an undefined user
-            if(participants.length == 0){
-              if(userPool.length < 3){
-                  discardedUsers = discardedUsers.concat(userPool);
-                  userPool = [];
-                  console.log("Finished with user-pool");
-                  placeDiscardedUser();
-                  reject({value:"something"});
+                if(participants != undefined)
+                {
 
-              }
-              else{
-                console.log("Received undefined user: 1617. Going to next user");
-                resolve({value:"something"}); 
-                nextUser();             
-              }
-            }
-            else{
-              discardedUsers = discardedUsers.concat(participants);    
-              nextUser();           
-            }
+                  // if participants.length == 0, userPool is less than 3 or there in an undefined user
+                  if(participants.length == 0){
+
+                      if(userPool.length < 3){
+                          discardedUsers = discardedUsers.concat(userPool);
+                          userPool = [];
+                          console.log("Finished with user-pool");
+                          placeDiscardedUser();
+                          reject({value:"something"});
+
+                      }
+                      else{
+                        console.log("Received undefined user: 1617. Going to next user");
+                        resolve({value:"something"}); 
+                        nextUser();             
+                      }
+
+                  }
+                  else{
+                    
+                      discardedUsers = discardedUsers.concat(participants);    
+                      nextUser();           
+                  }
+                }
+                else{
+                  console.log("Invalid value passed to discarded. Bug:1630");
+                  nextUser();
+                } 
+
+                resolve({'value':"Something"}); 
           }
           else{
-            console.log("Invalid value passed to discarded. Bug:1630");
-            nextUser()
-          } 
-
-          resolve({'value':"Something"}); 
+            console.log("Object passed to discard was undefined");
+          }
       });
-
     }  
 
     function addMatch(object){
@@ -1806,10 +1814,7 @@ function matchingAlgorithm( userPool ){
                         if(err || res.length==0){
                           console.log("Error(1787): Not able to find restaurant", err);
 
-                          if(userPool.length)
-                            resolve({'value':"Added match"});
-                          else
-                            reject({});
+                          reject({users: [group[0]]});
                         } 
                         else {
                               var rest = res[Math.floor(Math.random() * res.length)];
@@ -1828,10 +1833,7 @@ function matchingAlgorithm( userPool ){
 
                                     if(err || match == undefined){
                                       console.log("Error(1807): Unable to create match", err);
-                                      if(userPool.length>0)
-                                        resolve({'value':"Added match"});
-                                      else
-                                        reject({});
+                                      reject({users: [group[0]]});;
                                     }
                                     else{
 
@@ -1850,12 +1852,11 @@ function matchingAlgorithm( userPool ){
 
                                       console.log("Added match");
                                       console.log("------------------------------------------------");
-                                      if(userPool.length>0)
+                                      //if(userPool.length>0)
                                         resolve({'value':"Added match"});
-                                      else{
-                                        reject({})
-                                      }
-
+                                      //else{
+                                        //reject({})
+                                      //}
                                     }
  
                               });
@@ -2012,15 +2013,12 @@ function matchingAlgorithm( userPool ){
             pool = pool[2].concat(pool[1]).concat(pool[0]);
 
           ////console.log(pool.length, "hello");
-          if((pool.length + group.length) < 2){
-            if(group.length == 0)
-              reject({'users': [currUser]});
-            else
-              reject({'users': [group[0]]});
+          group.push(currUser);
+          if((pool.length + group.length) < 3){
+            reject({'users': [group[0]]});
           }
           else{
-              group.push(currUser);
-              resolve({'pool': pool, 'currUser': currUser, 'group': group});            
+            resolve({'pool': pool, 'currUser': currUser, 'group': group});            
           }  
       });
 
@@ -2107,4 +2105,4 @@ initialize(); // runs everytime dynos are set
   lunchedin.mails = false;
   lunchedin.timeToSecondCall = 5000;
   lunchedin.timeToThirdCall = 20000;
-}*/
+} */
