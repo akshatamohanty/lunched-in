@@ -1,31 +1,4 @@
-<style>
-.header {
-  padding: 10px;
-  background-color: #FFCE54;
-  border-bottom: 1px solid #F6BB42;
-  height: 55px;
-}
-
-.header img{
-  height: 35px;
-  position: absolute;
-  left: 45%;
-}
-
-.header #logout{
-  background-color: #FFCE54;
-  border-bottom: 1px solid #F6BB42;
-}
-
-.btn, .panel-heading{
-  background-color: #FFCE54;
-  border: 1px solid #F6BB42;
-  color: white;
-}
-
-</style>
-
-<div class='header'>
+<div class='header main-header'>
   <img class='logo' src='../assets/images/lunchedin-white.png'/>
   <button class='btn pull-right' onclick='location.replace("/logout");window.reload();'><i class='fa fa-sign-out'/></a>
 </div>
@@ -45,7 +18,7 @@
   
       <!--beginning of card-->
       <div class='row simple-card' style="padding: 0px; margin-bottom: 0px;">   
-        <div class='header' style='padding : 10px'>
+        <div class='header'>
           <h4> About You </h4>
         </div> 
       </div>
@@ -62,7 +35,7 @@
 
               <div class='panel-body card-body' style='padding: 20px;'>
                 
-                <img ng-src="{{active_user.picture}}" class='img-responsive' style='width: 200px; height:200px; border-radius: 50%'> </img>
+                <img ng-src="{{active_user.picture}}" class='img-responsive user-image'> </img>
                 <div class='file-upload'> </div>
 
 <!--                 <p class='text-center bottom-align'>{{ active_user.tagline }} 
@@ -130,7 +103,7 @@
       
       <!--beginning of preferences-->
       <div class='row simple-card' style="padding: 0px; margin-bottom: 0px; margin-top: 20px">   
-        <div class='header' style='padding : 10px'>
+        <div class='header'>
           <h4> Cuisine  </h4>
         </div> 
       </div>
@@ -138,18 +111,18 @@
         <div class='row'>
           <md-chips ng-model="active_user.cuisine"></md-chips>
              <br>
-            <md-checkbox ng-model='active_user.veg'> Are you Vegeterian?</md-checkbox>
-            <md-checkbox ng-model='active_user.halal'> Do you prefer restaurants that serve Halal meat?</md-checkbox>
+            <md-checkbox ng-model='active_user.veg'> Strictly Vegeterian?</md-checkbox>
+            <md-checkbox ng-model='active_user.halal'> Strictly Halal?</md-checkbox>
               <br>
               <div class='row'>
                 <div class='col-sm-3 col-xs-6' ng-repeat='cuisine in cuisines'>
                         <div class='cuisine-card card panel panel-default' ng-model='active_user' ng-click='toggle(cuisine, active_user.cuisine)'>
                             <div class='panel-heading card-heading'>
-                              <h6 class='text-center'>{{cuisine}}</h6> 
+                              <h4 class='text-center'>{{cuisine}}</h4> 
                             </div>           
                             <div class='panel-body card-body zero-padding'>                        
                               <img src='assets/images/cuisines/{{cuisine.toLowerCase()}}.jpg' class='img-responsive cuisine-photo' style='height:150px; width: inherit;'/>
-                              <i style='position: absolute; top:40%; left: 40%; color: white' class='fa fa-check-circle-o fa-4x'
+                              <i style='position: absolute; top:40%; left: 40%; color: #00FF00' class='fa fa-check-circle-o fa-4x'
                               ng-show='exists(cuisine, active_user.cuisine)'/>
                             </div>
 
@@ -181,7 +154,7 @@
 
       <!--beginning of mates--> 
       <div class='row simple-card' style="padding: 0px; margin-bottom: 0px; margin-top: 20px;">   
-        <div class='header' style='padding : 10px'>
+        <div class='header'>
           <h4> Lunchmates </h4>
         </div> 
       </div>
@@ -195,15 +168,13 @@
                   
                   <div class='card panel panel-default' style='min-height: 400px;'>
                     <div class='panel-body card-body' style='padding: 20px;'>
-                                             
-                      <img ng-src="{{user.picture}}" class='img-responsive' style='width: 200px; height:200px; border-radius: 50%'> </img>
-
-                      <button class='btn btn-info' ng-model='user' ng-click='addToKnown(user._id)'>
+                      <button class='btn btn-info user-btn' ng-model='user' ng-click='addToKnown(user._id)'>
                         <i ng-class='isKnown(user._id) ? "fa fa-star" : "fa fa-star-o"'/> 
                       </button>
-                      <button class='btn btn-info pull-right' ng-model='user' ng-click='addToBlocked(user._id)'>
+                      <button class='btn btn-info pull-right user-btn' ng-model='user' ng-click='addToBlocked(user._id)'>
                         <i ng-class='isBlocked(user._id) ? "fa fa-circle" : "fa fa-circle-o"'/> 
                       </button>
+                      <img ng-src="{{user.picture}}" class='img-responsive user-image'> </img>
                     
                       <hr style='margin:20px'/>
 

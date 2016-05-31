@@ -1,9 +1,15 @@
 html {
-  font-family: sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 body { 
   
+}
+
+h1{
+  color: #787878;
+  font-size: 48px;
+  font-weight: bold;
 }
 
 #home{
@@ -24,7 +30,7 @@ body {
   left: 37%;
   right: 37%;
   height: 80px;
-  width: 26%;
+  width: auto;
   padding-bottom: 20px;
   border-bottom: 4px solid white;
 }
@@ -95,7 +101,7 @@ body {
 }
 
 #intro{
-  padding-top: 15%;
+  padding-top: 10%;
   text-align: center;
   font-family: Arial, sans-serif;
   color: #777776;
@@ -104,11 +110,6 @@ body {
   padding-left: 10%;
   padding-right: 10%;
   max-width: 900px;
-}
-
-#intro h1{
-  font-size: 64px;
-  font-weight: bold;
 }
 
 #intro p{
@@ -130,8 +131,7 @@ body {
 }
 
 #howitworks h1{
-  font-size: 64px;
-  font-weight: bold;
+  margin-bottom: 90px;
 }
 
 #howitworks p{
@@ -140,18 +140,21 @@ body {
   text-align: left;
 }
 
+#howitworks .row{
+  margin-bottom: 60px;
+}
+
+#howitworks .description{
+  margin-top: 90px;
+}
+
 #footer{
   color: #777776;
   background-color: #FAFAFA;
   border-top: 1px solid #EDEDED;
   border-bottom: 1px solid #EDEDED;
-  margin:-top 10px;
+  margin:-top: 100px;
   padding: 20px 5% 20px 5%;
-}
-
-#footer h1{
-  font-size: 16px;
-  font-weight: bold;
 }
 
 #footer p{
@@ -162,12 +165,12 @@ body {
 
 #footer .people img{
   border-radius: 50%;
-  padding-top: 10px;
+  border: 3px solid #bbb;
 }
 
 #footer .people p{
   margin-top: 20px;
-  text-align: left;
+  text-align: center;
 }
 
 #links{
@@ -176,14 +179,12 @@ body {
   margin-bottom: 15px;
   font-size: 15px;
   margin-left: 30px;
-  text-transform: uppercase;
 }
 
 #links span{
   margin-right: 15px;
   font-size: 15px;
   margin-left: 45px;
-  text-transform: uppercase;
   color: #bbb;
 }
 
@@ -192,25 +193,9 @@ body {
 }
 
 
+/********* End of User-Dashboard *********************/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- .panel {
+.panel {
     border: 1px solid #2f6596; 
     border-radius:0;
     transition: box-shadow 0.5s;
@@ -236,6 +221,7 @@ body {
     border-top-right-radius: 0px;
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
+    font-size: 24px;
 }
 
 .panel-footer {
@@ -251,7 +237,7 @@ body {
     font-size: 14px;
 }
 
- .panel-footer .btn {
+.panel-footer .btn {
     margin: 15px 0;
     background-color: #2f6596;
     color: #fff;
@@ -360,22 +346,55 @@ body {
   position: relative;
 }
 
-.bottom-align{
+.header {
+  padding: 10px;
+  background-color: #FFCE54;
+  border-bottom: 1px solid #F6BB42;
+  height: 55px;
+}
+
+.header img{
+  height: 35px;
   position: absolute;
-  bottom: 1%;
+  left: 45%;
 }
 
-.cuisine-card{
-  
+.btn, .panel-heading{
+  background-color: #FFCE54;
+  border: 1px solid #F6BB42;
+  color: white;
 }
 
+.main-header{
+  background-color: #787878;
+  border: none;
+}
 
+.main-header .btn{
+  background-color: #787878;
+  border: none;
+}
 
+.header h4{
+  font-size: 28px;
+}
 
+.user-image{
+  width: 200px; 
+  height:200px; 
+  border-radius: 50%;
+  border: 2px solid #787878;
+  margin-left: 10px;
+}
 
 /*
  *  Overrides
  */
+.user-btn{
+  border-radius: 50% !important;
+}
+
+
 .btn{
   border-radius: 0px;
 }
@@ -394,11 +413,6 @@ input{
   border: 1px solid #2f6596;
 }
 
-.jumbotron{
-  border-radius: 0 !important;
-}
-
-
 .navbar {
     margin-bottom: 0;
     background-color: #12A6E9;
@@ -409,3 +423,4 @@ input{
     letter-spacing: 4px;
     border-radius: 0;
 }
+
