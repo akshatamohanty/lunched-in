@@ -232,9 +232,9 @@ lunchedin.addUser = function(user){
         user.veg = false; 
         user.halal = false;
         if(user.gender == 0)
-          user.picture = 'http://res.cloudinary.com/hzif3kbk7/image/upload/c_scale,h_200,w_200/v1463920100/misc/head-659651_960_720.png';
+          user.picture = 'http://res.cloudinary.com/hzif3kbk7/image/upload/c_scale,h_200,w_200/v1464755704/misc/Businessmen.svg';
         else if(user.gender == 1)
-          user.picture = 'http://res.cloudinary.com/hzif3kbk7/image/upload/c_scale,h_200,w_200/v1463920003/misc/lady-31217_960_720.png';
+          user.picture = 'http://res.cloudinary.com/hzif3kbk7/image/upload/c_scale,h_200,w_200/v1464755705/misc/Businesswoman.svg';
         else
           user.picture = 'http://placehold.it/200x200';
 

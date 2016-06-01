@@ -122,7 +122,7 @@
                             </div>           
                             <div class='panel-body card-body zero-padding'>                        
                               <img src='assets/images/cuisines/{{cuisine.toLowerCase()}}.jpg' class='img-responsive cuisine-photo' style='height:150px; width: inherit;'/>
-                              <i style='position: absolute; top:40%; left: 40%; color: #00FF00' class='fa fa-check-circle-o fa-4x'
+                              <i style='position: absolute; top:40%; left: 40%; color: #6ac403' class='fa fa-check-circle-o fa-4x'
                               ng-show='exists(cuisine, active_user.cuisine)'/>
                             </div>
 
@@ -218,7 +218,7 @@
 
 
       <div class='row text-center'>
-          <button class='btn btn-success' style='margin: 20px' ng-click="updateUser(active_user)">Save
+          <button class='btn btn-success' style='margin: 20px; background-color: #4b4b4b; border:none;' ng-click="updateUser(active_user)">Save
           <i id='spinner' class="fa fa-refresh fa-spin fa-fw" aria-hidden="true" style='display:none;'></i>
           </button>
       </div>
