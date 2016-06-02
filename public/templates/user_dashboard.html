@@ -169,10 +169,10 @@
                   <div class='card panel panel-default' style='min-height: 400px;'>
                     <div class='panel-body card-body' style='padding: 20px;'>
                       <button class='btn btn-info user-btn' ng-model='user' ng-click='addToKnown(user._id)'>
-                        <i ng-class='isKnown(user._id) ? "fa fa-star" : "fa fa-star-o"'/> 
+                        <span ng-class='isKnown(user._id) ? "icon-FavFill selected" : "icon-FavFill"'/> 
                       </button>
                       <button class='btn btn-info pull-right user-btn' ng-model='user' ng-click='addToBlocked(user._id)'>
-                        <i ng-class='isBlocked(user._id) ? "fa fa-circle" : "fa fa-circle-o"'/> 
+                        <span ng-class='isBlocked(user._id) ? "icon-CancelFill selected" : "icon-CancelFill"'/> 
                       </button>
                       <img ng-src="{{user.picture}}" class='img-responsive user-image'> </img>
                     

@@ -1,0 +1,90 @@
+@font-face {
+    font-family: 'icomoon';
+    src:    url('./fonts/icomoon.eot?1yd0ne');
+    src:    url('./fonts/icomoon.eot?1yd0ne#iefix') format('embedded-opentype'),
+        url('./fonts/icomoon.ttf?1yd0ne') format('truetype'),
+        url('./fonts/icomoon.woff?1yd0ne') format('woff'),
+        url('./fonts/icomoon.svg?1yd0ne#icomoon') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'icomoon' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-Cancel .path1:before {
+    content: "\e900";
+    color: rgb(49, 78, 85);
+}
+.icon-Cancel .path2:before {
+    content: "\e901";
+    margin-left: -1em;
+    color: rgb(115, 201, 201);
+}
+.icon-Cancel .path3:before {
+    content: "\e902";
+    margin-left: -1em;
+    color: rgb(49, 78, 85);
+}
+.icon-Cancel .path4:before {
+    content: "\e903";
+    margin-left: -1em;
+    color: rgb(49, 78, 85);
+}
+.icon-Cancel .path5:before {
+    content: "\e904";
+    margin-left: -1em;
+    color: rgb(49, 78, 85);
+}
+.icon-Cancel .path6:before {
+    content: "\e905";
+    margin-left: -1em;
+    color: rgb(49, 78, 85);
+}
+.icon-CancelFill:before {
+    content: "\e906";
+}
+.icon-Fav .path1:before {
+    content: "\e907";
+    color: rgb(49, 78, 85);
+}
+.icon-Fav .path2:before {
+    content: "\e908";
+    margin-left: -1em;
+    color: rgb(115, 201, 201);
+}
+.icon-Fav .path3:before {
+    content: "\e909";
+    margin-left: -1em;
+    color: rgb(49, 78, 85);
+}
+.icon-Fav .path4:before {
+    content: "\e90a";
+    margin-left: -1em;
+    color: rgb(49, 78, 85);
+}
+.icon-Fav .path5:before {
+    content: "\e90b";
+    margin-left: -1em;
+    color: rgb(228, 173, 64);
+}
+.icon-Fav .path6:before {
+    content: "\e90c";
+    margin-left: -1em;
+    color: rgb(49, 78, 85);
+}
+.icon-FavFill:before {
+    content: "\e90d";
+}
