@@ -183,7 +183,7 @@ lunchedin.timeToMail_normal = 1200000;
 lunchedin.checkHoliday = function(date){
 
 
-/*  var today = date; 
+  var today = date; 
   // check for saturday - sunday
   if(date == null)
     today = new Date();
@@ -204,7 +204,7 @@ lunchedin.checkHoliday = function(date){
 
       if( holidays[holiday].date == today.getDate() && holidays[holiday].month == today.getMonth() )
         return true;
-  }*/
+  }
 
   return false;
 }
