@@ -1,0 +1,55 @@
+  <div class='container-fluid user-dashboard-body'>
+
+    <div class='row'>
+
+      <!---borders-->
+      <div class='col-sm-1 col-xs-1'></div>
+      
+
+      <!---mainsection-->
+      <div class='col-sm-10 col-xs-10 dashboard-content'>
+      	<div class='row'>
+            <img class='logo' src='../assets/images/logo.png'/>
+        </div>
+
+        <div class='jumbotron simple-card' id='dashboard-header'>
+            <div class='row text-center text-white'>
+              <h3>LunchedIn Dashboard </h3>
+            </div>
+        </div>
+        
+
+        <a href='/api/toggleMails' target='_blank'>Toggle Email</a>
+        <a href='/api/toggleSpeedRun' target='_blank'>Speed Run</a>
+        <a href='/api/firstCall' target='_blank'>Start Algorithm</a>
+
+        <div class='row'>
+			<md-tabs  md-dynamic-height md-border-bottom md-center-tabs md-stretch-tabs>
+			    <md-tab label="Users">
+					<md-content class="md-padding">
+					 	<ng-include src="'templates/lunchMates_admin.html'"> </ng-include> 
+					</md-content>
+				</md-tab>
+
+			    <md-tab label="Matches">
+			    	<md-content class="md-padding">
+						<ng-include src="'templates/lunches_admin.html'"> </ng-include> 
+					</md-content>
+				</md-tab>
+
+			    <md-tab label="Restaurants">
+					<md-content class="md-padding">
+					 	<ng-include src="'templates/settings_admin.html'"> </ng-include> 
+					</md-content>
+				</md-tab>
+
+			</md-tabs>
+		</div>
+	  </div>
+      
+      <!--border-->
+      <div class='col-sm-1 col-xs-1'></div>
+
+    </div><!-- row end-->
+  
+ </div><!--container end-->

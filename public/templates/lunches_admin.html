@@ -1,0 +1,16 @@
+<div class='row'>
+  <div class='col-sm-1'>Run Number</div>
+  <div class='col-sm-2'>Date</div>
+  <div class='col-sm-3'>Participants</div>
+  <div class='col-sm-3'>Drops</div>
+  <div class='col-sm-3'>Location</div>
+</div>
+<div ng-repeat="match in matches">
+  <div class='row text-center'>
+    <div class='col-sm-1'>{{ match.run }}</div>
+    <div class='col-sm-2'>{{ match.date }}</div>
+    <div class='col-sm-3'><ul><li ng-repeat=" participant in match.participants">{{ participant }}</li></ul></div>
+    <div class='col-sm-3'><ul><li ng-repeat=" participant in match.dropouts">{{ participant }}</li></ul></div>
+    <div class='col-sm-3'>{{ match.location.name }}</li></ul></div>
+  </div>
+</div>

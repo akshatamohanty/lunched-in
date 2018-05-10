@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<title> LunchedIn </title>
+<head>
+    <!--Angular Material StyleSheets -->
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.11.2/angular-material.min.css">
+
+    <!--App StyleSheets and Fonts-->
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,100,400' rel='stylesheet' type='text/css'>
+
+    <meta charset="utf-8">
+
+    <base href="/">
+    <!--Bootstrap -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome-animation/0.0.9/font-awesome-animation.css">
+
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+
+
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/general.css">
+
+</head>
+
+
+<body ng-app="lunchedIn" ng-controller="MainCtrl" data-spy="scroll" data-target=".navbar" data-offset="0">
+       
+    <!-- Shifted from ng-show / ng-hide approach to reduce number of watchers for better performance and digest cycle -->
+    <!-- use ng-include directly without a div or you get a multiple directives error -->
+    <div ng-switch="loggedInUser != null">
+      
+      <div ng-switch-when="false">
+          <ng-include src="'templates/landing.html'"> </ng-include> 
+      </div>
+      
+      <div ng-switch-when="true">
+        <div ng-switch="loggedInUser.adminStatus == true">
+          <div ng-switch-when="false" ng-controller="user">
+            <ng-include src="'templates/user_dashboard.html'"> </ng-include> 
+          </div>
+          <div ng-switch-when="true" ng-controller="admin">
+            <ng-include src="'templates/admin_dashboard.html'"> </ng-include> 
+          </div>
+      </div>
+
+    </div>
+
+</body>
+    
+    <script src="assets/js/compiled.js"></script>
+
+
+    <script src='assets/js/jquery.ui.widget.js' type='text/javascript'></script>
+    <script src='assets/js/jquery.iframe-transport.js' type='text/javascript'></script>
+    <script src='assets/js/jquery.fileupload.js' type='text/javascript'></script>
+    <script src='assets/js/jquery.cloudinary.js' type='text/javascript'></script>
+
+    <!--Angular App File -->
+    <script src="angularApp.js"></script>
+
+
+</html>

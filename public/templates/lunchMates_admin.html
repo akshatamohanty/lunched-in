@@ -1,0 +1,37 @@
+<div class='row'>
+  <md-input-container class='col-sm-3'>
+    <label>Name</label>
+    <input ng-model="newuser.name">
+  </md-input-container>
+  <md-input-container class='col-sm-3'> 
+    <label>Email</label>
+    <input ng-model="newuser.email">
+  </md-input-container>
+  <md-input-container class='col-sm-3'> 
+    <label>Gender</label>
+    <input ng-model="newuser.gender">
+  </md-input-container>
+  <button class='btn btn-primary' ng-click='addUser()'>Invite User</button>
+</div>
+
+
+<div class='row' style="border-bottom: 1px solid black;">
+  <div class='col-sm-3'>Name</div>
+  <div class='col-sm-4'>Email</div>
+  <div class='col-sm-1'>Known Count</div>
+  <div class='col-sm-1'>Blocked Count</div>
+  <div class='col-sm-2'>Available</div>
+  <div class='col-sm-1'>Number of Cuisines</div>
+</div>
+<div ng-repeat="user in users">
+  <div class='row' style="border-bottom: 1px solid black;border-top: 1px solid black; ">{{ user._id }}</div>
+  <div class='row text-left'>
+    <div class='col-sm-3'>{{ user.name }}</div>
+    <div class='col-sm-4'>{{ user.email }}</div>
+    <div class='col-sm-1'>{{ user.known.length }}</div>
+    <div class='col-sm-1'>{{ user.blocked.length }}</div>
+    <div class='col-sm-1'>{{ user.dropCount }}</div>
+    <div class='col-sm-1'>{{ user.lunchCount }}</div>
+    <span>Cuisine: <ul><li ng-repeat=" cuisine in user.cuisine">{{ cuisine }}</li></ul></span>
+  </div>
+</div>
